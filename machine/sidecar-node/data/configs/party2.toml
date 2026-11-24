@@ -1,0 +1,31 @@
+# Mesh config of node 2 in the development deployment. Ports are the
+# harness's: party j listens on 10200 + j, on loopback only;
+# `--mesh-base-port` moves all three. TLS paths
+# are relative to this file and name scripts/gen-dev-certs.sh's output in
+# machine/data/keys; a deployment pins its nodes' own certificates instead.
+my_id = 2
+bind_addr = "127.0.0.1:10202"
+connect_timeout = "30s"
+timeout = "10m"
+
+# Peers are named by IP, not localhost, which may resolve to ::1 while the
+# listener binds IPv4; the dev certificates carry both names.
+[[parties]]
+id = 0
+dns_name = "127.0.0.1:10200"
+
+[[parties]]
+id = 1
+dns_name = "127.0.0.1:10201"
+
+[[parties]]
+id = 2
+dns_name = "127.0.0.1:10202"
+
+[tls]
+key = "../../../data/keys/mesh-key2.der"
+certs = [
+    "../../../data/keys/mesh-cert0.der",
+    "../../../data/keys/mesh-cert1.der",
+    "../../../data/keys/mesh-cert2.der",
+]

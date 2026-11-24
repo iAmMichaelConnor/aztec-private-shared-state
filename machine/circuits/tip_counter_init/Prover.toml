@@ -1,0 +1,9 @@
+# Development values for scripts/check-noir.sh machine: the counter starts at
+# 5 under blinding 9 at slot 0x7c01 in namespace 0xc0ffee.
+# The nodes fill these from the manifest (PUBLIC $namespace, PUBLIC $vk_hash,
+# PUBLIC ["$state_keys.writes[0]"], PUBLIC "start", SAMPLE 1).
+namespace = "0xc0ffee"
+vk_hash = "0x5a5a"
+out_slots = ["0x7c01"]
+start = "5"
+r_new = "9"

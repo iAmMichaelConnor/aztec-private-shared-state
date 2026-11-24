@@ -1,0 +1,41 @@
+# Expected outputs of every amm-tip case, checked by
+# scripts/check-noir.sh examples/amm-tip --outputs examples/amm-tip/circuits/outputs.txt
+# (the format is in check-noir.sh's header).
+#
+# amm_init_tip's Prover.toml has old_c = 0, and its new_c (the first pool
+# commitment, POOL) is the old_c of every swap case on the live pool. Each
+# swap case outputs [ok, partial_note, code, amount_out], the trader's
+# partial note echoed for apply's completion; a rejected case re-commits the
+# state unchanged (new_c = old_c), the trade makes a new commitment. drain
+# and bad-reserve start from pools of their own. amm_swap_tip_next, the
+# upgraded swap, trades its Prover case exactly as amm_swap_tip does and
+# refuses its small case (amount_in 50, below MIN_TRADE) with code 10.
+#
+# amm_swap_tip_shared's outputs are pss_core Private, so its rows check
+# them by value: every case reads POOL (0x216c...) and writes under the
+# fresh blinding 444 whatever the outcome, the trade the non-secret-shared
+# trade's new commitment (0x0390...), every failure the pool kept
+# (0x1c13...), never POOL; its note hash completes the trader's partial
+# note with [code, amount_out, request_id] at OUTCOME_SLOT 1 (the trade's
+# [0, 33450, ...]), and amount_out is 0 on every failure. The mismatch has
+# the trade's request id and attempt (the same C), with code 9 in its
+# note and ciphertext.
+state old_c new_c
+
+# circuit                            prover               from to     outputs
+amm_init_tip                         Prover               0x00 POOL
+amm_swap_tip,amm_swap_tip_next      Prover               POOL traded ok=0x01 code=0x00 amount_out=0x82aa partial_note=0x082534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a
+amm_swap_tip                         Prover-zero          POOL =      ok=0x00 code=0x01 amount_out=0x00 partial_note=0x082534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a
+amm_swap_tip                         Prover-oversize      POOL =      ok=0x00 code=0x02 amount_out=0x00 partial_note=0x082534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a
+amm_swap_tip                         Prover-direction2    POOL =      ok=0x00 code=0x03 amount_out=0x00 partial_note=0x082534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a
+amm_swap_tip                         Prover-direction-neg POOL =      ok=0x00 code=0x03 amount_out=0x00 partial_note=0x082534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a
+amm_swap_tip                         Prover-overflow      POOL =      ok=0x00 code=0x04 amount_out=0x00 partial_note=0x082534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a
+amm_swap_tip                         Prover-dust          POOL =      ok=0x00 code=0x05 amount_out=0x00 partial_note=0x082534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a
+amm_swap_tip                         Prover-drain         -    =      ok=0x00 code=0x06 amount_out=0x00 partial_note=0x082534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a
+amm_swap_tip                         Prover-bad-reserve   -    =      ok=0x00 code=0x07 amount_out=0x00 partial_note=0x082534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a
+amm_swap_tip                         Prover-min-out       POOL =      ok=0x00 code=0x08 amount_out=0x00 partial_note=0x082534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a
+amm_swap_tip_next                    Prover-small         POOL =      ok=0x00 code=0x0a amount_out=0x00 partial_note=0x082534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a
+amm_swap_tip_shared                  Prover               -    -      old_commitments=[0x216c4005a3578abf5f829fbf121dc857749f82d555c519c24b4984c7c7b7a399] new_commitments=[0x0390fb7ffe63807afb170e456692f09dd62910b50ae15300baaf6f3be568eb76] note_hashes=[0x167d204d5bde558149b1a334b15dab5becd79dd1e82d18abbad539101bdc6a66]
+amm_swap_tip_shared                  Prover-mismatch      -    -      old_commitments=[0x216c4005a3578abf5f829fbf121dc857749f82d555c519c24b4984c7c7b7a399] new_commitments=[0x1c135d3a25bdee025e2c3efafdf89f6d56b89873ced4aea53ea521f14d4b3141] note_hashes=[0x0cbca2b9ccbed8ebc7dfb0cd998c9bf82d8e53b8bd75765110c4421aef1b1a4f]
+amm_swap_tip_shared                  Prover-min-out       -    -      old_commitments=[0x216c4005a3578abf5f829fbf121dc857749f82d555c519c24b4984c7c7b7a399] new_commitments=[0x1c135d3a25bdee025e2c3efafdf89f6d56b89873ced4aea53ea521f14d4b3141] note_hashes=[0x0818d1095613fdebd963813b389f4cc57bdd8df0e65113763bed4b57e625a80b]
+amm_swap_tip_shared                  Prover-zero          -    -      old_commitments=[0x216c4005a3578abf5f829fbf121dc857749f82d555c519c24b4984c7c7b7a399] new_commitments=[0x1c135d3a25bdee025e2c3efafdf89f6d56b89873ced4aea53ea521f14d4b3141] note_hashes=[0x2ecc872a2c7672a15e1edfe8e3fed13a892cdc6a4f4fd3e25df76ccf3c419b82]

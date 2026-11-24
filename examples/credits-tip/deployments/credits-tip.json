@@ -1,0 +1,14 @@
+{
+  "descriptor": 1,
+  "name": "credits-tip",
+  "contract": "credits_tip",
+  "stale_blocks": 50,
+  "packages": [
+    {"name": "credits_init", "circuit": "credits_init", "state_keys": {"reads": [], "writes": ["ledger"]}},
+    {"name": "pay", "circuit": "pay", "state_keys": {"reads": ["ledger"], "writes": ["ledger"]}},
+    {"name": "claim", "circuit": "claim", "state_keys": {"reads": ["ledger"], "writes": ["ledger"]}},
+    {"name": "view", "circuit": "view", "state_keys": {"reads": ["ledger"], "writes": ["ledger"]}},
+    {"name": "move", "circuit": "move", "state_keys": {"reads": ["ledger"], "writes": ["ledger"]}}
+  ],
+  "init": {"package": "credits_init", "inputs": []}
+}

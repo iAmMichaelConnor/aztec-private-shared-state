@@ -1,0 +1,21 @@
+# the add's C, but shares that do not open to it (another blinding): code 1,
+# the total 0 kept under r_new
+namespace = "0xc0ffee"
+# a stand-in for the circuit's vk hash, which process_result checks
+vk_hash = "0x5a5a"
+in_slots = ["0xa003"]
+out_slots = ["0xa003"]
+# C, the commitment the queued request carries (PUBLIC $inputs_hash):
+# poseidon2([amount, partial_note, outcome_key, outcome_tag, blinding])
+inputs_hash = "0x4f493d9b0c16ddbc8793300169f4b6ab5bb633e71368ceafc32111d90dadc92"
+# shared: the amount and the reserved values; partial_note is
+# partial_commitment(owner 0xa11ce, rho 0x5eed), the requester's partial note
+amount = "5"
+partial_note = "0x82534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a"
+outcome_key = "0x6b6b"
+outcome_tag = "0x7a7a"
+blinding = "0xb1b2"
+total = ["0"]
+r_old = "333"
+r_new = "444"
+nsk_app = "777"

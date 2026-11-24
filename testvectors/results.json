@@ -1,0 +1,281 @@
+{
+  "cases": [
+    {
+      "commitments": [
+        "0x0000000000000000000000000000000000000000000000000000000000000077",
+        "0x0000000000000000000000000000000000000000000000000000000000000078"
+      ],
+      "name": "two_client_held_outputs",
+      "nodes": [
+        {
+          "message": "0x1112ae4e6476e527aa3b1f1c96810167116e68bfcb36ce2554627f6ee5584ff1",
+          "node": 0,
+          "record_hashes": [
+            "0x1b2d206eee8ca1f92d59897c35ccd74c4a9668a3158be6d360be94fb89a46991",
+            "0x1a3b1585bb3d9491784625e9b7d6ce2743cf7e1530afea489029fdfd5edf9142"
+          ],
+          "sealed_hash": "0x1196403ed06c8c233e8bbc38952777e2e8258f402e887ed948a3397083f2a1ca",
+          "sig_pubkey": {
+            "x": "0x2b681809013b22f0d2db3b443103b7fffdd7fa834a008595320ac526ab30de44",
+            "y": "0x28de1717d62f6f9ebd274bd7e1dd72ad225657277893e174d4f437a53aeab182"
+          },
+          "signature": {
+            "e": [
+              "0x000000000000000000000000000000007ecef6081dafed342f525a1653a63ce2",
+              "0x000000000000000000000000000000000e645c9fac4c6d0cd087f6270392248a"
+            ],
+            "s": [
+              "0x0000000000000000000000000000000095aa6982f9133d0de0b7c220176d5556",
+              "0x000000000000000000000000000000002bdc8835e8b55d451424b62750babdaa"
+            ]
+          }
+        },
+        {
+          "message": "0x1cf484e83cc7eecda0608d4c993e34321342250835843c0558332910562c9b01",
+          "node": 1,
+          "record_hashes": [
+            "0x1bac23fb8616cda8e334a7f341730b3220c6e9fea47eee470882ff7dd34085e8",
+            "0x2090b2cf6a4f51d366b8310aa5ad2af96a01d8ad794cd2468310b0cb57b2df23"
+          ],
+          "sealed_hash": "0x2ac15ef2a262c8cfb87b2f91d5cd22966562fdabea59444e8807217a74809ec9",
+          "sig_pubkey": {
+            "x": "0x0b53299786c80b86efd037531a7f8c8b21cac11146c56854f315d608030c730b",
+            "y": "0x28c8b5e2974e1676c8a8e182b2f4ed5ae003e2cd3fdbbb333e4cab004d1d2bb4"
+          },
+          "signature": {
+            "e": [
+              "0x00000000000000000000000000000000d622f4a092a5481a1b3b59fa32bb9278",
+              "0x000000000000000000000000000000001885a3b88ffc0916b179aedbc090f9ec"
+            ],
+            "s": [
+              "0x0000000000000000000000000000000068bac608d42ffe447ced3b30f380fb65",
+              "0x00000000000000000000000000000000222214c2f6ded6152c384d249b19c48c"
+            ]
+          }
+        },
+        {
+          "message": "0x133186e47446644b809f92f3b95a75c4230e2aaae09e9a4ff3b0000f130dc3bb",
+          "node": 2,
+          "record_hashes": [
+            "0x2bd5315720d27ac73b53644046ddfd34e000b5099cdf0919904e682694d9eb52",
+            "0x1530a7d148dbbbc951006668bc3b51e4c7531aa63b76876b203d5c26837cef49"
+          ],
+          "sealed_hash": "0x047f9b1f7ea45e251eddc4b3bf4ad7166cdf1f2ed6bd57ff642d3cfe26d723d0",
+          "sig_pubkey": {
+            "x": "0x0510626ed26672208a7c0a9354eb21632b15278602f6e99673bd247bac8e3726",
+            "y": "0x0a6177e34014e1610da411dec54a91340cfadfcb5eb054f9944e655f195935eb"
+          },
+          "signature": {
+            "e": [
+              "0x000000000000000000000000000000001568deb09051aa066d173b40481944c9",
+              "0x000000000000000000000000000000000be2d98a767f9af2e6f50159ec4f41e2"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000acae7e3f091ff06354710ee0094fae7e",
+              "0x000000000000000000000000000000002347c2402f610f0dce57778ffe28f240"
+            ]
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "key": "0xb001",
+          "note_hash": "0x0000000000000000000000000000000000000000000000000000000000000077",
+          "record": "client_b001",
+          "state": "client"
+        },
+        {
+          "key": "0xb002",
+          "note_hash": "0x0000000000000000000000000000000000000000000000000000000000000078",
+          "record": "client_b002",
+          "state": "client"
+        }
+      ],
+      "request_id": "0x000000000000000000000000000000005e1f0c2a9b7d4e3f8a6b1c0d2e4f6a8b"
+    },
+    {
+      "commitments": [
+        "0x0000000000000000000000000000000000000000000000000000000000000077",
+        "0x000000000000000000000000000000000000000000000000000000000000007b"
+      ],
+      "name": "one_client_held_output",
+      "nodes": [
+        {
+          "message": "0x1af1505b6a769193b7ce81bcc5929b88602ecf1ecda8c45283b5d54927947f9e",
+          "node": 0,
+          "record_hashes": [
+            "0x1b2d206eee8ca1f92d59897c35ccd74c4a9668a3158be6d360be94fb89a46991"
+          ],
+          "sealed_hash": "0x0e49d4fd7a0d679fbec3c8aea2956fc1a235d3405c4cbbb024fa7e5525c3ca56",
+          "sig_pubkey": {
+            "x": "0x2b681809013b22f0d2db3b443103b7fffdd7fa834a008595320ac526ab30de44",
+            "y": "0x28de1717d62f6f9ebd274bd7e1dd72ad225657277893e174d4f437a53aeab182"
+          },
+          "signature": {
+            "e": [
+              "0x0000000000000000000000000000000090b6ec12a421321930464c3bb50520a6",
+              "0x0000000000000000000000000000000013e04c20dbadbe2717ec35bed86b5f11"
+            ],
+            "s": [
+              "0x000000000000000000000000000000005dfcd39e9149a6fe47e155371adc422c",
+              "0x000000000000000000000000000000002c85da57b49cab9e0455b3fc3d11e042"
+            ]
+          }
+        },
+        {
+          "message": "0x16733cea58a4fdb7dd773cc051384bd27e7349c69a420e0a6ac9a08a8b835380",
+          "node": 1,
+          "record_hashes": [
+            "0x1bac23fb8616cda8e334a7f341730b3220c6e9fea47eee470882ff7dd34085e8"
+          ],
+          "sealed_hash": "0x06c32666b381055f0fb95548d11c15a272124cdcd103105a56b20e269f4d496f",
+          "sig_pubkey": {
+            "x": "0x0b53299786c80b86efd037531a7f8c8b21cac11146c56854f315d608030c730b",
+            "y": "0x28c8b5e2974e1676c8a8e182b2f4ed5ae003e2cd3fdbbb333e4cab004d1d2bb4"
+          },
+          "signature": {
+            "e": [
+              "0x0000000000000000000000000000000008878ac1cf9d0c89fb40b66641b0916d",
+              "0x000000000000000000000000000000002d4d9aedf3d18e5cc84c9196fd2f3274"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000142b8cd1589cdd7b4fbcbbf0e1d51f22",
+              "0x000000000000000000000000000000002aabc933c1f85cd12f880f652cde741c"
+            ]
+          }
+        },
+        {
+          "message": "0x0cf58f9c01cae6c6eddec36d7926dbf735237ae6cbdbf3ee40f7b8de32b3b2de",
+          "node": 2,
+          "record_hashes": [
+            "0x2bd5315720d27ac73b53644046ddfd34e000b5099cdf0919904e682694d9eb52"
+          ],
+          "sealed_hash": "0x0d8da5394c081af9456852fb5dbf14306283797a6f287ff22d11a91465e45bc7",
+          "sig_pubkey": {
+            "x": "0x0510626ed26672208a7c0a9354eb21632b15278602f6e99673bd247bac8e3726",
+            "y": "0x0a6177e34014e1610da411dec54a91340cfadfcb5eb054f9944e655f195935eb"
+          },
+          "signature": {
+            "e": [
+              "0x0000000000000000000000000000000037e5c82e488f62e379980350840d032d",
+              "0x0000000000000000000000000000000003f4b2fc5580b27d6a6badb5c95520c2"
+            ],
+            "s": [
+              "0x0000000000000000000000000000000064c34a43288a7587a0f08a5d7758d024",
+              "0x0000000000000000000000000000000005598ad370610e3254131adee5796b40"
+            ]
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "key": "0xb001",
+          "note_hash": "0x0000000000000000000000000000000000000000000000000000000000000077",
+          "record": "client_b001",
+          "state": "client"
+        },
+        {
+          "key": "pool_total",
+          "note_hash": "0x000000000000000000000000000000000000000000000000000000000000007b",
+          "record": null,
+          "state": "node"
+        }
+      ],
+      "request_id": "0x000000000000000000000000000000000f1e2d3c4b5a69788796a5b4c3d2e1f0"
+    },
+    {
+      "commitments": [
+        "0x000000000000000000000000000000000000000000000000000000000000007a",
+        "0x000000000000000000000000000000000000000000000000000000000000007b"
+      ],
+      "name": "node_held_outputs",
+      "nodes": [
+        {
+          "message": "0x089c3a8b6029636fd8f3cd3256d22c8f18bc25f4f7fe8d49590cab05ce9ee4d5",
+          "node": 0,
+          "record_hashes": [],
+          "sealed_hash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "sig_pubkey": {
+            "x": "0x2b681809013b22f0d2db3b443103b7fffdd7fa834a008595320ac526ab30de44",
+            "y": "0x28de1717d62f6f9ebd274bd7e1dd72ad225657277893e174d4f437a53aeab182"
+          },
+          "signature": {
+            "e": [
+              "0x00000000000000000000000000000000895edd8ed6cac60399419f948f18ea88",
+              "0x000000000000000000000000000000000a0650e8ffe58d443e05cd2fc235e8af"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000eb061402a705cfdf6d304c80b6ea9555",
+              "0x000000000000000000000000000000000d57f02919539c0163161d739d22cbc3"
+            ]
+          }
+        },
+        {
+          "message": "0x295b7dee525bd9635785bc311a0dc360e499195d018e80034b7db75fe638db7a",
+          "node": 1,
+          "record_hashes": [],
+          "sealed_hash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "sig_pubkey": {
+            "x": "0x0b53299786c80b86efd037531a7f8c8b21cac11146c56854f315d608030c730b",
+            "y": "0x28c8b5e2974e1676c8a8e182b2f4ed5ae003e2cd3fdbbb333e4cab004d1d2bb4"
+          },
+          "signature": {
+            "e": [
+              "0x0000000000000000000000000000000022d3b3fb85160e5c7be2809fc7c5de99",
+              "0x000000000000000000000000000000001b432223585b21b3800be6f804a59379"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000fb686c59101fd3d2a331564d246d8008",
+              "0x000000000000000000000000000000000c7d70aab694e68051e4cdda5074635b"
+            ]
+          }
+        },
+        {
+          "message": "0x23cf8fae909fb4a0b4f13a14d978aa4c410f95b7bc6c7a1436faf42e9249db24",
+          "node": 2,
+          "record_hashes": [],
+          "sealed_hash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "sig_pubkey": {
+            "x": "0x0510626ed26672208a7c0a9354eb21632b15278602f6e99673bd247bac8e3726",
+            "y": "0x0a6177e34014e1610da411dec54a91340cfadfcb5eb054f9944e655f195935eb"
+          },
+          "signature": {
+            "e": [
+              "0x00000000000000000000000000000000ebc3fcd971f772a8356d762c7272604a",
+              "0x00000000000000000000000000000000009d1cbdd0f084e844015d7695f73ac1"
+            ],
+            "s": [
+              "0x0000000000000000000000000000000053b8eacf4a586482dac4c97b8ee7605f",
+              "0x000000000000000000000000000000002bd413a2d8148281222ef8725699f005"
+            ]
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "key": "pool",
+          "note_hash": "0x000000000000000000000000000000000000000000000000000000000000007a",
+          "record": null,
+          "state": "node"
+        },
+        {
+          "key": "pool_total",
+          "note_hash": "0x000000000000000000000000000000000000000000000000000000000000007b",
+          "record": null,
+          "state": "node"
+        }
+      ],
+      "request_id": "0x000000000000000000000000000000007c6b5a4938271605f4e3d2c1b0a99887"
+    }
+  ],
+  "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+  "result_domain": "0x000000000000000000000000000000000000736964656361722e726573756c74",
+  "rules": {
+    "commitments": "the note hashes of the round's outputs in manifest order",
+    "message": "poseidon2([RESULT_DOMAIN, namespace, request_id, commitments..., i, sealed_hash]); RESULT_DOMAIN = ASCII \"sidecar.result\" as a big-endian integer",
+    "record_hashes": "the record_hash of the named case's third i in testvectors/records.json",
+    "request_id": "a note-mode id: 128 bits, one field element",
+    "sealed_hash": "H(sealed_i) = poseidon2(record_hashes), the record hashes of node i's new thirds in manifest order (a one-element list for one third), 0 when the round makes none; node-held outputs and sealed replaced vectors are not signed",
+    "signature": "Schnorr over Grumpkin by node i's sig key (testvectors/keys.json), its nonce derived from the key and the message: StdRng (rand 0.8) seeded with the 32 big-endian bytes of poseidon2([ASCII \"sidecar.result_nonce\", sig.lo, sig.hi, message]), so a node signs one message one way; any valid signature verifies"
+  }
+}

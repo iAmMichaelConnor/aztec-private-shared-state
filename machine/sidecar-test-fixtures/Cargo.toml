@@ -1,0 +1,25 @@
+[package]
+name = "sidecar-test-fixtures"
+version = "0.1.0"
+description = "What the machine's test suites share: scratch directories, the prepared circuits, manifests and CRS, the shared test vectors and node keys, a blocking runner, the example apps' requests, three in-process nodes on any store, and the Postgres test server"
+publish = false
+
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+sidecar-core = { path = "../sidecar-core", features = ["testing"] }
+serde_json.workspace = true
+rand.workspace = true
+# `nodes`: three in-process nodes behind their HTTPS APIs and admin sockets,
+# and the calls a test makes to the three at once.
+sidecar-node = { path = "../sidecar-node", features = ["test-util"], optional = true }
+# `postgres`: the Postgres test server.
+sqlx = { version = "0.8.6", default-features = false, features = ["postgres", "runtime-tokio"], optional = true }
+# `block_on`: a future run to completion from a synchronous test.
+tokio.workspace = true
+
+[features]
+nodes = ["dep:sidecar-node"]
+postgres = ["nodes", "dep:sqlx"]

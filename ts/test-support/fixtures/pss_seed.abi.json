@@ -1,0 +1,101 @@
+{
+ "noir_version": "1.0.0+275d3ab1a5c916c6ea73e8d6b943f685f574500c",
+ "abi": {
+  "parameters": [
+   {
+    "name": "namespace",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "public"
+   },
+   {
+    "name": "owner",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "public"
+   },
+   {
+    "name": "out_slots",
+    "type": {
+     "kind": "array",
+     "length": 1,
+     "type": {
+      "kind": "field"
+     }
+    },
+    "visibility": "public"
+   },
+   {
+    "name": "out0_randomness",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "rand_seed",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   }
+  ],
+  "return_type": {
+   "abi_type": {
+    "kind": "struct",
+    "path": "pss_core::effects::PssEffects",
+    "fields": [
+     {
+      "name": "read_leaves",
+      "type": {
+       "kind": "array",
+       "length": 0,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     {
+      "name": "nullifiers",
+      "type": {
+       "kind": "array",
+       "length": 0,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     {
+      "name": "new_note_hashes",
+      "type": {
+       "kind": "array",
+       "length": 1,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     {
+      "name": "npk_app_hash",
+      "type": {
+       "kind": "field"
+      }
+     },
+     {
+      "name": "app_outputs",
+      "type": {
+       "kind": "array",
+       "length": 0,
+       "type": {
+        "kind": "field"
+       }
+      }
+     }
+    ]
+   },
+   "visibility": "public"
+  }
+ }
+}

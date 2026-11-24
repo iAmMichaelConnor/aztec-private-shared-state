@@ -1,0 +1,14 @@
+# Development values for scripts/check-noir.sh machine: the state
+# tip_counter_init/Prover.toml stores ([5, 9]), plus 3, under blinding 10.
+# The nodes fill these from the manifest (PUBLIC $namespace, PUBLIC $vk_hash,
+# PUBLIC ["$state_keys.reads[0]"], PUBLIC ["$state_keys.writes[0]"], PUBLIC "amount",
+# PUBLIC $user_nonce, LOAD $state_keys.reads[0], SAMPLE 1).
+namespace = "0xc0ffee"
+vk_hash = "0x5a5a"
+in_slots = ["0x7c01"]
+out_slots = ["0x7c01"]
+amount = "3"
+user_nonce = "3"
+value = ["5"]
+r_old = "9"
+r_new = "10"

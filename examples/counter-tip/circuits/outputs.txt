@@ -1,0 +1,20 @@
+# Expected outputs of every counter-tip case, checked by
+# scripts/check-noir.sh examples/counter-tip --outputs examples/counter-tip/circuits/outputs.txt
+# (the format is in check-noir.sh's header).
+#
+# counter_init creates the counter, total 0 under blinding 333: COUNTER,
+# the old commitment of counter_add's Prover and Prover-mismatch cases.
+# counter_add's outputs are pss_core Private, so its rows check them by
+# value: the add writes the total 5 under the fresh blinding 444
+# (0x1451...); the mismatch keeps the total 0 under 444 (0x18cc...), never
+# COUNTER, and has the add's request id (the same C); the overflow starts
+# from a counter of its own at the u64 limit and keeps it under 444. Each
+# note hash completes the requester's partial note with [code, total,
+# request_id] at OUTCOME_SLOT 1: [0, 5, ...], [1, 0, ...], [2, 0, ...].
+state old_c new_c
+
+# circuit     prover            from to       outputs
+counter_init  Prover            0x00 COUNTER  new_c=0x28a935689dbf119b9c0191428ebd4abd29e87b6bbe1519681adc7c2e4e8c3824
+counter_add   Prover            -    -        request_id=0x2a61396a641ef1e00358ba237e6ac1e771f66f8f72c21afa5fc9bd5356edd29e old_commitments=[0x28a935689dbf119b9c0191428ebd4abd29e87b6bbe1519681adc7c2e4e8c3824] new_commitments=[0x145116b85e92d2feb240e7c93095be60f9cb4f8abcc8fb1c11388f7d0acea53d] note_hashes=[0x2f09acc8240f2183ccecfdfc350173cde8de09cadfc0964d4d83fe05f4b4a40b]
+counter_add   Prover-mismatch   -    -        request_id=0x2a61396a641ef1e00358ba237e6ac1e771f66f8f72c21afa5fc9bd5356edd29e old_commitments=[0x28a935689dbf119b9c0191428ebd4abd29e87b6bbe1519681adc7c2e4e8c3824] new_commitments=[0x18ccb5315106a8c3f26a4053b0688af99d79149ad4e68d63e0e0bf14e732e08d] note_hashes=[0x17456ebf0f2ddc8bc1701bf665014617a62efc2243b7f2d7e6246dde46fab3cf]
+counter_add   Prover-overflow   -    -        old_commitments=[0x274952fcdce3af13552f1631c9ee3e79c144b9c90694d66da5e9d93718775364] new_commitments=[0x26f00010d2ea654843332bc649949786e82725156813ba0d796596268c0d48cc] note_hashes=[0x09d7536faf285cf835ce830c19ac09bbb5b7ac5f216d7417a6970c4184e1b42a]

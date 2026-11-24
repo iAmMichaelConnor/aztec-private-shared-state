@@ -1,0 +1,16 @@
+# a pool with an empty x reserve: selling 5 x pays out all of y, rejected
+# with code 6. The preimage differs from the live pool's, so read_leaves
+# names a different note; the circuit only hashes what it is given.
+namespace = "0xc0ffee"
+owner = "0x1234"
+in_slots = ["0xa002"]
+out_slots = ["0xa002"]
+amount_in = "5"
+direction = "0"
+# not a pool any round writes: see the header
+in0_fields = ["0", "1000000"]
+in0_randomness = "333"
+# compute_note_hash_nonce(first_nullifier=8, index=0)
+in0_nonce = "0x17bad57eb7869a9ec5c83647e40b5332e91091d9c5622c32286b2170177bffae"
+out0_randomness = "444"
+nsk_app = "777"

@@ -1,0 +1,30 @@
+# Expected outputs of every credits-tip case, checked by
+#   scripts/check-noir.sh examples/credits-tip --outputs examples/credits-tip/circuits/outputs.txt
+# (the format is in check-noir.sh's header). Written by circuits/gen-fixtures.py,
+# whose sparse tree the circuits' commitments are checked against: every row's
+# old_commitments is the ledger the case loads and new_commitments the ledger it
+# leaves. Every round writes every slot it touches under a fresh blinding, so
+# every new commitment differs from its old one: a round that writes no new
+# value keeps a present leaf's key and balance and enters an absent key with a
+# zero balance, which every round reads as absent (a vacant leaf, no key, when
+# the shares do not open C). Only a round whose slots are not placed (move's
+# Prover-same: one path twice) writes nothing and keeps the commitment.
+# The outputs are pss_core Private: no leaf hash, no code or amount in public.
+state old_c new_c
+
+# circuit     prover             from  to  outputs
+credits_init  Prover             0x00  S0  new_c=0x07e970dbd74fc8a9d2c3ac754fd0a7591c7d6fcc82e76a4bba7984412962de5e
+pay           Prover             -  -  old_commitments=[0x07e970dbd74fc8a9d2c3ac754fd0a7591c7d6fcc82e76a4bba7984412962de5e] new_commitments=[0x2cefbc79aca980ecf79f0f6df6ac3ed19da48b9ffcbf8853f1758ed2238e80ea] outcome_tag=0x7a01
+pay           Prover-top-up      -  -  old_commitments=[0x2cefbc79aca980ecf79f0f6df6ac3ed19da48b9ffcbf8853f1758ed2238e80ea] new_commitments=[0x0413d30e9c508d2f1675eefeb6deafd275ce2141706ec497eb89bcef4e203249] outcome_tag=0x7a02
+pay           Prover-taken       -  -  old_commitments=[0x0413d30e9c508d2f1675eefeb6deafd275ce2141706ec497eb89bcef4e203249] new_commitments=[0x0c080de01b60ab27d256007be95e583b3660b78facab298b8d0faedd2ddb9789] outcome_tag=0x7a03
+pay           Prover-zero        -  -  old_commitments=[0x0413d30e9c508d2f1675eefeb6deafd275ce2141706ec497eb89bcef4e203249] new_commitments=[0x0b80e3de2bea77e21a5eba906276e1b7cb55e61591f0d1e759dd187c185fbfa7] outcome_tag=0x7a04
+pay           Prover-mismatch    -  -  old_commitments=[0x0413d30e9c508d2f1675eefeb6deafd275ce2141706ec497eb89bcef4e203249] new_commitments=[0x213dce4dbeda7c5f8c347201e37ce2ca1607c7462b583b895d4db810483b3d40] outcome_tag=0x7a05
+claim         Prover             -  -  old_commitments=[0x0413d30e9c508d2f1675eefeb6deafd275ce2141706ec497eb89bcef4e203249] new_commitments=[0x02641707595c3e1806bc502271279215d948f5f79eee7e6cd084458954db187f] outcome_tag=0x7a06
+claim         Prover-absent      -  -  old_commitments=[0x0413d30e9c508d2f1675eefeb6deafd275ce2141706ec497eb89bcef4e203249] new_commitments=[0x2917c1a08a9548108a1ceee3bc8147f658275b16d92e4c98bdd5711f0dbf6212] outcome_tag=0x7a07
+claim         Prover-over        -  -  old_commitments=[0x0413d30e9c508d2f1675eefeb6deafd275ce2141706ec497eb89bcef4e203249] new_commitments=[0x0550cefd39514f4674ade1b1346a428dd3b6d504dfbdf5a1f9766c5df108cef0] outcome_tag=0x7a08
+view          Prover             -  -  old_commitments=[0x02641707595c3e1806bc502271279215d948f5f79eee7e6cd084458954db187f] new_commitments=[0x02749a92c280cd32d55f13f196f7834c2d5b4d94736e6d5969529640319308dc] outcome_tag=0x7a09
+view          Prover-absent      -  -  old_commitments=[0x02641707595c3e1806bc502271279215d948f5f79eee7e6cd084458954db187f] new_commitments=[0x1645c7e8ddc05531481e68da8d4d5ba69b034fe460545899817bdbf077bf2f87] outcome_tag=0x7a0a
+move          Prover             -  -  old_commitments=[0x02641707595c3e1806bc502271279215d948f5f79eee7e6cd084458954db187f] new_commitments=[0x2eb7ab7c9ad9cfe8e70d33ea6290ac713a2ab92b73d5c82162fa8bcc6cd17b2d] outcome_tag=0x7a0b
+move          Prover-same        -  -  old_commitments=[0x02641707595c3e1806bc502271279215d948f5f79eee7e6cd084458954db187f] new_commitments=[0x02641707595c3e1806bc502271279215d948f5f79eee7e6cd084458954db187f] outcome_tag=0x7a0c
+move          Prover-absent      -  -  old_commitments=[0x02641707595c3e1806bc502271279215d948f5f79eee7e6cd084458954db187f] new_commitments=[0x06eac0ef33a47eb971110847f0c51b5db2c0dff851dde01f605fab73d8fc8507] outcome_tag=0x7a0d
+pay           Prover-mismatch-absent -  -  old_commitments=[0x0413d30e9c508d2f1675eefeb6deafd275ce2141706ec497eb89bcef4e203249] new_commitments=[0x1ce83919fb46a4badf5230b50e10119687c0918328d80e6642602af03dee2963] outcome_tag=0x7a0e

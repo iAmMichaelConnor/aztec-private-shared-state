@@ -1,0 +1,38 @@
+{
+  "rule": "nsk_app = poseidon2([SIDECAR_NSK_APP, master, namespace]); npk_app = EmbeddedCurveScalar::from_field(nsk_app) * G; npk_app_hash = poseidon2([SIDECAR_NPK_APP, npk_app.x, npk_app.y]); SIDECAR_NSK_APP = 0x736964656361722e6e736b5f617070 (ASCII \"sidecar.nsk_app\"), SIDECAR_NPK_APP = 0x736964656361722e6e706b5f617070 (ASCII \"sidecar.npk_app\")",
+  "vectors": [
+    {
+      "master": "0x00000000000000000000000000000000000000000000000000006d6173746572",
+      "name": "pss_core_kat_register_derivation",
+      "namespace": "0x0000000000000000000000000000000000000000000000000000000000c0ffee",
+      "npk_app": {
+        "x": "0x163ac2ac0b5f336671afe3a09fb630eacafd2d69d227ec8d0ba8b4423be9df2d",
+        "y": "0x01800d451cd74cb4d28e92922657b5bca1bb3b587d7796c8273b16b2b5504fc0"
+      },
+      "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+      "nsk_app": "0x02ae8d3b9b6a6b6e9e5b20349f68cedb428409d2884aa23c0d98bf4d13e04eda"
+    },
+    {
+      "master": "0x0b0e5a1f6c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b",
+      "name": "amm_like_namespace",
+      "namespace": "0x1f2ea9c0d1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f6071829304a5b",
+      "npk_app": {
+        "x": "0x0bfefdfdf8c2040a14147be7b7428ebcc78b7b25d8041dd1a560e5450337b5a0",
+        "y": "0x25cedf3883ab5ee8445f480e71c3c208f9cd42a8843d9a2c0d8191b428d21745"
+      },
+      "npk_app_hash": "0x182ba61dfa7c1cf2d6fcf42a6f9c0ff0828bd75976a14eecc88588bbcd7068e5",
+      "nsk_app": "0x0318ad493e97db73ebb150742ab9f13522a09b8ed990ef944ca3218460c69d71"
+    },
+    {
+      "master": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+      "name": "max_master_zero_namespace",
+      "namespace": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "npk_app": {
+        "x": "0x0e1961a713ad23f90b8c5fadc9bc45237433e36431b8ef78c8903b8f6a2af57a",
+        "y": "0x2d16396c10710954d0d53265340c34c98e86f93442f39d3b8757cac02db76713"
+      },
+      "npk_app_hash": "0x06b653b88200996d20f431f80c62606f55b3e60b72353d5067c026893b661944",
+      "nsk_app": "0x1ac9b8622b27a2faea1ac9f1e7da7c58b07e125565181e0f86247a1e10d1e232"
+    }
+  ]
+}

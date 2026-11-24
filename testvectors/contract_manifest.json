@@ -1,0 +1,406 @@
+{
+  "comment": "The contract manifest of examples/amm-tip's non-secret-shared deployment (vk hashes, class id and slots made up). manifest_hash = poseidon2_hash_bytes(JCS(manifest)), jcs the RFC 8785 serialisation; packages_hash: h = 0, then for each package without alias_of in order h = poseidon2([h, poseidon2_hash_bytes(name), circuits[circuit].vk_hash]).",
+  "jcs": "{\"circuits\":{\"amm_init_tip\":{\"vk_hash\":\"0x00000000000000000000000000000000000000000000000000000000000000a1\"},\"amm_swap_tip\":{\"vk_hash\":\"0x00000000000000000000000000000000000000000000000000000000000000a2\"}},\"contract\":{\"class_id\":\"0x00000000000000000000000000000000000000000000000000000000000c1a55\",\"package_capacity\":2},\"contract_manifest\":1,\"init\":{\"input_slots\":[],\"package\":\"amm_init_tip\"},\"name\":\"amm_tip\",\"node_keys\":\"rotating\",\"packages\":[{\"circuit\":\"amm_init_tip\",\"manifest\":{\"binding\":\"turn\",\"circuit\":\"amm_init_tip\",\"intake\":\"onchain\",\"manifest\":1,\"namespace_param\":\"namespace\",\"outcome\":\"none\",\"outputs\":[{\"STORE\":\"$state_keys.writes[0]\",\"TACEO_store\":\"out0\",\"len\":3,\"note_hash\":\"new_c\"}],\"public_reads\":[],\"state\":{\"$state_keys.writes[0]\":\"node\"},\"state_keys\":{\"reads\":0,\"writes\":1},\"witness\":[{\"from\":{\"PUBLIC\":\"$namespace\"},\"param\":\"namespace\"},{\"from\":{\"PUBLIC\":\"$vk_hash\"},\"param\":\"vk_hash\"},{\"from\":{\"PUBLIC\":[\"$state_keys.writes[0]\"]},\"param\":\"out_slots\"},{\"from\":{\"SAMPLE\":1},\"param\":\"rand_seed\"},{\"from\":{\"SAMPLE\":1},\"param\":\"r_new\"},{\"from\":{\"LOAD\":\"nsk_app\",\"len\":1,\"slice\":[0,1]},\"param\":\"nsk_app\"}]},\"name\":\"amm_init_tip\",\"state_keys\":{\"reads\":[],\"writes\":[\"pool\"]}},{\"circuit\":\"amm_swap_tip\",\"manifest\":{\"binding\":\"turn\",\"circuit\":\"amm_swap_tip\",\"commitment_slot\":{\"$state_keys.reads[0]\":{\"old\":\"old_c\"}},\"intake\":\"onchain\",\"manifest\":1,\"namespace_param\":\"namespace\",\"outputs\":[{\"STORE\":\"$state_keys.writes[0]\",\"TACEO_store\":\"out0\",\"len\":3,\"note_hash\":\"new_c\"}],\"public_reads\":[],\"state\":{\"$state_keys.reads[0]\":\"node\",\"$state_keys.writes[0]\":\"node\"},\"state_keys\":{\"reads\":1,\"writes\":1},\"witness\":[{\"from\":{\"PUBLIC\":\"$namespace\"},\"param\":\"namespace\"},{\"from\":{\"PUBLIC\":\"$vk_hash\"},\"param\":\"vk_hash\"},{\"from\":{\"PUBLIC\":[\"$state_keys.reads[0]\"]},\"param\":\"in_slots\"},{\"from\":{\"PUBLIC\":[\"$state_keys.writes[0]\"]},\"param\":\"out_slots\"},{\"from\":{\"PUBLIC\":\"amount_in\"},\"param\":\"amount_in\"},{\"from\":{\"PUBLIC\":\"direction\"},\"param\":\"direction\"},{\"from\":{\"PUBLIC\":\"min_out\"},\"param\":\"min_out\"},{\"from\":{\"PUBLIC\":\"$partial_note\"},\"param\":\"partial_note\"},{\"from\":{\"PUBLIC\":\"$user_nonce\"},\"param\":\"user_nonce\"},{\"from\":{\"LOAD\":\"$state_keys.reads[0]\",\"len\":3,\"slice\":[0,2]},\"param\":\"pool\"},{\"from\":{\"LOAD\":\"$state_keys.reads[0]\",\"len\":3,\"slice\":[2,3]},\"param\":\"r_old\"},{\"from\":{\"SAMPLE\":1},\"param\":\"r_new\"},{\"from\":{\"LOAD\":\"nsk_app\",\"len\":1,\"slice\":[0,1]},\"param\":\"nsk_app\"}]},\"name\":\"amm_swap_tip\",\"state_keys\":{\"reads\":[\"pool\"],\"writes\":[\"pool\"]}},{\"alias_of\":\"amm_swap_tip\",\"circuit\":\"amm_swap_tip\",\"manifest\":{\"binding\":\"turn\",\"circuit\":\"amm_swap_tip_receipt\",\"commitment_slot\":{\"$state_keys.reads[0]\":{\"old\":\"old_c\"}},\"intake\":\"receipt\",\"manifest\":1,\"namespace_param\":\"namespace\",\"outputs\":[{\"STORE\":\"$state_keys.writes[0]\",\"TACEO_store\":\"out0\",\"len\":3,\"note_hash\":\"new_c\"}],\"public_reads\":[],\"state\":{\"$state_keys.reads[0]\":\"node\",\"$state_keys.writes[0]\":\"node\"},\"state_keys\":{\"reads\":1,\"writes\":1},\"witness\":[{\"from\":{\"PUBLIC\":\"$namespace\"},\"param\":\"namespace\"},{\"from\":{\"PUBLIC\":\"$vk_hash\"},\"param\":\"vk_hash\"},{\"from\":{\"PUBLIC\":[\"$state_keys.reads[0]\"]},\"param\":\"in_slots\"},{\"from\":{\"PUBLIC\":[\"$state_keys.writes[0]\"]},\"param\":\"out_slots\"},{\"from\":{\"PUBLIC\":\"amount_in\"},\"param\":\"amount_in\"},{\"from\":{\"PUBLIC\":\"direction\"},\"param\":\"direction\"},{\"from\":{\"PUBLIC\":\"min_out\"},\"param\":\"min_out\"},{\"from\":{\"PUBLIC\":\"$partial_note\"},\"param\":\"partial_note\"},{\"from\":{\"PUBLIC\":\"$user_nonce\"},\"param\":\"user_nonce\"},{\"from\":{\"LOAD\":\"$state_keys.reads[0]\",\"len\":3,\"slice\":[0,2]},\"param\":\"pool\"},{\"from\":{\"LOAD\":\"$state_keys.reads[0]\",\"len\":3,\"slice\":[2,3]},\"param\":\"r_old\"},{\"from\":{\"SAMPLE\":1},\"param\":\"r_new\"},{\"from\":{\"LOAD\":\"nsk_app\",\"len\":1,\"slice\":[0,1]},\"param\":\"nsk_app\"}]},\"name\":\"amm_swap_tip_receipt\",\"state_keys\":{\"reads\":[\"pool\"],\"writes\":[\"pool\"]}}],\"queue\":{\"slot\":\"0x000000000000000000000000000000000000000000000000000000000000000c\",\"stale_blocks\":50,\"stale_blocks_slot\":\"0x0000000000000000000000000000000000000000000000000000000000000001\"},\"state_keys\":{\"pool\":\"0x0000000000000000000000000000000000000000000000000000000000000010\"},\"storage\":{\"configured\":\"0x000000000000000000000000000000000000000000000000000000000000000b\"},\"upgrades\":\"fixed\"}",
+  "manifest": {
+    "circuits": {
+      "amm_init_tip": {
+        "vk_hash": "0x00000000000000000000000000000000000000000000000000000000000000a1"
+      },
+      "amm_swap_tip": {
+        "vk_hash": "0x00000000000000000000000000000000000000000000000000000000000000a2"
+      }
+    },
+    "contract": {
+      "class_id": "0x00000000000000000000000000000000000000000000000000000000000c1a55",
+      "package_capacity": 2
+    },
+    "contract_manifest": 1,
+    "init": {
+      "input_slots": [],
+      "package": "amm_init_tip"
+    },
+    "name": "amm_tip",
+    "node_keys": "rotating",
+    "packages": [
+      {
+        "circuit": "amm_init_tip",
+        "manifest": {
+          "binding": "turn",
+          "circuit": "amm_init_tip",
+          "intake": "onchain",
+          "manifest": 1,
+          "namespace_param": "namespace",
+          "outcome": "none",
+          "outputs": [
+            {
+              "STORE": "$state_keys.writes[0]",
+              "TACEO_store": "out0",
+              "len": 3,
+              "note_hash": "new_c"
+            }
+          ],
+          "public_reads": [],
+          "state": {
+            "$state_keys.writes[0]": "node"
+          },
+          "state_keys": {
+            "reads": 0,
+            "writes": 1
+          },
+          "witness": [
+            {
+              "from": {
+                "PUBLIC": "$namespace"
+              },
+              "param": "namespace"
+            },
+            {
+              "from": {
+                "PUBLIC": "$vk_hash"
+              },
+              "param": "vk_hash"
+            },
+            {
+              "from": {
+                "PUBLIC": [
+                  "$state_keys.writes[0]"
+                ]
+              },
+              "param": "out_slots"
+            },
+            {
+              "from": {
+                "SAMPLE": 1
+              },
+              "param": "rand_seed"
+            },
+            {
+              "from": {
+                "SAMPLE": 1
+              },
+              "param": "r_new"
+            },
+            {
+              "from": {
+                "LOAD": "nsk_app",
+                "len": 1,
+                "slice": [
+                  0,
+                  1
+                ]
+              },
+              "param": "nsk_app"
+            }
+          ]
+        },
+        "name": "amm_init_tip",
+        "state_keys": {
+          "reads": [],
+          "writes": [
+            "pool"
+          ]
+        }
+      },
+      {
+        "circuit": "amm_swap_tip",
+        "manifest": {
+          "binding": "turn",
+          "circuit": "amm_swap_tip",
+          "commitment_slot": {
+            "$state_keys.reads[0]": {
+              "old": "old_c"
+            }
+          },
+          "intake": "onchain",
+          "manifest": 1,
+          "namespace_param": "namespace",
+          "outputs": [
+            {
+              "STORE": "$state_keys.writes[0]",
+              "TACEO_store": "out0",
+              "len": 3,
+              "note_hash": "new_c"
+            }
+          ],
+          "public_reads": [],
+          "state": {
+            "$state_keys.reads[0]": "node",
+            "$state_keys.writes[0]": "node"
+          },
+          "state_keys": {
+            "reads": 1,
+            "writes": 1
+          },
+          "witness": [
+            {
+              "from": {
+                "PUBLIC": "$namespace"
+              },
+              "param": "namespace"
+            },
+            {
+              "from": {
+                "PUBLIC": "$vk_hash"
+              },
+              "param": "vk_hash"
+            },
+            {
+              "from": {
+                "PUBLIC": [
+                  "$state_keys.reads[0]"
+                ]
+              },
+              "param": "in_slots"
+            },
+            {
+              "from": {
+                "PUBLIC": [
+                  "$state_keys.writes[0]"
+                ]
+              },
+              "param": "out_slots"
+            },
+            {
+              "from": {
+                "PUBLIC": "amount_in"
+              },
+              "param": "amount_in"
+            },
+            {
+              "from": {
+                "PUBLIC": "direction"
+              },
+              "param": "direction"
+            },
+            {
+              "from": {
+                "PUBLIC": "min_out"
+              },
+              "param": "min_out"
+            },
+            {
+              "from": {
+                "PUBLIC": "$partial_note"
+              },
+              "param": "partial_note"
+            },
+            {
+              "from": {
+                "PUBLIC": "$user_nonce"
+              },
+              "param": "user_nonce"
+            },
+            {
+              "from": {
+                "LOAD": "$state_keys.reads[0]",
+                "len": 3,
+                "slice": [
+                  0,
+                  2
+                ]
+              },
+              "param": "pool"
+            },
+            {
+              "from": {
+                "LOAD": "$state_keys.reads[0]",
+                "len": 3,
+                "slice": [
+                  2,
+                  3
+                ]
+              },
+              "param": "r_old"
+            },
+            {
+              "from": {
+                "SAMPLE": 1
+              },
+              "param": "r_new"
+            },
+            {
+              "from": {
+                "LOAD": "nsk_app",
+                "len": 1,
+                "slice": [
+                  0,
+                  1
+                ]
+              },
+              "param": "nsk_app"
+            }
+          ]
+        },
+        "name": "amm_swap_tip",
+        "state_keys": {
+          "reads": [
+            "pool"
+          ],
+          "writes": [
+            "pool"
+          ]
+        }
+      },
+      {
+        "alias_of": "amm_swap_tip",
+        "circuit": "amm_swap_tip",
+        "manifest": {
+          "binding": "turn",
+          "circuit": "amm_swap_tip_receipt",
+          "commitment_slot": {
+            "$state_keys.reads[0]": {
+              "old": "old_c"
+            }
+          },
+          "intake": "receipt",
+          "manifest": 1,
+          "namespace_param": "namespace",
+          "outputs": [
+            {
+              "STORE": "$state_keys.writes[0]",
+              "TACEO_store": "out0",
+              "len": 3,
+              "note_hash": "new_c"
+            }
+          ],
+          "public_reads": [],
+          "state": {
+            "$state_keys.reads[0]": "node",
+            "$state_keys.writes[0]": "node"
+          },
+          "state_keys": {
+            "reads": 1,
+            "writes": 1
+          },
+          "witness": [
+            {
+              "from": {
+                "PUBLIC": "$namespace"
+              },
+              "param": "namespace"
+            },
+            {
+              "from": {
+                "PUBLIC": "$vk_hash"
+              },
+              "param": "vk_hash"
+            },
+            {
+              "from": {
+                "PUBLIC": [
+                  "$state_keys.reads[0]"
+                ]
+              },
+              "param": "in_slots"
+            },
+            {
+              "from": {
+                "PUBLIC": [
+                  "$state_keys.writes[0]"
+                ]
+              },
+              "param": "out_slots"
+            },
+            {
+              "from": {
+                "PUBLIC": "amount_in"
+              },
+              "param": "amount_in"
+            },
+            {
+              "from": {
+                "PUBLIC": "direction"
+              },
+              "param": "direction"
+            },
+            {
+              "from": {
+                "PUBLIC": "min_out"
+              },
+              "param": "min_out"
+            },
+            {
+              "from": {
+                "PUBLIC": "$partial_note"
+              },
+              "param": "partial_note"
+            },
+            {
+              "from": {
+                "PUBLIC": "$user_nonce"
+              },
+              "param": "user_nonce"
+            },
+            {
+              "from": {
+                "LOAD": "$state_keys.reads[0]",
+                "len": 3,
+                "slice": [
+                  0,
+                  2
+                ]
+              },
+              "param": "pool"
+            },
+            {
+              "from": {
+                "LOAD": "$state_keys.reads[0]",
+                "len": 3,
+                "slice": [
+                  2,
+                  3
+                ]
+              },
+              "param": "r_old"
+            },
+            {
+              "from": {
+                "SAMPLE": 1
+              },
+              "param": "r_new"
+            },
+            {
+              "from": {
+                "LOAD": "nsk_app",
+                "len": 1,
+                "slice": [
+                  0,
+                  1
+                ]
+              },
+              "param": "nsk_app"
+            }
+          ]
+        },
+        "name": "amm_swap_tip_receipt",
+        "state_keys": {
+          "reads": [
+            "pool"
+          ],
+          "writes": [
+            "pool"
+          ]
+        }
+      }
+    ],
+    "queue": {
+      "slot": "0x000000000000000000000000000000000000000000000000000000000000000c",
+      "stale_blocks": 50,
+      "stale_blocks_slot": "0x0000000000000000000000000000000000000000000000000000000000000001"
+    },
+    "state_keys": {
+      "pool": "0x0000000000000000000000000000000000000000000000000000000000000010"
+    },
+    "storage": {
+      "configured": "0x000000000000000000000000000000000000000000000000000000000000000b"
+    },
+    "upgrades": "fixed"
+  },
+  "manifest_hash": "0x1ef6e9e4c29a1c4a7ecc93ca9ca767b7c63a333eb9ed3bdaf48dffffa04bb074",
+  "name_hashes": {
+    "amm_init_tip": "0x07daf5e0d19e1533cb9c1abef284c5d232b9abd416302a5d691476f6f8003417",
+    "amm_swap_tip": "0x26336c8688915c2f234d0850720bf3ec29865920f00866499168adc410ecb917",
+    "amm_swap_tip_receipt": "0x27ec83f6b4b9db4248a9c820bae7beca3ad15ad69db438fa1b6640a5267c9fda"
+  },
+  "packages_hash": "0x06805dba77e1c468001804eac66ff3f57ad1e92dee7ad17313871fa0802fb8bb"
+}

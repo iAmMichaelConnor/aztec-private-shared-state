@@ -1,0 +1,83 @@
+aztec-private-shared-state
+Copyright 2026 Michael Connor
+
+Licensed under the Apache License, Version 2.0 (LICENSE). This repository
+contains, or is derived from, the third-party work listed below, each under
+its own licence. docs/PROVENANCE.md records where each copied tree came from
+and what was changed.
+
+--------------------------------------------------------------------------------
+gigadoram-rs (TACEO GmbH), MIT OR Apache-2.0
+  machine/sidecar-oblivious/vendor/{primitives,circuits,data-structures,doram}
+
+  Vendored and modified from https://github.com/TaceoLabs/gigadoram-rs at
+  commit 09bea241410bb554b143957bd7b34b30626d7be2. Copyright (c) 2026 TACEO
+  GmbH. The vendored crates, with their changes, stay under the upstream's
+  dual licence, MIT OR Apache-2.0, as their Cargo.toml files say. The
+  licence texts (LICENSE-APACHE, LICENSE-MIT) and the list of changes
+  (PROVENANCE.md) are kept beside the crates in
+  machine/sidecar-oblivious/vendor/.
+
+--------------------------------------------------------------------------------
+Monty Hall example application (TaceoLabs), MIT
+  examples/monty-hall/
+  noir/pss_utils/ (ae.nr, dh.nr; authors = ["TACEO"])
+  noir/pss_core/src/prng.nr
+
+  Derived from https://github.com/TaceoLabs/monty-hall-aztec at commit
+  d33340438db7b5e1361d3dfc154582bd1a1d381f: the game logic
+  (examples/monty-hall/circuits/monty_hall/src/game_state.nr), the round
+  circuits and the contract's game flow (rewritten here on noir/pss_core and
+  noir/pss_contract), the PRNG (noir/pss_core/src/prng.nr), and the Noir
+  utilities pss_utils keeps (authenticated encryption, Diffie-Hellman).
+  examples/monty-hall/LICENSE carries its licence:
+
+    MIT License
+
+    Copyright (c) 2025 TaceoLabs
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to permit
+    persons to whom the Software is furnished to do so, subject to the
+    following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+    NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+    DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+    USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+Aztec reference token contract (Aztec), Apache-2.0
+  examples/token/contract/token/
+
+  Copied from https://github.com/aztec-labs-eng/aztec-node at v6.0.0 (commit
+  d2e67c1d938f06a6476dd7d4bd01e73771923dd1),
+  noir-projects/noir-contracts/contracts/app/token_contract. Changed: a
+  header comment added to src/main.nr; its `mod test;` line removed (the
+  test module is not copied); Nargo.toml rewritten (package name, the
+  aztec-nr paths into deps/, no test-contract dependency). Copyright 2023
+  Spilsbury Holdings Ltd, licensed under the Apache License, Version 2.0.
+
+--------------------------------------------------------------------------------
+Dependencies that are not part of this repository
+
+  co-snarks (TACEO GmbH; the fork iAmMichaelConnor/co-snarks at the rev in
+  machine/Cargo.lock), MIT OR Apache-2.0: a cargo git dependency of machine/,
+  fetched by cargo, not vendored. The machine uses none of its GPL-3.0
+  crates (co-circom, circom-mpc-compiler).
+
+  aztec-nr and the protocol types (aztec-labs-eng/aztec-node and
+  AztecProtocol/aztec-packages), total-noir (iAmMichaelConnor/total-noir:
+  its `total` library and total-lint), noir-lang/schnorr and noir-lang/poseidon,
+  the npm packages in package-lock.json and the crates in machine/Cargo.lock
+  are fetched by scripts/install-toolchain.sh, nargo, npm and cargo under
+  their own licences.

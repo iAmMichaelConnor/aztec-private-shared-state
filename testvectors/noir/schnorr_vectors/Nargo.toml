@@ -1,0 +1,10 @@
+[package]
+name = "schnorr_vectors"
+type = "bin"
+# exact: the round circuits' Noir 1.0.0 (toolchain.json noir.version)
+compiler_version = "=1.0.0"
+
+[dependencies]
+schnorr = { tag = "v0.4.0", git = "https://github.com/noir-lang/schnorr" }
+pss_core = { path = "../../../noir/pss_core" }
+protocol_types = { path = "../../../deps/foundation-world/noir-projects/fnd/noir-protocol-circuits/crates/types" }

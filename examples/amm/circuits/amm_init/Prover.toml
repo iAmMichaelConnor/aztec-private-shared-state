@@ -1,0 +1,11 @@
+namespace = "0xc0ffee"
+owner = "0x1234"
+in_slots = ["0xa001"]
+out_slots = ["0xa002"]
+# the seed note pss_seed/Prover.toml creates: [rand_seed]
+in0_fields = ["111"]
+in0_randomness = "222"
+# compute_note_hash_nonce(first_nullifier=7, index=0)
+in0_nonce = "0x26873b4daab0cd79798315a61559e32301deda2cbf0fb0eb1494a548981fa0ca"
+out0_randomness = "333"
+nsk_app = "777"

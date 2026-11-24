@@ -1,0 +1,34 @@
+{
+  "example": "credits-tip",
+  "descriptor": "credits-tip",
+  "config": {},
+  "init": {
+    "method": "init_ledger"
+  },
+  "methods": {
+    "pay": {
+      "name": "process_result",
+      "args": [
+        1
+      ]
+    },
+    "claim": {
+      "name": "process_result",
+      "args": [
+        2
+      ]
+    },
+    "view": {
+      "name": "process_result",
+      "args": [
+        3
+      ]
+    },
+    "move": {
+      "name": "process_result",
+      "args": [
+        4
+      ]
+    }
+  }
+}

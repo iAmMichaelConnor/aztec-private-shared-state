@@ -1,0 +1,21 @@
+{
+  "name": "aztec-private-shared-state",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "workspaces": [
+    "ts/pss-client",
+    "ts/test-support",
+    "ts/pss-relayer",
+    "e2e",
+    "examples/counter-tip/client"
+  ],
+  "scripts": {
+    "test": "npm test --workspace ts/pss-client && npm test --workspace ts/pss-relayer",
+    "build": "npm run build --workspaces --if-present && tsc -p machine/sidecar-tip/tests/chain"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

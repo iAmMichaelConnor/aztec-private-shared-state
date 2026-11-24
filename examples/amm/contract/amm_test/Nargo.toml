@@ -1,0 +1,12 @@
+[package]
+name = "amm_test"
+type = "lib"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0; deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+amm = { path = "../amm" }
+pss_contract = { path = "../../../../noir/pss_contract" }
+# the TXE helpers every contract suite shares (dummy vk, proof capsule, tx effects)
+pss_tip_test = { path = "../../../../noir/pss_tip_test" }

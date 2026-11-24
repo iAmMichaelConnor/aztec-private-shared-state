@@ -1,0 +1,10 @@
+# The circuits sidecar-core embeds (machine/circuits/circuits.env, EMBEDDED),
+# pinned by the SHA-256 of their nargo artifact's `bytecode` field, as
+# `jq -j .bytecode <data dir>/circuits/<circuit>.json | sha256sum` prints it.
+# The bytecode is what every node proves and verifies with, and nargo writes
+# it the same from the same source on every machine; the rest of the artifact
+# is not pinned (`file_map` holds absolute paths). build.rs refuses to embed
+# an artifact whose bytecode differs, and scripts/prepare-data.sh says so as
+# it compiles one. A change to an embedded circuit's source updates its line.
+sidecar_register 4732e4dc21eb9c5036715565c2d9ce38b906407129b80005e380bac14fecee72
+sidecar_audit 8aa16a4e5ba668443c16dad80a5378e443968857a1bf6b94513deab987e71ea2

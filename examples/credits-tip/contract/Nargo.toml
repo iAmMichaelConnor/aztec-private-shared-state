@@ -1,0 +1,2 @@
+[workspace]
+members = ["credits_tip", "credits_tip_test"]

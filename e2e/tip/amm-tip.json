@@ -1,0 +1,9 @@
+{
+  "example": "amm-tip",
+  "descriptor": "amm-tip",
+  "fee": "amm-tip",
+  "config": {},
+  "init": {
+    "method": "init_pool"
+  }
+}

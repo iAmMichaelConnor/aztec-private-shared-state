@@ -1,0 +1,6929 @@
+{
+ "id": "monty-hall",
+ "label": "monty-hall",
+ "path": "sidecar",
+ "example": "monty",
+ "title": "A game of Monty Hall whose winning door nobody knows",
+ "summary": "The client-held sidecar example. The network draws a seed nobody knows and derives the winning door from it, as parts. Between rounds the game state exists only as a state record, one sealed third per node, that the player carries. She requests every round; the host lands the seed and the start of the game, and she lands the rest from her own wallet, each private function verifying the round's co-SNARK proof under a vk hash pinned in a note. The contract has no public functions and no public state, so nothing crosses the divide and the relayer is idle.",
+ "basis": "hand-written",
+ "source": {
+  "files": [
+   "examples/monty-hall/README.md",
+   "examples/monty-hall/contract/montyhall/src/main.nr",
+   "examples/monty-hall/contract/montyhall/src/notes.nr",
+   "examples/monty-hall/circuits/monty_hall_init/src/main.nr",
+   "examples/monty-hall/circuits/monty_hall_open_door/src/main.nr",
+   "examples/monty-hall/circuits/monty_hall_finish/src/main.nr",
+   "examples/monty-hall/circuits/monty_hall/src/door.nr",
+   "examples/monty-hall/circuits/monty_hall/src/game_state.nr",
+   "examples/monty-hall/manifests/pss_seed.json",
+   "examples/monty-hall/manifests/monty_hall_init.json",
+   "examples/monty-hall/manifests/monty_hall_open_door.json",
+   "examples/monty-hall/manifests/monty_hall_finish.json",
+   "examples/amm/circuits/pss_seed/src/main.nr",
+   "noir/pss_contract/src/lib.nr",
+   "noir/pss_contract/src/anchor.nr",
+   "noir/pss_core/src/effects.nr",
+   "e2e/scenarios/monty.ts"
+  ]
+ },
+ "phases": [
+  {
+   "id": "setup",
+   "label": "Setup · once"
+  },
+  {
+   "id": "seed",
+   "label": "Seed · pss_seed, init_game"
+  },
+  {
+   "id": "game",
+   "label": "Game · monty_hall_init, start_game"
+  },
+  {
+   "id": "door",
+   "label": "Doors · pick, open, switch"
+  },
+  {
+   "id": "finish",
+   "label": "Finish · monty_hall_finish, finish_game"
+  }
+ ],
+ "interactions": {
+  "register": "The host deploys and registers",
+  "seed": "Seed the game",
+  "start": "Start the game",
+  "choose": "The player picks a door",
+  "open": "The host opens a door",
+  "switch": "The player switches",
+  "finish": "Finish the game"
+ },
+ "entities": [
+  {
+   "id": "orch",
+   "kind": "orchestrator",
+   "label": "Orchestrator",
+   "role": "passes requests on; no scheduler",
+   "meta": "Sees each request and answer; the records and the door reach it only as ciphertext.",
+   "empty": {
+    "code": "runs no circuit; its registry copy is long-lived state",
+    "interaction": "idle"
+   }
+  },
+  {
+   "id": "node",
+   "kind": "node",
+   "label": "Node i",
+   "copies": 3,
+   "role": "no state rows for the game",
+   "meta": "The same rows at every node but its own keys, its parts i and i−1 and its signature.",
+   "empty": {
+    "interaction": "idle"
+   },
+   "circuits": [
+    {
+     "id": "pss_seed",
+     "label": "pss_seed",
+     "summary": "draws a seed nobody knows and outputs its note hash; reads nothing, so it nullifies nothing",
+     "vk_hash": "0x1d7a…5e20",
+     "verified_by": "init_game",
+     "total": true,
+     "total_note": "No check: nothing in it can fail the proof. examples/amm's package, reached through the link circuits/pss_seed.",
+     "params": {
+      "id": "cx-seed-params",
+      "label": "pss_seed",
+      "reader": "public",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "$namespace: 0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "owner",
+        "v": "const 0xafafaf",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "out_slots",
+        "v": "$state_keys.writes[0]: [0xff01]",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "out0_randomness",
+        "v": "SAMPLE 1: the note's blinding, in parts",
+        "reader": "shared",
+        "form": "part",
+        "src": "SAMPLE"
+       },
+       {
+        "k": "rand_seed",
+        "v": "SAMPLE 1: the seed, in parts; nobody knows it",
+        "reader": "shared",
+        "form": "part",
+        "src": "SAMPLE"
+       }
+      ],
+      "open": "(",
+      "close": ")"
+     },
+     "logic": [
+      {
+       "kind": "compute",
+       "text": "`namespace` is in no hash (nothing is consumed); it stays a public input so every circuit shares the canonical prefix"
+      },
+      {
+       "kind": "store",
+       "text": "create_note(0, owner, out_slots[0], [rand_seed], out0_randomness): store [rand_seed, out0_randomness] as out0 (len 2) and compute the seed note hash `0x24c8…6b19`"
+      },
+      {
+       "kind": "compute",
+       "text": "return PssEffects: no read leaves, no nullifiers, the seed note hash, npk_app_hash 0 (no key taken), no app outputs"
+      }
+     ],
+     "outputs": {
+      "id": "cx-seed-out",
+      "label": "PssEffects<0, 1, 0>",
+      "reader": "public",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "read_leaves",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear",
+        "note": "R = 0"
+       },
+       {
+        "k": "nullifiers",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "new_note_hashes",
+        "v": "[seed note 0x24c8…6b19]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "npk_app_hash",
+        "v": "0",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "app_outputs",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "note": "public outputs: 5 public inputs with the three public parameters"
+     }
+    },
+    {
+     "id": "monty_hall_init",
+     "label": "monty_hall_init",
+     "summary": "spends the seed and derives the game from it: the winning door and the game's PRNG, in parts",
+     "vk_hash": "0x2c39…8f14",
+     "verified_by": "start_game",
+     "total": false,
+     "total_note": "Not a total circuit, though it asserts nothing of its own: a wrong record or nonce gives a leaf the contract cannot find.",
+     "params": {
+      "id": "cx-init-params",
+      "label": "monty_hall_init",
+      "reader": "public",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "$namespace: 0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "owner",
+        "v": "const 0xafafaf",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "in_slots",
+        "v": "$state_keys.reads[0]: [0xff01]",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "out_slots",
+        "v": "$state_keys.writes[0]: [0xff02]",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "in0_fields",
+        "v": "$state_keys.reads[0], slice [0, 1], len 2: [seed], from her seed record",
+        "reader": "shared",
+        "form": "part",
+        "src": "LOAD"
+       },
+       {
+        "k": "in0_randomness",
+        "v": "$state_keys.reads[0], slice [1, 2], len 2: the seed's blinding",
+        "reader": "shared",
+        "form": "part",
+        "src": "LOAD"
+       },
+       {
+        "k": "in0_nonce",
+        "v": "in0_nonce: 0x0a6e…41c9",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC",
+        "note": "mined from init_game's effects, index 0"
+       },
+       {
+        "k": "out0_randomness",
+        "v": "SAMPLE 1",
+        "reader": "shared",
+        "form": "part",
+        "src": "SAMPLE"
+       },
+       {
+        "k": "nsk_app",
+        "v": "LOAD nsk_app, slice [0, 1], len 1: node i's parts",
+        "reader": "shared",
+        "form": "part",
+        "src": "LOAD"
+       }
+      ],
+      "open": "(",
+      "close": ")"
+     },
+     "logic": [
+      {
+       "kind": "load",
+       "text": "the machine, before the circuit: node i opens its third of the seed record and loads its parts of the seed, its blinding and nsk_app"
+      },
+      {
+       "kind": "compute",
+       "text": "consume_note: the seed's note hash from (in_slots[0], owner, in0_fields, in0_randomness); its leaf unique_note_hash(namespace, note hash, in0_nonce) `0x05d3…e872`; its nullifier note_nullifier(leaf, nsk_app) `0x1b77…30fa`"
+      },
+      {
+       "kind": "compute",
+       "text": "GameState::init(seed): Prng::init(seed); winning_door = prng.get_field() as u64 % 3 (door 0, on parts: nobody sees it)"
+      },
+      {
+       "kind": "compute",
+       "text": "the state: phase STATE_INITIALIZED (0), the PRNG, winning_door, chosen_door 0, open_door 0"
+      },
+      {
+       "kind": "store",
+       "text": "create_note(0, owner, out_slots[0], the 9 fields, out0_randomness): store them as out0 (len 10) and compute game state 0's note hash `0x0c91…5a4f`"
+      },
+      {
+       "kind": "compute",
+       "text": "npk_app_hash(nsk_app) `0x0f42…a917`"
+      },
+      {
+       "kind": "compute",
+       "text": "no app outputs: anything derived from the game state would reveal it before she chooses"
+      }
+     ],
+     "outputs": {
+      "id": "cx-init-out",
+      "label": "PssEffects<1, 1, 0>",
+      "reader": "public",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "read_leaves",
+        "v": "[seed leaf 0x05d3…e872]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "nullifiers",
+        "v": "[0x1b77…30fa]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "new_note_hashes",
+        "v": "[game state 0: 0x0c91…5a4f]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "npk_app_hash",
+        "v": "0x0f42…a917",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "app_outputs",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "note": "public outputs: 8 public inputs with the four public parameters"
+     }
+    },
+    {
+     "id": "monty_hall_open_door",
+     "label": "monty_hall_open_door",
+     "summary": "opens a door that is neither hers nor the winner and outputs the next game state; a door out of range or a game in the wrong phase makes no proof",
+     "vk_hash": "0x08b5…d26c",
+     "verified_by": "open_door",
+     "total": false,
+     "total_note": "Not a total circuit: its asserts fail the proof, so a bad door or phase makes no answer.",
+     "params": {
+      "id": "cx-open-params",
+      "label": "monty_hall_open_door",
+      "reader": "public",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "$namespace: 0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "owner",
+        "v": "const 0xafafaf",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "in_slots",
+        "v": "$state_keys.reads[0]: [0xff02]",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "out_slots",
+        "v": "$state_keys.writes[0]: [0xff02]",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "door",
+        "v": "door: 1, in parts",
+        "reader": "shared",
+        "form": "part",
+        "src": "INPUT_SHARED"
+       },
+       {
+        "k": "door_randomness",
+        "v": "door_randomness: 0x58e2…90c1, in parts",
+        "reader": "shared",
+        "form": "part",
+        "src": "INPUT_SHARED"
+       },
+       {
+        "k": "in0_fields",
+        "v": "$state_keys.reads[0], slice [0, 9], len 10: game state 0, from her state record",
+        "reader": "shared",
+        "form": "part",
+        "src": "LOAD"
+       },
+       {
+        "k": "in0_randomness",
+        "v": "$state_keys.reads[0], slice [9, 10], len 10",
+        "reader": "shared",
+        "form": "part",
+        "src": "LOAD"
+       },
+       {
+        "k": "in0_nonce",
+        "v": "in0_nonce: 0x11f4…8e3a",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC",
+        "note": "mined from start_game's effects, index 0"
+       },
+       {
+        "k": "out0_randomness",
+        "v": "SAMPLE 1",
+        "reader": "shared",
+        "form": "part",
+        "src": "SAMPLE"
+       },
+       {
+        "k": "nsk_app",
+        "v": "LOAD nsk_app, slice [0, 1], len 1: node i's parts",
+        "reader": "shared",
+        "form": "part",
+        "src": "LOAD"
+       }
+      ],
+      "open": "(",
+      "close": ")"
+     },
+     "logic": [
+      {
+       "kind": "load",
+       "text": "the machine, before the circuit: node i opens its third of game record 0 and its envelopes of door and door_randomness; loads nsk_app"
+      },
+      {
+       "kind": "compute",
+       "text": "consume_note: game state 0's leaf `0x27bd…c018` from the preimage and in0_nonce, its nullifier `0x2f91…0b6a` under nsk_app; a wrong preimage gives a leaf the contract cannot find"
+      },
+      {
+       "kind": "assert",
+       "text": "assert_door: door · (door − 1) · (door − 2) = 0, on parts; then door as u8",
+       "msg": "door out of range"
+      },
+      {
+       "kind": "compute",
+       "text": "GameState::from_field_array(in0_fields)"
+      },
+      {
+       "kind": "assert",
+       "text": "choose_door: the game is in phase STATE_INITIALIZED",
+       "msg": "monty: no game to choose a door in"
+      },
+      {
+       "kind": "assert",
+       "text": "door < 3",
+       "msg": "monty: no such door"
+      },
+      {
+       "kind": "compute",
+       "text": "chosen_door := door; both branches run on parts: if hers wins, one of the other two by a coin flip from a fresh PRNG field; if not, the third door (3 + 3 − winning − door) % 3. Here door 2"
+      },
+      {
+       "kind": "compute",
+       "text": "open_door := the branch for winning_door == door; phase := STATE_OPENED_DOOR"
+      },
+      {
+       "kind": "store",
+       "text": "create_note(0, owner, out_slots[0], the 9 fields, out0_randomness): store them as out0 (len 10) and compute game state 1's note hash `0x1e08…77d3`"
+      },
+      {
+       "kind": "compute",
+       "text": "npk_app_hash(nsk_app) `0x0f42…a917`"
+      },
+      {
+       "kind": "compute",
+       "text": "app_outputs: [opened door 2, door_commitment(door, door_randomness) = P2(0x4d480003, [door, door_randomness]) `0x3a17…e4b8`]"
+      }
+     ],
+     "outputs": {
+      "id": "cx-open-out",
+      "label": "PssEffects<1, 1, 2>",
+      "reader": "public",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "read_leaves",
+        "v": "[game state 0's leaf 0x27bd…c018]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "nullifiers",
+        "v": "[0x2f91…0b6a]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "new_note_hashes",
+        "v": "[game state 1: 0x1e08…77d3]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "npk_app_hash",
+        "v": "0x0f42…a917",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "app_outputs",
+        "v": "[opened door 2, door commitment 0x3a17…e4b8]",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "note": "public outputs: 10 public inputs with the four public parameters"
+     }
+    },
+    {
+     "id": "monty_hall_finish",
+     "label": "monty_hall_finish",
+     "summary": "applies stick or switch and outputs win; nothing replaces the state, so the game is over",
+     "vk_hash": "0x13f0…a4e7",
+     "verified_by": "finish_game",
+     "total": false,
+     "total_note": "Not a total circuit: its phase assert fails the proof, so finish cannot run before a door is opened.",
+     "params": {
+      "id": "cx-fin-params",
+      "label": "monty_hall_finish",
+      "reader": "public",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "$namespace: 0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "owner",
+        "v": "const 0xafafaf",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "in_slots",
+        "v": "$state_keys.reads[0]: [0xff02]",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC"
+       },
+       {
+        "k": "switch",
+        "v": "switch: true (1)",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC",
+        "note": "her committed choice; the contract passes it as the app input"
+       },
+       {
+        "k": "in0_fields",
+        "v": "$state_keys.reads[0], slice [0, 9], len 10: game state 1, from her state record",
+        "reader": "shared",
+        "form": "part",
+        "src": "LOAD"
+       },
+       {
+        "k": "in0_randomness",
+        "v": "$state_keys.reads[0], slice [9, 10], len 10",
+        "reader": "shared",
+        "form": "part",
+        "src": "LOAD"
+       },
+       {
+        "k": "in0_nonce",
+        "v": "in0_nonce: 0x09c7…3b81",
+        "reader": "public",
+        "form": "clear",
+        "src": "PUBLIC",
+        "note": "mined from open_door's effects, index 0"
+       },
+       {
+        "k": "nsk_app",
+        "v": "LOAD nsk_app, slice [0, 1], len 1: node i's parts",
+        "reader": "shared",
+        "form": "part",
+        "src": "LOAD"
+       }
+      ],
+      "open": "(",
+      "close": ")"
+     },
+     "logic": [
+      {
+       "kind": "load",
+       "text": "the machine, before the circuit: node i opens its third of game record 1; loads nsk_app"
+      },
+      {
+       "kind": "compute",
+       "text": "consume_note: game state 1's leaf `0x30a2…d45e`, its nullifier `0x22e6…a90f` under nsk_app"
+      },
+      {
+       "kind": "compute",
+       "text": "GameState::from_field_array(in0_fields)"
+      },
+      {
+       "kind": "assert",
+       "text": "switch: the game is in phase STATE_OPENED_DOOR",
+       "msg": "monty: no door opened yet"
+      },
+      {
+       "kind": "compute",
+       "text": "her door: if switch, 3 − chosen_door − open_door (3 − 1 − 2 = 0), else chosen_door"
+      },
+      {
+       "kind": "compute",
+       "text": "win = her door == winning_door: 1"
+      },
+      {
+       "kind": "compute",
+       "text": "npk_app_hash(nsk_app) `0x0f42…a917`; no note created, nothing stored"
+      }
+     ],
+     "outputs": {
+      "id": "cx-fin-out",
+      "label": "PssEffects<1, 0, 1>",
+      "reader": "public",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "read_leaves",
+        "v": "[game state 1's leaf 0x30a2…d45e]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "nullifiers",
+        "v": "[0x22e6…a90f]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "new_note_hashes",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear",
+        "note": "W = 0: nothing replaces the state"
+       },
+       {
+        "k": "npk_app_hash",
+        "v": "0x0f42…a917",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "app_outputs",
+        "v": "[win 1]",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "note": "public outputs: 8 public inputs with the four public parameters (switch among them)"
+     }
+    }
+   ]
+  },
+  {
+   "id": "relayer",
+   "kind": "relayer",
+   "label": "Relayer",
+   "role": "idle on this path",
+   "idle": "the user lands every result herself on the sidecar path"
+  },
+  {
+   "id": "host",
+   "kind": "user",
+   "label": "Host",
+   "role": "the game's operator account",
+   "meta": "Deploys the contract, registers the circuits, lands the seed and the start of the game.",
+   "empty": {
+    "interaction": "idle"
+   }
+  },
+  {
+   "id": "player",
+   "kind": "user",
+   "label": "Player",
+   "role": "requests every round and lands her own",
+   "meta": "Her requester key signs every round, so every state record is hers.",
+   "empty": {
+    "interaction": "idle"
+   }
+  }
+ ],
+ "contracts": [
+  {
+   "id": "mh",
+   "label": "MontyHall contract",
+   "address": "0x2b6e…c3d1",
+   "groups": {
+    "public": [],
+    "private": [
+     {
+      "id": "notes",
+      "label": "long-lived · note hashes"
+     },
+     {
+      "id": "nullifiers",
+      "label": "long-lived · nullifiers"
+     }
+    ]
+   },
+   "empty": {
+    "public": "none: no public functions and no public state"
+   },
+   "functions": [
+    {
+     "id": "init_game",
+     "kind": "private",
+     "summary": "lands the seed round and records the host's Config; once per deployment",
+     "runs_in": "runs in the host's wallet",
+     "verifies": {
+      "circuit": "pss_seed",
+      "vk_source": "its Config argument's seed_vk_hash",
+      "signatures": "none: the npk_app_hash pin ties the round to the network"
+     },
+     "logic": [
+      {
+       "kind": "assert",
+       "text": "config.player ≠ 0",
+       "msg": "player must not be zero"
+      },
+      {
+       "kind": "compute",
+       "text": "operator = msg_sender (the host)"
+      },
+      {
+       "kind": "compute",
+       "text": "apply → verify_pinned: canonical_public_inputs [this, config.owner, [], [SEED_SLOT 0xff01], [], [], [], [seed_note_hash], 0, []] (apply_seed: R = 0, W = 1) (5 fields)"
+      },
+      {
+       "kind": "assert",
+       "text": "pop the proof capsule (vk, proof) staged under the sender (\"proof capsule missing\"); poseidon2(vk) = config.seed_vk_hash",
+       "msg": "unexpected verification key"
+      },
+      {
+       "kind": "assert",
+       "text": "verify_proof_with_type(vk, proof, the 5 public inputs, vk hash, HONK ZK)"
+      },
+      {
+       "kind": "compute",
+       "text": "R = 0: no network pin (the proof binds npk_app_hash 0), no leaf to check"
+      },
+      {
+       "kind": "push",
+       "text": "push_note_hash: the seed note hash `0x24c8…6b19` (index 0)"
+      },
+      {
+       "kind": "push",
+       "text": "push_once: the once-nullifier P2(0x4d480005, [1]) `0x2e05…71bd`",
+       "id": "ig-once"
+      },
+      {
+       "kind": "push",
+       "text": "config.at(operator).initialize(config): the Config's initialisation nullifier and its note hash `0x163e…9b02` (index 1)"
+      },
+      {
+       "kind": "emit",
+       "text": "deliver the Config to the host on chain, unconstrained"
+      }
+     ]
+    },
+    {
+     "id": "start_game",
+     "kind": "private",
+     "summary": "lands monty_hall_init: spends the seed, pushes game state 0, gives the player her Game note",
+     "runs_in": "runs in the host's wallet",
+     "verifies": {
+      "circuit": "monty_hall_init",
+      "vk_source": "the host's Config note",
+      "signatures": "none: the npk_app_hash pin ties the round to the network"
+     },
+     "logic": [
+      {
+       "kind": "compute",
+       "text": "operator = msg_sender (the host)"
+      },
+      {
+       "kind": "read",
+       "text": "the caller's Config note (get_note: fails if missing, so only the host after init_game)",
+       "id": "sg-config"
+      },
+      {
+       "kind": "compute",
+       "text": "apply → verify_pinned: canonical_public_inputs [this, config.owner, [SEED_SLOT], [GAME_STATE_SLOT 0xff02], [], read_leaves, nullifiers, new_note_hashes, npk_app_hash, []] (8 fields)"
+      },
+      {
+       "kind": "assert",
+       "text": "pop the proof capsule (vk, proof) staged under the sender (\"proof capsule missing\"); poseidon2(vk) = config.init_vk_hash",
+       "msg": "unexpected verification key"
+      },
+      {
+       "kind": "assert",
+       "text": "verify_proof_with_type(vk, proof, the 8 public inputs, vk hash, HONK ZK)"
+      },
+      {
+       "kind": "assert",
+       "text": "R > 0: effects.npk_app_hash = the pinned npk_app_hash",
+       "msg": "unexpected network identity"
+      },
+      {
+       "kind": "assert",
+       "text": "assert_note_exists: the seed's leaf is a settled leaf (a read request the kernel proves)"
+      },
+      {
+       "kind": "push",
+       "text": "push_nullifier_for_note_hash: the seed's nullifier"
+      },
+      {
+       "kind": "push",
+       "text": "push_note_hash: game state 0 `0x0c91…5a4f` (index 0)"
+      },
+      {
+       "kind": "compute",
+       "text": "Game {owner, npk_app_hash, open_vk_hash, finish_vk_hash}, copied from the Config"
+      },
+      {
+       "kind": "push",
+       "text": "create_note at the game slot, owner = config.player: the Game note hash `0x0e6a…f251` (index 1; no initialisation nullifier)"
+      },
+      {
+       "kind": "emit",
+       "text": "deliver the Game to the player on chain, unconstrained (with a separate wallet, through a handshake note)"
+      }
+     ]
+    },
+    {
+     "id": "choose_door",
+     "kind": "private",
+     "summary": "commits her door as a note only she can read; no proof",
+     "runs_in": "runs in the player's wallet",
+     "check": "no proof: `door < 3` and her own Game note",
+     "logic": [
+      {
+       "kind": "assert",
+       "text": "door < 3",
+       "msg": "door out of range"
+      },
+      {
+       "kind": "compute",
+       "text": "player = msg_sender"
+      },
+      {
+       "kind": "read",
+       "text": "her Game note (get_note: fails if missing)"
+      },
+      {
+       "kind": "push",
+       "text": "door_choice.at(player).initialize(DoorNote {door, randomness}): its initialisation nullifier and its note hash, the commitment P2(0x4d480003, [door, randomness]) `0x3a17…e4b8`"
+      },
+      {
+       "kind": "emit",
+       "text": "deliver the DoorNote to herself on chain, unconstrained"
+      }
+     ]
+    },
+    {
+     "id": "open_door",
+     "kind": "private",
+     "summary": "lands monty_hall_open_door: spends game state 0, pushes game state 1, pins the played door to her DoorNote",
+     "runs_in": "runs in the player's wallet",
+     "verifies": {
+      "circuit": "monty_hall_open_door",
+      "vk_source": "her Game note",
+      "signatures": "none: the npk_app_hash pin ties the round to the network"
+     },
+     "logic": [
+      {
+       "kind": "compute",
+       "text": "player = msg_sender"
+      },
+      {
+       "kind": "read",
+       "text": "her Game note: open_vk_hash, owner, npk_app_hash (get_note: fails if missing)",
+       "id": "od-game"
+      },
+      {
+       "kind": "compute",
+       "text": "apply → verify_pinned: canonical_public_inputs [this, game.owner, [GAME_STATE_SLOT], [GAME_STATE_SLOT], [], read_leaves, nullifiers, new_note_hashes, npk_app_hash, app_outputs] (10 fields)"
+      },
+      {
+       "kind": "assert",
+       "text": "pop the proof capsule (vk, proof) staged under the sender (\"proof capsule missing\"); poseidon2(vk) = game.open_vk_hash",
+       "msg": "unexpected verification key"
+      },
+      {
+       "kind": "assert",
+       "text": "verify_proof_with_type(vk, proof, the 10 public inputs, vk hash, HONK ZK)"
+      },
+      {
+       "kind": "assert",
+       "text": "R > 0: effects.npk_app_hash = the pinned npk_app_hash",
+       "msg": "unexpected network identity"
+      },
+      {
+       "kind": "assert",
+       "text": "assert_note_exists: game state 0's leaf is a settled leaf (a read request the kernel proves)"
+      },
+      {
+       "kind": "push",
+       "text": "push_nullifier_for_note_hash: its nullifier `0x2f91…0b6a`"
+      },
+      {
+       "kind": "push",
+       "text": "push_note_hash: game state 1 `0x1e08…77d3` (index 0)"
+      },
+      {
+       "kind": "read",
+       "text": "her DoorNote",
+       "id": "od-door"
+      },
+      {
+       "kind": "assert",
+       "text": "effects.app_outputs[1] = door.commitment()",
+       "msg": "not the committed door"
+      }
+     ]
+    },
+    {
+     "id": "switch_door",
+     "kind": "private",
+     "summary": "commits stick or switch as a note only she can read; no proof",
+     "runs_in": "runs in the player's wallet",
+     "check": "no proof: her own Game note",
+     "logic": [
+      {
+       "kind": "compute",
+       "text": "player = msg_sender"
+      },
+      {
+       "kind": "read",
+       "text": "her Game note (get_note: fails if missing)"
+      },
+      {
+       "kind": "push",
+       "text": "switch_choice.at(player).initialize(SwitchNote {switch}): its initialisation nullifier and its note hash `0x19fb…0d6c` (aztec-nr's default, hidden by the note randomness)"
+      },
+      {
+       "kind": "emit",
+       "text": "deliver the SwitchNote to herself on chain, unconstrained"
+      }
+     ]
+    },
+    {
+     "id": "finish_game",
+     "kind": "private",
+     "summary": "lands monty_hall_finish: spends game state 1 with her committed switch as the app input; nothing replaces it",
+     "runs_in": "runs in the player's wallet",
+     "verifies": {
+      "circuit": "monty_hall_finish",
+      "vk_source": "her Game note",
+      "signatures": "none: the npk_app_hash pin ties the round to the network"
+     },
+     "logic": [
+      {
+       "kind": "compute",
+       "text": "player = msg_sender"
+      },
+      {
+       "kind": "read",
+       "text": "her Game note (get_note: fails if missing)"
+      },
+      {
+       "kind": "read",
+       "text": "her SwitchNote: switch, the app input (never an argument)",
+       "id": "fg-switch"
+      },
+      {
+       "kind": "compute",
+       "text": "apply → verify_pinned: canonical_public_inputs [this, game.owner, [GAME_STATE_SLOT], [], [switch as Field], read_leaves, nullifiers, [], npk_app_hash, app_outputs] (8 fields)"
+      },
+      {
+       "kind": "assert",
+       "text": "pop the proof capsule (vk, proof) staged under the sender (\"proof capsule missing\"); poseidon2(vk) = game.finish_vk_hash",
+       "msg": "unexpected verification key"
+      },
+      {
+       "kind": "assert",
+       "text": "verify_proof_with_type(vk, proof, the 8 public inputs, vk hash, HONK ZK)"
+      },
+      {
+       "kind": "assert",
+       "text": "R > 0: effects.npk_app_hash = the pinned npk_app_hash",
+       "msg": "unexpected network identity"
+      },
+      {
+       "kind": "assert",
+       "text": "assert_note_exists: game state 1's leaf is a settled leaf (a read request the kernel proves)"
+      },
+      {
+       "kind": "push",
+       "text": "push_nullifier_for_note_hash: its nullifier `0x22e6…a90f`"
+      },
+      {
+       "kind": "compute",
+       "text": "win (app_outputs[0]) is checked by the proof in her wallet and otherwise unused"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "initial": [
+  {
+   "op": "create",
+   "at": {
+    "in": "orch",
+    "sec": "long_lived"
+   },
+   "item": {
+    "id": "or-keys",
+    "label": "the nodes' public keys",
+    "reader": "public",
+    "form": "clear",
+    "fields": [
+     {
+      "k": "sig_0, sig_1, sig_2",
+      "v": "0x2a71…e5c0, 0x1f9c…08b3, 0x0d4e…b7a1",
+      "reader": "public",
+      "form": "clear"
+     },
+     {
+      "k": "enc_0, enc_1, enc_2",
+      "v": "0x13b8…46fd, 0x2c05…9e12, 0x07f3…d258",
+      "reader": "public",
+      "form": "clear"
+     }
+    ],
+    "open": "{",
+    "close": "}",
+    "about": "Each node's signing and encryption public keys; the client seals envelopes to the enc keys."
+   }
+  },
+  {
+   "op": "create",
+   "at": {
+    "in": "node",
+    "sec": "long_lived"
+   },
+   "item": {
+    "id": "nd-keys",
+    "label": "node i's own keys",
+    "reader": "operator",
+    "form": "clear",
+    "value": "sig_i, enc_i (secret)",
+    "about": "Node i's signing and encryption secret keys; only its own process reads them.",
+    "per_node": {
+     "0": "sig_0, enc_0",
+     "1": "sig_1, enc_1",
+     "2": "sig_2, enc_2"
+    }
+   }
+  },
+  {
+   "op": "create",
+   "at": {
+    "in": "node",
+    "sec": "long_lived"
+   },
+   "item": {
+    "id": "nd-master",
+    "label": "master secret",
+    "reader": "shared",
+    "form": "part",
+    "value": "parts i, i−1",
+    "about": "The network's master secret as Rep3 parts; the registration circuit derives each namespace's nsk_app from it.",
+    "per_node": {
+     "0": "master: parts 0, 2",
+     "1": "master: parts 1, 0",
+     "2": "master: parts 2, 1"
+    }
+   }
+  },
+  {
+   "op": "create",
+   "at": {
+    "in": "host",
+    "sec": "code"
+   },
+   "item": {
+    "id": "ho-code",
+    "label": "MontyHall contract, its four circuits and manifests",
+    "reader": "public",
+    "form": "clear",
+    "value": "montyhall, pss_seed, monty_hall_init, monty_hall_open_door, monty_hall_finish",
+    "about": "The code the host deploys and registers; public."
+   }
+  },
+  {
+   "op": "create",
+   "at": {
+    "in": "host",
+    "sec": "long_lived"
+   },
+   "item": {
+    "id": "ho-acct",
+    "label": "the host's account",
+    "reader": "user",
+    "form": "clear",
+    "value": "0x0b91…4d27",
+    "about": "The Aztec account that sends init_game and start_game; whoever sends init_game is the operator."
+   }
+  },
+  {
+   "op": "create",
+   "at": {
+    "in": "host",
+    "sec": "long_lived"
+   },
+   "item": {
+    "id": "ho-ownerkey",
+    "label": "namespace owner key",
+    "reader": "user",
+    "form": "clear",
+    "value": "public 0x2f0d…8a63",
+    "about": "Signs REGISTER and DISABLE bodies for the namespace; kept with the deployer's secrets."
+   }
+  },
+  {
+   "op": "create",
+   "at": {
+    "in": "player",
+    "sec": "code"
+   },
+   "item": {
+    "id": "pl-code",
+    "label": "the contract's code; the manifests",
+    "reader": "public",
+    "form": "clear",
+    "value": "montyhall, the four manifests",
+    "about": "What her wallet and client need: the contract artifact and the manifests her requests follow."
+   }
+  },
+  {
+   "op": "create",
+   "at": {
+    "in": "player",
+    "sec": "long_lived"
+   },
+   "item": {
+    "id": "pl-acct",
+    "label": "the player's account",
+    "reader": "user",
+    "form": "clear",
+    "value": "0x1c5a…3e90",
+    "about": "Her Aztec account: the owner of her Game, DoorNote and SwitchNote."
+   }
+  },
+  {
+   "op": "create",
+   "at": {
+    "in": "player",
+    "sec": "long_lived"
+   },
+   "item": {
+    "id": "pl-reqkey",
+    "label": "requester key (Grumpkin)",
+    "reader": "user",
+    "form": "clear",
+    "value": "public 0x1a4c…77e0",
+    "about": "Signs every round she requests; every state record names it, so only she can present it."
+   }
+  }
+ ],
+ "steps": [
+  {
+   "phase": "setup",
+   "interaction": "register",
+   "title": "The host deploys the contract",
+   "text": "The [[host]] deploys the MontyHall contract. It has no constructor, no public functions and no public state, so the deploy writes nothing of the game. Its address `0x2b6e…c3d1` is the namespace the circuits are then registered under.",
+   "acts": [
+    "host"
+   ],
+   "effects": [
+    {
+     "op": "create",
+     "at": {
+      "in": "host",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "ho-deploy",
+      "label": "sent: deploy",
+      "reader": "public",
+      "form": "clear",
+      "value": "tx 0x61d0…2a9e: class and instance of MontyHall at 0x2b6e…c3d1, no initializer",
+      "about": "The deploy transaction: it publishes the contract's class and instance, nothing else."
+     }
+    }
+   ],
+   "flows": [
+    {
+     "from": "ho-deploy",
+     "to": [
+      "mh"
+     ],
+     "kind": "submit",
+     "reader": "public",
+     "payload": "tx 0x61d0…2a9e",
+     "text": "[[host]] → deploy tx `0x61d0…2a9e` → [[mh]] at `0x2b6e…c3d1`: no constructor runs"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Everyone",
+     "text": "the contract's address and class; nothing of a game"
+    }
+   ],
+   "bricks": [
+    "path",
+    "upgrades"
+   ],
+   "pick": "ho-deploy",
+   "basis": "hand-written",
+   "n": 1
+  },
+  {
+   "phase": "setup",
+   "interaction": "register",
+   "title": "The host registers the four circuits",
+   "text": "The [[host]] signs a REGISTER body with the namespace owner key: the four circuits and their manifests, under the address of the contract it just deployed ([[ho-deploy|the deploy]]). Each node checks every circuit against its manifest, computes its vk hash, and runs the registration circuit, which derives the namespace's nullifier secret `nsk_app` from the master secret as parts. Nobody holds `nsk_app` whole. The nodes answer with the vk hashes and `npk_app_hash`, which the contract will pin; the host tells the [[player]] the address and the pins.",
+   "acts": [
+    "host",
+    "orch",
+    "node"
+   ],
+   "effects": [
+    {
+     "op": "create",
+     "at": {
+      "in": "host",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "ho-reg",
+      "label": "REGISTER body",
+      "reader": "public",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1 (the contract's address)",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "manifest",
+        "v": "the contract manifest: four circuits with their vk hashes, intake direct, upgrades fixed",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuits",
+        "v": "{pss_seed, monty_hall_init, monty_hall_open_door, monty_hall_finish}: compiled",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "owner_pubkey",
+        "v": "0x2f0d…8a63",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "seq",
+        "v": "0",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "by the namespace owner key",
+        "reader": "public",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The signed registry body: the namespace's circuits and manifests, first time (seq 0).",
+      "same": "reg-body"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "orch",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "or-reg",
+      "label": "REGISTER body",
+      "reader": "public",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1 (the contract's address)",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "manifest",
+        "v": "the contract manifest: four circuits with their vk hashes, intake direct, upgrades fixed",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuits",
+        "v": "{pss_seed, monty_hall_init, monty_hall_open_door, monty_hall_finish}: compiled",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "owner_pubkey",
+        "v": "0x2f0d…8a63",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "seq",
+        "v": "0",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "by the namespace owner key",
+        "reader": "public",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The signed registry body: the namespace's circuits and manifests, first time (seq 0).",
+      "same": "reg-body"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "code"
+     },
+     "item": {
+      "id": "nd-pkgs",
+      "label": "packages",
+      "reader": "public",
+      "form": "clear",
+      "value": "the four circuits, their vks and vk hashes, the manifests",
+      "about": "What REGISTER stored: the circuits node i will run for this namespace."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "nd-ns",
+      "label": "namespace row",
+      "reader": "public",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "owner key",
+        "v": "0x2f0d…8a63",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "seq",
+        "v": "0",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "npk_app_hash",
+        "v": "0x0f42…a917",
+        "reader": "public",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The namespace's registry row at node i."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "nd-nsk",
+      "label": "nsk_app",
+      "reader": "shared",
+      "form": "part",
+      "value": "parts i, i−1",
+      "about": "The namespace's nullifier secret as Rep3 parts; every round that spends a state note loads it; any two nodes could rebuild it.",
+      "per_node": {
+       "0": "nsk_app: parts 0, 2",
+       "1": "nsk_app: parts 1, 0",
+       "2": "nsk_app: parts 2, 1"
+      }
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "orch",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "or-registry",
+      "label": "registry copy",
+      "reader": "public",
+      "form": "clear",
+      "value": "namespace 0x2b6e…c3d1: the contract manifest, four packages, npk_app_hash 0x0f42…a917",
+      "about": "The orchestrator's copy of the rows all three nodes hold."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "host",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "ho-pins",
+      "label": "REGISTER answer: the pins",
+      "reader": "public",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "npk_app_hash",
+        "v": "0x0f42…a917",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "seed_vk_hash",
+        "v": "0x1d7a…5e20",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "init_vk_hash",
+        "v": "0x2c39…8f14",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "open_vk_hash",
+        "v": "0x08b5…d26c",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "finish_vk_hash",
+        "v": "0x13f0…a4e7",
+        "reader": "public",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The values the nodes agreed on; the host pins them in the Config."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "pl-deploy",
+      "label": "the deployment and its pins",
+      "reader": "public",
+      "form": "clear",
+      "value": "MontyHall at 0x2b6e…c3d1; the four vk hashes and npk_app_hash",
+      "about": "What she needs to request rounds under the namespace and to check her pins."
+     }
+    }
+   ],
+   "flows": [
+    {
+     "from": "ho-reg",
+     "to": [
+      "or-reg"
+     ],
+     "kind": "send",
+     "reader": "public",
+     "payload": "REGISTER body",
+     "text": "[[host]] → [[orch]]: the REGISTER body, signed with the namespace owner key"
+    },
+    {
+     "from": "or-reg",
+     "to": [
+      "node"
+     ],
+     "kind": "send",
+     "reader": "public",
+     "payload": "REGISTER body",
+     "text": "[[orch]] → each [[node]]: the same body"
+    },
+    {
+     "from": "nd-master",
+     "to": [
+      "nd-nsk"
+     ],
+     "kind": "push",
+     "reader": "shared",
+     "payload": "nsk_app parts",
+     "text": "the registration circuit derives [[nd-nsk|nsk_app]] from [[nd-master|the master secret]]; node i keeps its parts"
+    },
+    {
+     "from": "node",
+     "to": [
+      "nd-pkgs",
+      "nd-ns"
+     ],
+     "kind": "push",
+     "reader": "public",
+     "payload": "packages, namespace row",
+     "text": "each node stores the four packages and the namespace row"
+    },
+    {
+     "from": "node",
+     "to": [
+      "or-registry"
+     ],
+     "kind": "send",
+     "reader": "public",
+     "payload": "signed answers",
+     "text": "each [[node]] → [[orch]]: its signed answer; the three must agree"
+    },
+    {
+     "from": "or-registry",
+     "to": [
+      "ho-pins"
+     ],
+     "kind": "send",
+     "reader": "public",
+     "payload": "vk hashes, npk_app_hash",
+     "text": "[[orch]] → [[host]]: the four vk hashes and `npk_app_hash`"
+    },
+    {
+     "from": "ho-pins",
+     "to": [
+      "pl-deploy"
+     ],
+     "kind": "send",
+     "reader": "public",
+     "payload": "address, pins",
+     "text": "[[host]] → [[player]]: the contract's address and the pins"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Host",
+     "text": "the four vk hashes and `npk_app_hash` to pin"
+    },
+    {
+     "party": "Player",
+     "text": "the address (the namespace) and the pins her rounds will be checked against"
+    },
+    {
+     "party": "Nodes, orchestrator",
+     "text": "the circuits and manifests (public code), the namespace and its owner key"
+    },
+    {
+     "party": "Nobody",
+     "text": "`nsk_app`: each node holds two of its three parts"
+    },
+    {
+     "party": "If two nodes colluded",
+     "text": "they could rebuild `nsk_app`; it nullifies the game's state notes, it does not let them forge a proof"
+    }
+   ],
+   "bricks": [
+    "state",
+    "shape",
+    "intake",
+    "upgrades"
+   ],
+   "pick": "nd-nsk",
+   "basis": "hand-written",
+   "n": 2
+  },
+  {
+   "phase": "seed",
+   "interaction": "seed",
+   "title": "The player asks for a seed",
+   "text": "The [[player]] asks the network for a seed: a `pss_seed` request with no inputs and no records, writing the seed key `0xff01`. It stores a client-held key, so her requester key signs it. The [[orch]] passes it to each node.",
+   "acts": [
+    "player",
+    "orch"
+   ],
+   "effects": [
+    {
+     "op": "remove",
+     "ref": "ho-reg"
+    },
+    {
+     "op": "remove",
+     "ref": "or-reg"
+    },
+    {
+     "op": "remove",
+     "ref": "ho-deploy"
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "pl-req-seed",
+      "label": "Request<Full>",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuit",
+        "v": "pss_seed",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "request_id",
+        "v": "0x8d3f…21a7",
+        "reader": "operator",
+        "form": "clear",
+        "note": "128 random bits the player drew"
+       },
+       {
+        "k": "public",
+        "v": "{}",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "state_keys",
+        "v": "reads [], writes [0xff01]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "shared_inputs",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "records",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "requester",
+        "v": "0x1a4c…77e0 (the player's requester key)",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "Schnorr over the canonical body, by the requester key",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Her request for the seed round.",
+      "same": "req-seed"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "orch",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "or-req-seed",
+      "label": "Request<Full>",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuit",
+        "v": "pss_seed",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "request_id",
+        "v": "0x8d3f…21a7",
+        "reader": "operator",
+        "form": "clear",
+        "note": "128 random bits the player drew"
+       },
+       {
+        "k": "public",
+        "v": "{}",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "state_keys",
+        "v": "reads [], writes [0xff01]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "shared_inputs",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "records",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "requester",
+        "v": "0x1a4c…77e0 (the player's requester key)",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "Schnorr over the canonical body, by the requester key",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The seed request as the orchestrator holds it.",
+      "same": "req-seed"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "nd-req-seed",
+      "label": "Request<ForNode>",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuit",
+        "v": "pss_seed",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "request_id",
+        "v": "0x8d3f…21a7",
+        "reader": "operator",
+        "form": "clear",
+        "note": "128 random bits the player drew"
+       },
+       {
+        "k": "public",
+        "v": "{}",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "state_keys",
+        "v": "reads [], writes [0xff01]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "shared_inputs",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "records",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "requester",
+        "v": "0x1a4c…77e0 (the player's requester key)",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "Schnorr over the canonical body, by the requester key",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The seed request as node i receives it.",
+      "same": "req-seed"
+     }
+    }
+   ],
+   "flows": [
+    {
+     "from": "pl-reqkey",
+     "to": [
+      "pl-req-seed"
+     ],
+     "kind": "read",
+     "reader": "user",
+     "payload": "signature",
+     "text": "[[pl-reqkey|her requester key]] signs the request"
+    },
+    {
+     "from": "pl-req-seed",
+     "to": [
+      "or-req-seed"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "request 0x8d3f…21a7",
+     "text": "[[player]] → [[orch]]: the signed `pss_seed` request"
+    },
+    {
+     "from": "or-req-seed",
+     "to": [
+      "nd-req-seed"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "request 0x8d3f…21a7",
+     "text": "[[orch]] → each [[node]]: the same request"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Nodes, orchestrator",
+     "text": "a seed request under the namespace, signed by her requester key; nothing secret is in it"
+    },
+    {
+     "party": "Everyone",
+     "text": "nothing: no transaction"
+    }
+   ],
+   "bricks": [
+    "intake",
+    "state"
+   ],
+   "pick": "pl-req-seed",
+   "basis": "hand-written",
+   "n": 3
+  },
+  {
+   "phase": "seed",
+   "interaction": "seed",
+   "title": "The nodes prove pss_seed",
+   "text": "The three nodes run [[pss_seed]] together. They sample the seed and its blinding as parts, so nobody knows the seed, and output its note hash. Each node seals its third of the stored seed to itself, signs its result and keeps the row. The [[orch]] checks the three agree and answers the [[player]] with the proof, the effects and the seed record.",
+   "acts": [
+    "node",
+    "orch",
+    "player",
+    "pss_seed"
+   ],
+   "runs": [
+    {
+     "circuit": "pss_seed"
+    }
+   ],
+   "open": [
+    "pss_seed"
+   ],
+   "effects": [
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "nd-res-seed",
+      "label": "NodeResult",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "request_id",
+        "v": "0x8d3f…21a7",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof; node i verified it itself",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "public_inputs",
+        "v": "[5]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "stored",
+        "v": "[0xff01]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "records",
+        "v": "[{key 0xff01, note_hash 0x24c8…6b19, c_i}]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "signature_i",
+        "v": "node i's Schnorr signature over the result",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Node i's result row for the seed round: kept as its requests row.",
+      "per_node": {
+       "0": "signature_0, third c_0",
+       "1": "signature_1, third c_1",
+       "2": "signature_2, third c_2"
+      }
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "orch",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "or-ans-seed",
+      "label": "Response",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof, one per node, all three agreeing",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "effects",
+        "v": "",
+        "reader": "operator",
+        "form": "clear",
+        "note": "PssEffects<0, 1, 0>",
+        "fields": [
+         {
+          "k": "read_leaves",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear",
+          "note": "R = 0"
+         },
+         {
+          "k": "nullifiers",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear"
+         },
+         {
+          "k": "new_note_hashes",
+          "v": "[0x24c8…6b19]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "npk_app_hash",
+          "v": "0",
+          "reader": "public",
+          "form": "clear"
+         },
+         {
+          "k": "app_outputs",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear"
+         }
+        ]
+       },
+       {
+        "k": "records",
+        "v": "seed record: key 0xff01, three sealed thirds",
+        "reader": "shared",
+        "form": "sealed"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The answer the orchestrator passes on.",
+      "same": "ans-seed"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "pl-ans-seed",
+      "label": "Response",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof, one per node, all three agreeing",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "effects",
+        "v": "",
+        "reader": "operator",
+        "form": "clear",
+        "note": "PssEffects<0, 1, 0>",
+        "fields": [
+         {
+          "k": "read_leaves",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear",
+          "note": "R = 0"
+         },
+         {
+          "k": "nullifiers",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear"
+         },
+         {
+          "k": "new_note_hashes",
+          "v": "[0x24c8…6b19]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "npk_app_hash",
+          "v": "0",
+          "reader": "public",
+          "form": "clear"
+         },
+         {
+          "k": "app_outputs",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear"
+         }
+        ]
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The seed round's answer: the proof and its effects; the host lands it.",
+      "same": "ans-seed"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "pl-seed-rec",
+      "label": "StateRecord",
+      "reader": "shared",
+      "form": "sealed",
+      "fields": [
+       {
+        "k": "key",
+        "v": "0xff01",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "note_hash",
+        "v": "0x24c8…6b19",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "c",
+        "v": "[third 0, third 1, third 2]",
+        "reader": "shared",
+        "form": "sealed",
+        "note": "one per node, sealed by node i to itself; she carries it and cannot open it",
+        "fields": [
+         {
+          "k": "seed",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "seed",
+            "v": "rand_seed, nobody knows it",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "blinding",
+            "v": "out0_randomness",
+            "reader": "shared",
+            "form": "sealed"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "associated data",
+        "v": "(namespace, key, note_hash, requester 0x1a4c…77e0)",
+        "reader": "operator",
+        "form": "clear",
+        "note": "owner-bound: only her signed request opens it"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The seed as she carries it: one sealed third per node, opened only by that node for her signed request."
+     }
+    }
+   ],
+   "flows": [
+    {
+     "from": "nd-req-seed",
+     "to": [
+      "pss_seed"
+     ],
+     "kind": "read",
+     "reader": "operator",
+     "payload": "request",
+     "text": "node i checks the signature and binds the request into [[pss_seed]]"
+    },
+    {
+     "from": "pss_seed",
+     "to": [
+      "nd-res-seed"
+     ],
+     "kind": "push",
+     "reader": "operator",
+     "payload": "proof, effects, c_i",
+     "text": "[[pss_seed]] → node i's result row: proof, 5 public inputs, its sealed third"
+    },
+    {
+     "from": "nd-res-seed",
+     "to": [
+      "or-ans-seed"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "three NodeResults",
+     "text": "each [[node]] → [[orch]]: its NodeResult; the three agree"
+    },
+    {
+     "from": "or-ans-seed",
+     "to": [
+      "pl-ans-seed",
+      "pl-seed-rec"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "proof, effects, seed record",
+     "text": "[[orch]] → [[player]]: the proof and effects, and the seed record she keeps"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Player",
+     "text": "the seed's note hash `0x24c8…6b19` and a proof; the record's thirds she cannot open"
+    },
+    {
+     "party": "Orchestrator",
+     "text": "the same answer; the record only as ciphertext"
+    },
+    {
+     "party": "Nodes",
+     "text": "nothing about the seed: each sampled only its parts"
+    },
+    {
+     "party": "If two nodes colluded",
+     "text": "they could open the record and read the seed, so later the winning door"
+    }
+   ],
+   "bricks": [
+    "state",
+    "outputs"
+   ],
+   "pick": "pl-seed-rec",
+   "basis": "hand-written",
+   "n": 4
+  },
+  {
+   "phase": "seed",
+   "interaction": "seed",
+   "title": "The host lands the seed: init_game",
+   "text": "The [[player]] hands the seed answer to the [[host]]. The host sends [[init_game]] with its Config and the seed's note hash, the proof staged as a capsule. [[init_game]] verifies the `pss_seed` proof under the vk hash in the Config, pushes the seed's note hash, the once-nullifier and the host's Config note. The seed itself never leaves the nodes.",
+   "acts": [
+    "host",
+    "init_game"
+   ],
+   "tx": {
+    "id": "0x3f88…0c52",
+    "by": "host",
+    "entry": "init_game",
+    "item": {
+     "id": "tx-init_game",
+     "label": "Tx 0x3f88…0c52",
+     "reader": "user",
+     "form": "clear",
+     "fields": [
+      {
+       "k": "sender, fee payer",
+       "v": "the host's account (hidden: a private call)",
+       "reader": "user",
+       "form": "clear"
+      },
+      {
+       "k": "entry, args",
+       "v": "MontyHall.init_game(config, seed_note_hash)",
+       "reader": "user",
+       "form": "clear",
+       "note": "in full in the row below"
+      },
+      {
+       "k": "capsule",
+       "v": "ProofData {vk, proof}",
+       "reader": "operator",
+       "form": "clear",
+       "note": "stays in the sender's wallet"
+      },
+      {
+       "k": "to the network",
+       "v": "the wallet's proof; effects: 2 note hashes, 2 nullifiers, the Config's encrypted log; no public call",
+       "reader": "public",
+       "form": "clear"
+      }
+     ],
+     "open": "{",
+     "close": "}"
+    },
+    "args": {
+     "id": "args-init",
+     "label": "init_game(",
+     "reader": "user",
+     "form": "clear",
+     "fields": [
+      {
+       "k": "config",
+       "v": "",
+       "reader": "user",
+       "form": "clear",
+       "note": "Config {",
+       "fields": [
+        {
+         "k": "player",
+         "v": "0x1c5a…3e90 (the player)",
+         "reader": "user",
+         "form": "clear"
+        },
+        {
+         "k": "owner",
+         "v": "0xafafaf",
+         "reader": "user",
+         "form": "clear"
+        },
+        {
+         "k": "npk_app_hash",
+         "v": "0x0f42…a917",
+         "reader": "user",
+         "form": "clear"
+        },
+        {
+         "k": "seed_vk_hash",
+         "v": "0x1d7a…5e20",
+         "reader": "user",
+         "form": "clear"
+        },
+        {
+         "k": "init_vk_hash",
+         "v": "0x2c39…8f14",
+         "reader": "user",
+         "form": "clear"
+        },
+        {
+         "k": "open_vk_hash",
+         "v": "0x08b5…d26c",
+         "reader": "user",
+         "form": "clear"
+        },
+        {
+         "k": "finish_vk_hash",
+         "v": "0x13f0…a4e7",
+         "reader": "user",
+         "form": "clear"
+        }
+       ]
+      },
+      {
+       "k": "seed_note_hash",
+       "v": "0x24c8…6b19",
+       "reader": "shared",
+       "form": "sealed"
+      }
+     ],
+     "open": "",
+     "close": ")"
+    }
+   },
+   "verifies": [
+    {
+     "function": "init_game",
+     "circuit": "pss_seed",
+     "public_inputs": {
+      "id": "pi-init",
+      "reader": "public",
+      "label": "public_inputs [5]",
+      "open": "{",
+      "close": "}",
+      "note": "canonical_public_inputs order, rebuilt by the contract",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1 (this contract's address)",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "owner",
+        "v": "0xafafaf (the Config's owner)",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "in_slots",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "out_slots",
+        "v": "[0xff01]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "app_inputs",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "read_leaves",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "nullifiers",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "new_note_hashes",
+        "v": "[0x24c8…6b19]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "npk_app_hash",
+        "v": "0",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "app_outputs",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear"
+       }
+      ]
+     }
+    }
+   ],
+   "open": [
+    "pss_seed"
+   ],
+   "effects": [
+    {
+     "op": "create",
+     "at": {
+      "in": "host",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "ho-seed-ans",
+      "label": "Response",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof, one per node, all three agreeing",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "effects",
+        "v": "",
+        "reader": "operator",
+        "form": "clear",
+        "note": "PssEffects<0, 1, 0>",
+        "fields": [
+         {
+          "k": "read_leaves",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear",
+          "note": "R = 0"
+         },
+         {
+          "k": "nullifiers",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear"
+         },
+         {
+          "k": "new_note_hashes",
+          "v": "[0x24c8…6b19]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "npk_app_hash",
+          "v": "0",
+          "reader": "public",
+          "form": "clear"
+         },
+         {
+          "k": "app_outputs",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear"
+         }
+        ]
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The seed answer the player handed over: the proof and the seed's note hash.",
+      "same": "ans-seed"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "host",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "ho-tx-init",
+      "label": "sent",
+      "reader": "operator",
+      "form": "clear",
+      "value": "tx 0x3f88…0c52 with the capsule {vk, proof}",
+      "about": "The host's init_game transaction; the capsule stays in its wallet."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "notes"
+     },
+     "item": {
+      "id": "k-seed-nh",
+      "label": "seed note hash",
+      "reader": "shared",
+      "form": "sealed",
+      "value": "0x24c8…6b19",
+      "about": "The seed's note hash: a hash of a value only the nodes hold, as parts.",
+      "same": "seed-nh"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "notes"
+     },
+     "item": {
+      "id": "k-cfg-nh",
+      "label": "Config note hash (the host's)",
+      "reader": "user",
+      "form": "sealed",
+      "value": "0x163e…9b02",
+      "about": "The host's Config note on chain: only the host can read it."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "nullifiers"
+     },
+     "item": {
+      "id": "k-once",
+      "label": "once-nullifier P2(0x4d480005, [1])",
+      "reader": "public",
+      "form": "clear",
+      "value": "0x2e05…71bd",
+      "about": "A constant nullifier: a second init_game repeats it and fails. Public and deterministic, so anyone can see init_game ran."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "nullifiers"
+     },
+     "item": {
+      "id": "k-cfg-init",
+      "label": "Config initialisation nullifier",
+      "reader": "user",
+      "form": "sealed",
+      "value": "0x0b4f…9d27",
+      "about": "PrivateImmutable's initialisation nullifier for the host's Config."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "host",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "ho-config",
+      "label": "Config",
+      "reader": "user",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "player",
+        "v": "0x1c5a…3e90 (the player)",
+        "reader": "user",
+        "form": "clear"
+       },
+       {
+        "k": "owner",
+        "v": "0xafafaf",
+        "reader": "user",
+        "form": "clear"
+       },
+       {
+        "k": "npk_app_hash",
+        "v": "0x0f42…a917",
+        "reader": "user",
+        "form": "clear"
+       },
+       {
+        "k": "seed_vk_hash",
+        "v": "0x1d7a…5e20",
+        "reader": "user",
+        "form": "clear"
+       },
+       {
+        "k": "init_vk_hash",
+        "v": "0x2c39…8f14",
+        "reader": "user",
+        "form": "clear"
+       },
+       {
+        "k": "open_vk_hash",
+        "v": "0x08b5…d26c",
+        "reader": "user",
+        "form": "clear"
+       },
+       {
+        "k": "finish_vk_hash",
+        "v": "0x13f0…a4e7",
+        "reader": "user",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The deployment pins, a note only the host owns; start_game reads it.",
+      "to": "→ note hash `0x163e…9b02`",
+      "to_reader": "user",
+      "to_form": "sealed"
+     }
+    }
+   ],
+   "flows": [
+    {
+     "from": "pl-ans-seed",
+     "to": [
+      "ho-seed-ans"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "proof, seed note hash",
+     "text": "[[player]] → [[host]]: the seed answer (proof and effects)"
+    },
+    {
+     "from": "ho-tx-init",
+     "to": [
+      "tx"
+     ],
+     "kind": "submit",
+     "reader": "user",
+     "payload": "tx 0x3f88…0c52",
+     "text": "[[host]] → tx `0x3f88…0c52` → [[init_game]]: Config, seed note hash, capsule {vk, proof}"
+    },
+    {
+     "from": "init_game",
+     "to": [
+      "k-seed-nh",
+      "k-cfg-nh",
+      "k-once",
+      "k-cfg-init"
+     ],
+     "kind": "push",
+     "reader": "public",
+     "payload": "2 note hashes, 2 nullifiers",
+     "text": "[[init_game]] → the seed's note hash, the Config's note hash, the once-nullifier and the Config's initialisation nullifier"
+    },
+    {
+     "from": "init_game",
+     "to": [
+      "ho-config"
+     ],
+     "kind": "push",
+     "reader": "user",
+     "payload": "Config note",
+     "text": "[[init_game]] → the host's wallet: its [[ho-config|Config]] note, delivered on chain"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Everyone",
+     "text": "a MontyHall transaction with 2 note hashes and 2 nullifiers; the once-nullifier says init_game ran"
+    },
+    {
+     "party": "Host",
+     "text": "the seed's note hash, not the seed"
+    },
+    {
+     "party": "Nobody",
+     "text": "the seed: only the nodes' parts"
+    }
+   ],
+   "bricks": [
+    "path",
+    "submission"
+   ],
+   "pick": "k-seed-nh",
+   "basis": "hand-written",
+   "n": 5
+  },
+  {
+   "phase": "game",
+   "interaction": "start",
+   "title": "The player asks for the game",
+   "text": "The [[player]] mines the seed note's nonce from init_game's effects (index 0) and asks for [[monty_hall_init]]: it reads the seed key `0xff01` and writes the game-state key `0xff02`. She presents her seed record; each node gets only its own third.",
+   "acts": [
+    "player",
+    "orch"
+   ],
+   "effects": [
+    {
+     "op": "remove",
+     "ref": "pl-req-seed"
+    },
+    {
+     "op": "remove",
+     "ref": "pl-ans-seed"
+    },
+    {
+     "op": "remove",
+     "ref": "or-req-seed"
+    },
+    {
+     "op": "remove",
+     "ref": "nd-req-seed"
+    },
+    {
+     "op": "remove",
+     "ref": "or-ans-seed"
+    },
+    {
+     "op": "move",
+     "ref": "nd-res-seed",
+     "to": {
+      "in": "node",
+      "sec": "long_lived"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "pl-req-init",
+      "label": "Request<Full>",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuit",
+        "v": "monty_hall_init",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "request_id",
+        "v": "0x4e90…c6b2",
+        "reader": "operator",
+        "form": "clear",
+        "note": "128 random bits the player drew"
+       },
+       {
+        "k": "public",
+        "v": "{in0_nonce: 0x0a6e…41c9}",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "state_keys",
+        "v": "reads [0xff01], writes [0xff02]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "shared_inputs",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "records",
+        "v": "",
+        "reader": "shared",
+        "form": "sealed",
+        "fields": [
+         {
+          "k": "record 0xff01",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "key",
+            "v": "0xff01",
+            "reader": "operator",
+            "form": "clear"
+           },
+           {
+            "k": "note_hash",
+            "v": "0x24c8…6b19",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "c",
+            "v": "[third 0, third 1, third 2]",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "sealed by the nodes to themselves; she cannot open it"
+           },
+           {
+            "k": "record_hashes",
+            "v": "[3]: the hash of each third",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "requester",
+        "v": "0x1a4c…77e0 (the player's requester key)",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "Schnorr over the canonical body, by the requester key",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Her request for the init round, carrying the seed record.",
+      "same": "req-init"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "orch",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "or-req-init",
+      "label": "Request<Full>",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuit",
+        "v": "monty_hall_init",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "request_id",
+        "v": "0x4e90…c6b2",
+        "reader": "operator",
+        "form": "clear",
+        "note": "128 random bits the player drew"
+       },
+       {
+        "k": "public",
+        "v": "{in0_nonce: 0x0a6e…41c9}",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "state_keys",
+        "v": "reads [0xff01], writes [0xff02]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "shared_inputs",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "records",
+        "v": "",
+        "reader": "shared",
+        "form": "sealed",
+        "fields": [
+         {
+          "k": "record 0xff01",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "key",
+            "v": "0xff01",
+            "reader": "operator",
+            "form": "clear"
+           },
+           {
+            "k": "note_hash",
+            "v": "0x24c8…6b19",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "c",
+            "v": "[third 0, third 1, third 2]",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "sealed by the nodes to themselves; she cannot open it"
+           },
+           {
+            "k": "record_hashes",
+            "v": "[3]: the hash of each third",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "requester",
+        "v": "0x1a4c…77e0 (the player's requester key)",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "Schnorr over the canonical body, by the requester key",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The init request as the orchestrator holds it: the record as ciphertext.",
+      "same": "req-init"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "nd-req-init",
+      "label": "Request<ForNode>",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuit",
+        "v": "monty_hall_init",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "request_id",
+        "v": "0x4e90…c6b2",
+        "reader": "operator",
+        "form": "clear",
+        "note": "128 random bits the player drew"
+       },
+       {
+        "k": "public",
+        "v": "{in0_nonce: 0x0a6e…41c9}",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "state_keys",
+        "v": "reads [0xff01], writes [0xff02]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "shared_inputs",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "records",
+        "v": "",
+        "reader": "shared",
+        "form": "sealed",
+        "fields": [
+         {
+          "k": "record 0xff01",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "key",
+            "v": "0xff01",
+            "reader": "operator",
+            "form": "clear"
+           },
+           {
+            "k": "note_hash",
+            "v": "0x24c8…6b19",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "c_i",
+            "v": "node i's third only",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "sealed by the nodes to themselves; she cannot open it"
+           },
+           {
+            "k": "record_hashes",
+            "v": "[3]: the hash of each third",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "requester",
+        "v": "0x1a4c…77e0 (the player's requester key)",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "Schnorr over the canonical body, by the requester key",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The init request as node i receives it: its own third.",
+      "same": "req-init"
+     }
+    }
+   ],
+   "flows": [
+    {
+     "from": "k-seed-nh",
+     "to": [
+      "pl-req-init"
+     ],
+     "kind": "read",
+     "reader": "public",
+     "payload": "nonce",
+     "text": "the seed note's nonce `0x0a6e…41c9`, mined from init_game's effects → her request"
+    },
+    {
+     "from": "pl-seed-rec",
+     "to": [
+      "pl-req-init"
+     ],
+     "kind": "read",
+     "reader": "shared",
+     "payload": "seed record",
+     "text": "[[pl-seed-rec|her seed record]] → the request"
+    },
+    {
+     "from": "pl-req-init",
+     "to": [
+      "or-req-init"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "request 0x4e90…c6b2",
+     "text": "[[player]] → [[orch]]: the signed request with the record's three thirds"
+    },
+    {
+     "from": "or-req-init",
+     "to": [
+      "nd-req-init"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "request, c_i",
+     "text": "[[orch]] → each [[node]]: the request with its own third"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Orchestrator",
+     "text": "the seed's note hash and nonce; the record only as ciphertext"
+    },
+    {
+     "party": "Nodes",
+     "text": "each can open only its own third"
+    }
+   ],
+   "bricks": [
+    "intake",
+    "state",
+    "binding"
+   ],
+   "pick": "pl-req-init",
+   "basis": "hand-written",
+   "n": 6
+  },
+  {
+   "phase": "game",
+   "interaction": "start",
+   "title": "The nodes prove monty_hall_init",
+   "text": "Each node opens its third of the seed record. Together they run [[monty_hall_init]]: spend the seed, derive the game's PRNG and the winning door from it, and store game state 0. The winning door exists only as parts, so nobody knows it. Each node marks the seed spent. The [[player]] gets the proof, the effects and game record 0, which replaces her seed record.",
+   "acts": [
+    "node",
+    "orch",
+    "player",
+    "monty_hall_init"
+   ],
+   "runs": [
+    {
+     "circuit": "monty_hall_init"
+    }
+   ],
+   "open": [
+    "monty_hall_init"
+   ],
+   "effects": [
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "nd-gs0",
+      "label": "GameState 0",
+      "reader": "shared",
+      "form": "part",
+      "fields": [
+       {
+        "k": "state",
+        "v": "0 (STATE_INITIALIZED)",
+        "reader": "shared",
+        "form": "part"
+       },
+       {
+        "k": "prng",
+        "v": "[s0, s1, s2, s3, 0]",
+        "reader": "shared",
+        "form": "part",
+        "note": "5 fields: 4 of sponge state and a counter"
+       },
+       {
+        "k": "winning_door",
+        "v": "0",
+        "reader": "shared",
+        "form": "part",
+        "note": "nobody sees it"
+       },
+       {
+        "k": "chosen_door",
+        "v": "0",
+        "reader": "shared",
+        "form": "part"
+       },
+       {
+        "k": "open_door",
+        "v": "0",
+        "reader": "shared",
+        "form": "part"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The game state, only in parts and only during the round; the nodes keep no row of it.",
+      "to": "→ note hash `0x0c91…5a4f`; sealed into game record 0, then dropped",
+      "to_reader": "shared",
+      "to_form": "sealed",
+      "per_node": {
+       "0": "parts 0, 2 of each field",
+       "1": "parts 1, 0 of each field",
+       "2": "parts 2, 1 of each field"
+      }
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "nd-res-init",
+      "label": "NodeResult",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "request_id",
+        "v": "0x4e90…c6b2",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof; node i verified it itself",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "public_inputs",
+        "v": "[8]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "stored",
+        "v": "[0xff02]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "records",
+        "v": "[{key 0xff02, note_hash 0x0c91…5a4f, c_i}]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "signature_i",
+        "v": "node i's Schnorr signature over the result",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Node i's result row for the init round.",
+      "per_node": {
+       "0": "signature_0, third c_0",
+       "1": "signature_1, third c_1",
+       "2": "signature_2, third c_2"
+      }
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "nd-consumed",
+      "label": "spent states (consumed)",
+      "reader": "operator",
+      "form": "clear",
+      "value": "seed 0x24c8…6b19 → monty_hall_init",
+      "about": "Each spent state's note hash with the circuit and request that spent it; a second request on it is refused."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "orch",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "or-ans-init",
+      "label": "Response",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof, one per node, all three agreeing",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "effects",
+        "v": "",
+        "reader": "operator",
+        "form": "clear",
+        "note": "PssEffects<1, 1, 0>",
+        "fields": [
+         {
+          "k": "read_leaves",
+          "v": "[0x05d3…e872]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "nullifiers",
+          "v": "[0x1b77…30fa]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "new_note_hashes",
+          "v": "[0x0c91…5a4f]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "npk_app_hash",
+          "v": "0x0f42…a917",
+          "reader": "public",
+          "form": "clear"
+         },
+         {
+          "k": "app_outputs",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear"
+         }
+        ]
+       },
+       {
+        "k": "records",
+        "v": "game record 0: key 0xff02, three sealed thirds",
+        "reader": "shared",
+        "form": "sealed"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The init answer the orchestrator passes on.",
+      "same": "ans-init"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "pl-ans-init",
+      "label": "Response",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof, one per node, all three agreeing",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "effects",
+        "v": "",
+        "reader": "operator",
+        "form": "clear",
+        "note": "PssEffects<1, 1, 0>",
+        "fields": [
+         {
+          "k": "read_leaves",
+          "v": "[0x05d3…e872]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "nullifiers",
+          "v": "[0x1b77…30fa]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "new_note_hashes",
+          "v": "[0x0c91…5a4f]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "npk_app_hash",
+          "v": "0x0f42…a917",
+          "reader": "public",
+          "form": "clear"
+         },
+         {
+          "k": "app_outputs",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear"
+         }
+        ]
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The init round's answer; the host lands it.",
+      "same": "ans-init"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "pl-rec0",
+      "label": "StateRecord",
+      "reader": "shared",
+      "form": "sealed",
+      "fields": [
+       {
+        "k": "key",
+        "v": "0xff02",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "note_hash",
+        "v": "0x0c91…5a4f",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "c",
+        "v": "[third 0, third 1, third 2]",
+        "reader": "shared",
+        "form": "sealed",
+        "note": "one per node, sealed by node i to itself; she carries it and cannot open it",
+        "fields": [
+         {
+          "k": "GameState 0",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "state",
+            "v": "0",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "prng",
+            "v": "[s0, s1, s2, s3, 0]",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "5 fields: 4 of sponge state and a counter"
+           },
+           {
+            "k": "winning_door",
+            "v": "0",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "nobody sees it"
+           },
+           {
+            "k": "chosen_door",
+            "v": "0",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "open_door",
+            "v": "0",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "blinding",
+            "v": "out0_randomness",
+            "reader": "shared",
+            "form": "sealed"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "associated data",
+        "v": "(namespace, key, note_hash, requester 0x1a4c…77e0)",
+        "reader": "operator",
+        "form": "clear",
+        "note": "owner-bound: only her signed request opens it"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Game record 0: game state 0 sealed in three thirds, one per node."
+     }
+    },
+    {
+     "op": "spend",
+     "ref": "pl-seed-rec",
+     "note": "replaced by game record 0 at 7"
+    }
+   ],
+   "flows": [
+    {
+     "from": "nd-req-init",
+     "to": [
+      "monty_hall_init"
+     ],
+     "kind": "read",
+     "reader": "shared",
+     "payload": "c_i, nonce",
+     "text": "node i opens its third of the seed record and binds it into [[monty_hall_init]]"
+    },
+    {
+     "from": "nd-nsk",
+     "to": [
+      "monty_hall_init"
+     ],
+     "kind": "read",
+     "reader": "shared",
+     "payload": "nsk_app parts",
+     "text": "[[nd-nsk|nsk_app]] → the seed's nullifier"
+    },
+    {
+     "from": "monty_hall_init",
+     "to": [
+      "nd-gs0",
+      "nd-res-init",
+      "nd-consumed"
+     ],
+     "kind": "push",
+     "reader": "operator",
+     "payload": "game state 0, result, seed spent",
+     "text": "[[monty_hall_init]] → game state 0 in parts, node i's result row; the seed marked spent"
+    },
+    {
+     "from": "nd-res-init",
+     "to": [
+      "or-ans-init"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "three NodeResults",
+     "text": "each [[node]] → [[orch]]: its NodeResult"
+    },
+    {
+     "from": "or-ans-init",
+     "to": [
+      "pl-ans-init",
+      "pl-rec0"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "proof, effects, game record 0",
+     "text": "[[orch]] → [[player]]: the proof and effects, and game record 0"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Player",
+     "text": "the seed's leaf and nullifier and game state 0's note hash: nothing about the winning door"
+    },
+    {
+     "party": "Nodes, orchestrator",
+     "text": "the same effects; the winning door only as parts"
+    },
+    {
+     "party": "If two nodes colluded",
+     "text": "the winning door"
+    }
+   ],
+   "bricks": [
+    "state",
+    "shape",
+    "outputs"
+   ],
+   "pick": "pl-rec0",
+   "basis": "hand-written",
+   "n": 7
+  },
+  {
+   "phase": "game",
+   "interaction": "start",
+   "title": "The host starts the game: start_game",
+   "text": "The [[player]] hands the init answer to the [[host]], which sends [[start_game]]. It reads the host's Config, verifies the `monty_hall_init` proof under `init_vk_hash`, checks the network pin and that the seed's leaf exists, then spends the seed and pushes game state 0's note hash. It gives the player her Game note: the pins her own calls use.",
+   "acts": [
+    "host",
+    "start_game"
+   ],
+   "tx": {
+    "id": "0x4a12…b7e3",
+    "by": "host",
+    "entry": "start_game",
+    "item": {
+     "id": "tx-start_game",
+     "label": "Tx 0x4a12…b7e3",
+     "reader": "user",
+     "form": "clear",
+     "fields": [
+      {
+       "k": "sender, fee payer",
+       "v": "the host's account (hidden: a private call)",
+       "reader": "user",
+       "form": "clear"
+      },
+      {
+       "k": "entry, args",
+       "v": "MontyHall.start_game(read_leaves, nullifiers, new_note_hashes, npk_app_hash)",
+       "reader": "user",
+       "form": "clear",
+       "note": "in full in the row below"
+      },
+      {
+       "k": "capsule",
+       "v": "ProofData {vk, proof}",
+       "reader": "operator",
+       "form": "clear",
+       "note": "stays in the sender's wallet"
+      },
+      {
+       "k": "to the network",
+       "v": "the wallet's proof; effects: 1 nullifier, 2 note hashes, the Game's encrypted log; no public call",
+       "reader": "public",
+       "form": "clear"
+      }
+     ],
+     "open": "{",
+     "close": "}"
+    },
+    "args": {
+     "id": "args-start",
+     "label": "start_game(",
+     "reader": "user",
+     "form": "clear",
+     "fields": [
+      {
+       "k": "read_leaves",
+       "v": "[0x05d3…e872]",
+       "reader": "shared",
+       "form": "sealed"
+      },
+      {
+       "k": "nullifiers",
+       "v": "[0x1b77…30fa]",
+       "reader": "shared",
+       "form": "sealed"
+      },
+      {
+       "k": "new_note_hashes",
+       "v": "[0x0c91…5a4f]",
+       "reader": "shared",
+       "form": "sealed"
+      },
+      {
+       "k": "npk_app_hash",
+       "v": "0x0f42…a917",
+       "reader": "public",
+       "form": "clear"
+      }
+     ],
+     "open": "",
+     "close": ")",
+     "note": "PssEffects<1, 1, 0> field by field, without app_outputs"
+    }
+   },
+   "verifies": [
+    {
+     "function": "start_game",
+     "circuit": "monty_hall_init",
+     "public_inputs": {
+      "id": "pi-start",
+      "reader": "public",
+      "label": "public_inputs [8]",
+      "open": "{",
+      "close": "}",
+      "note": "canonical_public_inputs order, rebuilt by the contract",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1 (this contract's address)",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "owner",
+        "v": "0xafafaf (the Config's owner)",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "in_slots",
+        "v": "[0xff01]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "out_slots",
+        "v": "[0xff02]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "app_inputs",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "read_leaves",
+        "v": "[0x05d3…e872]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "nullifiers",
+        "v": "[0x1b77…30fa]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "new_note_hashes",
+        "v": "[0x0c91…5a4f]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "npk_app_hash",
+        "v": "0x0f42…a917",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "app_outputs",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear"
+       }
+      ]
+     }
+    }
+   ],
+   "open": [
+    "monty_hall_init"
+   ],
+   "effects": [
+    {
+     "op": "remove",
+     "ref": "nd-gs0"
+    },
+    {
+     "op": "remove",
+     "ref": "ho-seed-ans"
+    },
+    {
+     "op": "remove",
+     "ref": "ho-tx-init"
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "host",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "ho-init-ans",
+      "label": "Response",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof, one per node, all three agreeing",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "effects",
+        "v": "",
+        "reader": "operator",
+        "form": "clear",
+        "note": "PssEffects<1, 1, 0>",
+        "fields": [
+         {
+          "k": "read_leaves",
+          "v": "[0x05d3…e872]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "nullifiers",
+          "v": "[0x1b77…30fa]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "new_note_hashes",
+          "v": "[0x0c91…5a4f]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "npk_app_hash",
+          "v": "0x0f42…a917",
+          "reader": "public",
+          "form": "clear"
+         },
+         {
+          "k": "app_outputs",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear"
+         }
+        ]
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The init answer the player handed over.",
+      "same": "ans-init"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "host",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "ho-tx-start",
+      "label": "sent",
+      "reader": "operator",
+      "form": "clear",
+      "value": "tx 0x4a12…b7e3 with the capsule {vk, proof}",
+      "about": "The host's start_game transaction."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "nullifiers"
+     },
+     "item": {
+      "id": "k-seed-null",
+      "label": "nullifier of the seed",
+      "reader": "shared",
+      "form": "sealed",
+      "value": "0x1b77…30fa",
+      "about": "The seed's nullifier under nsk_app: only the network could compute it."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "notes"
+     },
+     "item": {
+      "id": "k-gs0-nh",
+      "label": "note hash of game state 0",
+      "reader": "shared",
+      "form": "sealed",
+      "value": "0x0c91…5a4f",
+      "about": "Game state 0 on chain: a hash of parts only the nodes hold.",
+      "note": "leaf 0x27bd…c018 after the kernel's nonce"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "notes"
+     },
+     "item": {
+      "id": "k-game-nh",
+      "label": "Game note hash (the player's)",
+      "reader": "user",
+      "form": "sealed",
+      "value": "0x0e6a…f251",
+      "about": "The player's Game note on chain: only she can read it."
+     }
+    },
+    {
+     "op": "spend",
+     "ref": "k-seed-nh",
+     "note": "nullified at 8"
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "pl-game",
+      "label": "Game",
+      "reader": "user",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "owner",
+        "v": "0xafafaf",
+        "reader": "user",
+        "form": "clear"
+       },
+       {
+        "k": "npk_app_hash",
+        "v": "0x0f42…a917",
+        "reader": "user",
+        "form": "clear"
+       },
+       {
+        "k": "open_vk_hash",
+        "v": "0x08b5…d26c",
+        "reader": "user",
+        "form": "clear"
+       },
+       {
+        "k": "finish_vk_hash",
+        "v": "0x13f0…a4e7",
+        "reader": "user",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The pins her own calls use, copied from the Config; her open_door and finish_game take their vk hash from it.",
+      "to": "→ note hash `0x0e6a…f251`",
+      "to_reader": "user",
+      "to_form": "sealed"
+     }
+    }
+   ],
+   "flows": [
+    {
+     "from": "pl-ans-init",
+     "to": [
+      "ho-init-ans"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "proof, effects",
+     "text": "[[player]] → [[host]]: the init answer"
+    },
+    {
+     "from": "ho-tx-start",
+     "to": [
+      "tx"
+     ],
+     "kind": "submit",
+     "reader": "user",
+     "payload": "tx 0x4a12…b7e3",
+     "text": "[[host]] → tx `0x4a12…b7e3` → [[start_game]]: read_leaves, nullifiers, new_note_hashes, npk_app_hash, capsule"
+    },
+    {
+     "from": "ho-config",
+     "to": [
+      "sg-config"
+     ],
+     "kind": "read",
+     "reader": "user",
+     "payload": "init_vk_hash, pins",
+     "text": "[[ho-config|the host's Config]] → [[start_game]]: `init_vk_hash`, owner, `npk_app_hash`, the player"
+    },
+    {
+     "from": "start_game",
+     "to": [
+      "k-seed-null",
+      "k-gs0-nh",
+      "k-game-nh"
+     ],
+     "kind": "push",
+     "reader": "public",
+     "payload": "1 nullifier, 2 note hashes",
+     "text": "[[start_game]] → the seed's nullifier, game state 0's note hash, the Game's note hash"
+    },
+    {
+     "from": "start_game",
+     "to": [
+      "pl-game"
+     ],
+     "kind": "push",
+     "reader": "user",
+     "payload": "Game note",
+     "text": "[[start_game]] → the player's wallet: her [[pl-game|Game]] note, delivered on chain"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Everyone",
+     "text": "a MontyHall transaction with 1 nullifier and 2 note hashes"
+    },
+    {
+     "party": "Host",
+     "text": "the init effects: nothing about the winning door"
+    },
+    {
+     "party": "Player",
+     "text": "her Game note: the pins her calls use"
+    }
+   ],
+   "bricks": [
+    "path",
+    "submission",
+    "binding"
+   ],
+   "pick": "pl-game",
+   "basis": "hand-written",
+   "n": 8
+  },
+  {
+   "phase": "door",
+   "interaction": "choose",
+   "title": "The player commits her door: choose_door",
+   "text": "The [[player]] picks door 1 and a random blinding, and sends [[choose_door]]. It checks the door is below 3 and that she has a Game, then pushes her DoorNote, whose note hash is the commitment P2(0x4d480003, [door, randomness]). No proof: the network is not involved.",
+   "acts": [
+    "player",
+    "choose_door"
+   ],
+   "tx": {
+    "id": "0x5b07…e1a4",
+    "by": "player",
+    "entry": "choose_door",
+    "item": {
+     "id": "tx-choose_door",
+     "label": "Tx 0x5b07…e1a4",
+     "reader": "user",
+     "form": "clear",
+     "fields": [
+      {
+       "k": "sender, fee payer",
+       "v": "the player's account (hidden: a private call)",
+       "reader": "user",
+       "form": "clear"
+      },
+      {
+       "k": "entry, args",
+       "v": "MontyHall.choose_door(door, randomness)",
+       "reader": "user",
+       "form": "clear",
+       "note": "in full in the row below"
+      },
+      {
+       "k": "to the network",
+       "v": "the wallet's proof; effects: 1 nullifier, 1 note hash, the DoorNote's encrypted log; no public call",
+       "reader": "public",
+       "form": "clear"
+      }
+     ],
+     "open": "{",
+     "close": "}"
+    },
+    "args": {
+     "id": "args-choose",
+     "label": "choose_door(",
+     "reader": "user",
+     "form": "clear",
+     "fields": [
+      {
+       "k": "door",
+       "v": "1",
+       "reader": "user",
+       "form": "clear"
+      },
+      {
+       "k": "randomness",
+       "v": "0x58e2…90c1",
+       "reader": "user",
+       "form": "clear"
+      }
+     ],
+     "open": "",
+     "close": ")"
+    }
+   },
+   "effects": [
+    {
+     "op": "remove",
+     "ref": "pl-req-init"
+    },
+    {
+     "op": "remove",
+     "ref": "pl-ans-init"
+    },
+    {
+     "op": "remove",
+     "ref": "or-req-init"
+    },
+    {
+     "op": "remove",
+     "ref": "or-ans-init"
+    },
+    {
+     "op": "remove",
+     "ref": "nd-req-init"
+    },
+    {
+     "op": "remove",
+     "ref": "ho-init-ans"
+    },
+    {
+     "op": "remove",
+     "ref": "ho-tx-start"
+    },
+    {
+     "op": "move",
+     "ref": "nd-res-init",
+     "to": {
+      "in": "node",
+      "sec": "long_lived"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "pl-tx-choose",
+      "label": "sent",
+      "reader": "user",
+      "form": "clear",
+      "value": "tx 0x5b07…e1a4: choose_door(1, 0x58e2…90c1)",
+      "about": "Her choose_door transaction."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "notes"
+     },
+     "item": {
+      "id": "k-door-nh",
+      "label": "DoorNote hash = door commitment",
+      "reader": "user",
+      "form": "sealed",
+      "value": "0x3a17…e4b8",
+      "about": "Her door's commitment: hidden by the randomness, so nobody can test the three doors.",
+      "same": "door-com"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "nullifiers"
+     },
+     "item": {
+      "id": "k-door-init",
+      "label": "DoorNote initialisation nullifier",
+      "reader": "user",
+      "form": "sealed",
+      "value": "0x1f30…c7a2",
+      "about": "Makes choose_door single-use."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "pl-door",
+      "label": "DoorNote",
+      "reader": "user",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "door",
+        "v": "1",
+        "reader": "user",
+        "form": "clear"
+       },
+       {
+        "k": "randomness",
+        "v": "0x58e2…90c1",
+        "reader": "user",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Her committed door; open_door requires the round to have played exactly this door.",
+      "to": "→ commitment `0x3a17…e4b8`",
+      "to_reader": "user",
+      "to_form": "sealed",
+      "same": "door-com"
+     }
+    }
+   ],
+   "flows": [
+    {
+     "from": "pl-tx-choose",
+     "to": [
+      "tx"
+     ],
+     "kind": "submit",
+     "reader": "user",
+     "payload": "tx 0x5b07…e1a4",
+     "text": "[[player]] → tx `0x5b07…e1a4` → [[choose_door]]: door 1, randomness"
+    },
+    {
+     "from": "pl-game",
+     "to": [
+      "choose_door"
+     ],
+     "kind": "read",
+     "reader": "user",
+     "payload": "Game note",
+     "text": "[[pl-game|her Game note]] → [[choose_door]]: she has a started game"
+    },
+    {
+     "from": "choose_door",
+     "to": [
+      "k-door-nh",
+      "k-door-init"
+     ],
+     "kind": "push",
+     "reader": "user",
+     "payload": "1 note hash, 1 nullifier",
+     "text": "[[choose_door]] → the door commitment and the DoorNote's initialisation nullifier"
+    },
+    {
+     "from": "choose_door",
+     "to": [
+      "pl-door"
+     ],
+     "kind": "push",
+     "reader": "user",
+     "payload": "DoorNote",
+     "text": "[[choose_door]] → her wallet: the [[pl-door|DoorNote]]"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Everyone",
+     "text": "a note hash and a nullifier: nothing about the door"
+    },
+    {
+     "party": "Player",
+     "text": "her own door, 1"
+    },
+    {
+     "party": "Host, nodes, orchestrator",
+     "text": "nothing"
+    }
+   ],
+   "bricks": [
+    "intake",
+    "path"
+   ],
+   "pick": "pl-door",
+   "basis": "hand-written",
+   "n": 9
+  },
+  {
+   "phase": "door",
+   "interaction": "open",
+   "title": "The player asks the host to open a door",
+   "text": "The [[player]] mines game state 0's nonce from start_game's effects (index 0) and asks for [[monty_hall_open_door]], reading and writing the game-state key `0xff02`. She presents game record 0, and sends her door and its randomness as shared inputs: one envelope per node, each holding that node's parts. Nobody but her sees the door.",
+   "acts": [
+    "player",
+    "orch"
+   ],
+   "effects": [
+    {
+     "op": "remove",
+     "ref": "pl-tx-choose"
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "pl-req-open",
+      "label": "Request<Full>",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuit",
+        "v": "monty_hall_open_door",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "request_id",
+        "v": "0x7a15…e03d",
+        "reader": "operator",
+        "form": "clear",
+        "note": "128 random bits the player drew"
+       },
+       {
+        "k": "public",
+        "v": "{in0_nonce: 0x11f4…8e3a}",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "state_keys",
+        "v": "reads [0xff02], writes [0xff02]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "shared_inputs",
+        "v": "",
+        "reader": "shared",
+        "form": "sealed",
+        "fields": [
+         {
+          "k": "door",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "shares",
+            "v": "[envelope 0, envelope 1, envelope 2]",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "one Rep3 pair per node, encrypted to that node's enc key"
+           },
+           {
+            "k": "share_hashes",
+            "v": "[3]",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         },
+         {
+          "k": "door_randomness",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "shares",
+            "v": "[envelope 0, envelope 1, envelope 2]",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "one Rep3 pair per node, encrypted to that node's enc key"
+           },
+           {
+            "k": "share_hashes",
+            "v": "[3]",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "records",
+        "v": "",
+        "reader": "shared",
+        "form": "sealed",
+        "fields": [
+         {
+          "k": "record 0xff02",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "key",
+            "v": "0xff02",
+            "reader": "operator",
+            "form": "clear"
+           },
+           {
+            "k": "note_hash",
+            "v": "0x0c91…5a4f",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "c",
+            "v": "[third 0, third 1, third 2]",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "sealed by the nodes to themselves; she cannot open it"
+           },
+           {
+            "k": "record_hashes",
+            "v": "[3]: the hash of each third",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "requester",
+        "v": "0x1a4c…77e0 (the player's requester key)",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "Schnorr over the canonical body, by the requester key",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Her open-door request: record 0 and the door as envelopes.",
+      "same": "req-open"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "orch",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "or-req-open",
+      "label": "Request<Full>",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuit",
+        "v": "monty_hall_open_door",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "request_id",
+        "v": "0x7a15…e03d",
+        "reader": "operator",
+        "form": "clear",
+        "note": "128 random bits the player drew"
+       },
+       {
+        "k": "public",
+        "v": "{in0_nonce: 0x11f4…8e3a}",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "state_keys",
+        "v": "reads [0xff02], writes [0xff02]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "shared_inputs",
+        "v": "",
+        "reader": "shared",
+        "form": "sealed",
+        "fields": [
+         {
+          "k": "door",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "shares",
+            "v": "[envelope 0, envelope 1, envelope 2]",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "one Rep3 pair per node, encrypted to that node's enc key"
+           },
+           {
+            "k": "share_hashes",
+            "v": "[3]",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         },
+         {
+          "k": "door_randomness",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "shares",
+            "v": "[envelope 0, envelope 1, envelope 2]",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "one Rep3 pair per node, encrypted to that node's enc key"
+           },
+           {
+            "k": "share_hashes",
+            "v": "[3]",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "records",
+        "v": "",
+        "reader": "shared",
+        "form": "sealed",
+        "fields": [
+         {
+          "k": "record 0xff02",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "key",
+            "v": "0xff02",
+            "reader": "operator",
+            "form": "clear"
+           },
+           {
+            "k": "note_hash",
+            "v": "0x0c91…5a4f",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "c",
+            "v": "[third 0, third 1, third 2]",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "sealed by the nodes to themselves; she cannot open it"
+           },
+           {
+            "k": "record_hashes",
+            "v": "[3]: the hash of each third",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "requester",
+        "v": "0x1a4c…77e0 (the player's requester key)",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "Schnorr over the canonical body, by the requester key",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The request as the orchestrator holds it: ciphertext only.",
+      "same": "req-open"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "nd-req-open",
+      "label": "Request<ForNode>",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuit",
+        "v": "monty_hall_open_door",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "request_id",
+        "v": "0x7a15…e03d",
+        "reader": "operator",
+        "form": "clear",
+        "note": "128 random bits the player drew"
+       },
+       {
+        "k": "public",
+        "v": "{in0_nonce: 0x11f4…8e3a}",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "state_keys",
+        "v": "reads [0xff02], writes [0xff02]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "shared_inputs",
+        "v": "",
+        "reader": "shared",
+        "form": "sealed",
+        "fields": [
+         {
+          "k": "door",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "share",
+            "v": "node i's envelope only",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "one Rep3 pair per node, encrypted to that node's enc key"
+           },
+           {
+            "k": "share_hashes",
+            "v": "[3]",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         },
+         {
+          "k": "door_randomness",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "share",
+            "v": "node i's envelope only",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "one Rep3 pair per node, encrypted to that node's enc key"
+           },
+           {
+            "k": "share_hashes",
+            "v": "[3]",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "records",
+        "v": "",
+        "reader": "shared",
+        "form": "sealed",
+        "fields": [
+         {
+          "k": "record 0xff02",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "key",
+            "v": "0xff02",
+            "reader": "operator",
+            "form": "clear"
+           },
+           {
+            "k": "note_hash",
+            "v": "0x0c91…5a4f",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "c_i",
+            "v": "node i's third only",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "sealed by the nodes to themselves; she cannot open it"
+           },
+           {
+            "k": "record_hashes",
+            "v": "[3]: the hash of each third",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "requester",
+        "v": "0x1a4c…77e0 (the player's requester key)",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "Schnorr over the canonical body, by the requester key",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The request as node i receives it: its envelopes and its third.",
+      "same": "req-open"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "nd-door-parts",
+      "label": "her door, node i's parts",
+      "reader": "shared",
+      "form": "part",
+      "fields": [
+       {
+        "k": "door",
+        "v": "1, in parts",
+        "reader": "shared",
+        "form": "part"
+       },
+       {
+        "k": "door_randomness",
+        "v": "0x58e2…90c1, in parts",
+        "reader": "shared",
+        "form": "part"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Her door as node i holds it for this round: two of three parts, not the door.",
+      "per_node": {
+       "0": "parts 0, 2 of door and door_randomness",
+       "1": "parts 1, 0 of door and door_randomness",
+       "2": "parts 2, 1 of door and door_randomness"
+      }
+     }
+    }
+   ],
+   "flows": [
+    {
+     "from": "k-gs0-nh",
+     "to": [
+      "pl-req-open"
+     ],
+     "kind": "read",
+     "reader": "public",
+     "payload": "nonce",
+     "text": "game state 0's nonce `0x11f4…8e3a`, mined from start_game's effects → her request"
+    },
+    {
+     "from": "pl-rec0",
+     "to": [
+      "pl-req-open"
+     ],
+     "kind": "read",
+     "reader": "shared",
+     "payload": "game record 0",
+     "text": "[[pl-rec0|game record 0]] → the request"
+    },
+    {
+     "from": "pl-door",
+     "to": [
+      "pl-req-open"
+     ],
+     "kind": "read",
+     "reader": "user",
+     "payload": "door, randomness",
+     "text": "[[pl-door|her door and randomness]] → split into parts, one envelope per node"
+    },
+    {
+     "from": "pl-req-open",
+     "to": [
+      "or-req-open"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "request 0x7a15…e03d",
+     "text": "[[player]] → [[orch]]: the signed request, the envelopes and the record's thirds"
+    },
+    {
+     "from": "or-req-open",
+     "to": [
+      "nd-req-open"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "request, envelope, c_i",
+     "text": "[[orch]] → each [[node]]: the request with its own envelopes and third"
+    },
+    {
+     "from": "nd-req-open",
+     "to": [
+      "nd-door-parts"
+     ],
+     "kind": "push",
+     "reader": "shared",
+     "payload": "door parts",
+     "text": "node i opens its envelopes: its parts of the door"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Orchestrator",
+     "text": "ciphertext only: the envelopes and the record's thirds"
+    },
+    {
+     "party": "Each node",
+     "text": "its parts of the door: not the door"
+    },
+    {
+     "party": "If two nodes colluded",
+     "text": "her door and the winning door"
+    }
+   ],
+   "bricks": [
+    "intake",
+    "state",
+    "binding"
+   ],
+   "pick": "nd-door-parts",
+   "basis": "hand-written",
+   "n": 10
+  },
+  {
+   "phase": "door",
+   "interaction": "open",
+   "title": "The nodes prove monty_hall_open_door",
+   "text": "Each node opens its third of game record 0. Together they run [[monty_hall_open_door]]: spend game state 0, check her door is 0, 1 or 2 on parts, and open a door that is neither hers nor the winner. Her door 1 is not the winning door 0, so they open the third door, 2. They output the opened door and the commitment to the door they played, and store game state 1. The [[player]] gets game record 1, which replaces record 0.",
+   "acts": [
+    "node",
+    "orch",
+    "player",
+    "monty_hall_open_door"
+   ],
+   "runs": [
+    {
+     "circuit": "monty_hall_open_door"
+    }
+   ],
+   "open": [
+    "monty_hall_open_door"
+   ],
+   "effects": [
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "nd-gs1",
+      "label": "GameState 1",
+      "reader": "shared",
+      "form": "part",
+      "fields": [
+       {
+        "k": "state",
+        "v": "1 (STATE_OPENED_DOOR)",
+        "reader": "shared",
+        "form": "part"
+       },
+       {
+        "k": "prng",
+        "v": "advanced by one squeeze",
+        "reader": "shared",
+        "form": "part",
+        "note": "5 fields: 4 of sponge state and a counter"
+       },
+       {
+        "k": "winning_door",
+        "v": "0",
+        "reader": "shared",
+        "form": "part",
+        "note": "nobody sees it"
+       },
+       {
+        "k": "chosen_door",
+        "v": "1",
+        "reader": "shared",
+        "form": "part"
+       },
+       {
+        "k": "open_door",
+        "v": "2",
+        "reader": "shared",
+        "form": "part"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Game state 1, only in parts and only during the round.",
+      "to": "→ note hash `0x1e08…77d3`; sealed into game record 1, then dropped",
+      "to_reader": "shared",
+      "to_form": "sealed",
+      "per_node": {
+       "0": "parts 0, 2 of each field",
+       "1": "parts 1, 0 of each field",
+       "2": "parts 2, 1 of each field"
+      }
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "nd-res-open",
+      "label": "NodeResult",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "request_id",
+        "v": "0x7a15…e03d",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof; node i verified it itself",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "public_inputs",
+        "v": "[10]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "stored",
+        "v": "[0xff02]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "records",
+        "v": "[{key 0xff02, note_hash 0x1e08…77d3, c_i}]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "signature_i",
+        "v": "node i's Schnorr signature over the result",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Node i's result row for the open-door round: proof, effects, its signature.",
+      "per_node": {
+       "0": "signature_0, third c_0",
+       "1": "signature_1, third c_1",
+       "2": "signature_2, third c_2"
+      }
+     }
+    },
+    {
+     "op": "update",
+     "ref": "nd-consumed",
+     "set": {
+      "value": "seed 0x24c8…6b19 → monty_hall_init; game state 0 0x0c91…5a4f → monty_hall_open_door"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "orch",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "or-ans-open",
+      "label": "Response",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof, one per node, all three agreeing",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "effects",
+        "v": "",
+        "reader": "operator",
+        "form": "clear",
+        "note": "PssEffects<1, 1, 2>",
+        "fields": [
+         {
+          "k": "read_leaves",
+          "v": "[game state 0's leaf 0x27bd…c018]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "nullifiers",
+          "v": "[0x2f91…0b6a]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "new_note_hashes",
+          "v": "[game state 1: 0x1e08…77d3]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "npk_app_hash",
+          "v": "0x0f42…a917",
+          "reader": "public",
+          "form": "clear"
+         },
+         {
+          "k": "app_outputs",
+          "v": "[opened door 2, door commitment 0x3a17…e4b8]",
+          "reader": "operator",
+          "form": "clear"
+         }
+        ]
+       },
+       {
+        "k": "records",
+        "v": "game record 1: key 0xff02, three sealed thirds",
+        "reader": "shared",
+        "form": "sealed"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The open-door answer the orchestrator passes on.",
+      "same": "ans-open"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "pl-ans-open",
+      "label": "Response",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof, one per node, all three agreeing",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "effects",
+        "v": "",
+        "reader": "operator",
+        "form": "clear",
+        "note": "PssEffects<1, 1, 2>",
+        "fields": [
+         {
+          "k": "read_leaves",
+          "v": "[game state 0's leaf 0x27bd…c018]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "nullifiers",
+          "v": "[0x2f91…0b6a]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "new_note_hashes",
+          "v": "[game state 1: 0x1e08…77d3]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "npk_app_hash",
+          "v": "0x0f42…a917",
+          "reader": "public",
+          "form": "clear"
+         },
+         {
+          "k": "app_outputs",
+          "v": "[opened door 2, door commitment 0x3a17…e4b8]",
+          "reader": "operator",
+          "form": "clear"
+         }
+        ]
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The answer: proof and PssEffects; opened door 2, which she and the operator's side see.",
+      "same": "ans-open"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "pl-opened",
+      "label": "opened door",
+      "reader": "operator",
+      "form": "clear",
+      "value": "2",
+      "about": "The game's own reveal: one door that is neither hers nor the winner. The operator's side sees it too."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "pl-rec1",
+      "label": "StateRecord",
+      "reader": "shared",
+      "form": "sealed",
+      "fields": [
+       {
+        "k": "key",
+        "v": "0xff02",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "note_hash",
+        "v": "0x1e08…77d3",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "c",
+        "v": "[third 0, third 1, third 2]",
+        "reader": "shared",
+        "form": "sealed",
+        "note": "one per node, sealed by node i to itself; she carries it and cannot open it",
+        "fields": [
+         {
+          "k": "GameState 1",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "state",
+            "v": "1",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "prng",
+            "v": "advanced by one squeeze",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "5 fields: 4 of sponge state and a counter"
+           },
+           {
+            "k": "winning_door",
+            "v": "0",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "nobody sees it"
+           },
+           {
+            "k": "chosen_door",
+            "v": "1",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "open_door",
+            "v": "2",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "blinding",
+            "v": "out0_randomness",
+            "reader": "shared",
+            "form": "sealed"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "associated data",
+        "v": "(namespace, key, note_hash, requester 0x1a4c…77e0)",
+        "reader": "operator",
+        "form": "clear",
+        "note": "owner-bound: only her signed request opens it"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Game record 1: game state 1 sealed in three thirds; replaces record 0."
+     }
+    },
+    {
+     "op": "spend",
+     "ref": "pl-rec0",
+     "note": "replaced by game record 1 at 11"
+    }
+   ],
+   "flows": [
+    {
+     "from": "nd-req-open",
+     "to": [
+      "monty_hall_open_door"
+     ],
+     "kind": "read",
+     "reader": "shared",
+     "payload": "c_i, nonce",
+     "text": "node i opens its third of game record 0 and binds it into [[monty_hall_open_door]]"
+    },
+    {
+     "from": "nd-door-parts",
+     "to": [
+      "monty_hall_open_door"
+     ],
+     "kind": "read",
+     "reader": "shared",
+     "payload": "door parts",
+     "text": "[[nd-door-parts|her door's parts]] → the range check, the play and the commitment"
+    },
+    {
+     "from": "nd-nsk",
+     "to": [
+      "monty_hall_open_door"
+     ],
+     "kind": "read",
+     "reader": "shared",
+     "payload": "nsk_app parts",
+     "text": "[[nd-nsk|nsk_app]] → game state 0's nullifier"
+    },
+    {
+     "from": "monty_hall_open_door",
+     "to": [
+      "nd-gs1",
+      "nd-res-open",
+      "nd-consumed"
+     ],
+     "kind": "push",
+     "reader": "operator",
+     "payload": "game state 1, result, state 0 spent",
+     "text": "[[monty_hall_open_door]] → game state 1 in parts, node i's result row; game state 0 marked spent"
+    },
+    {
+     "from": "nd-res-open",
+     "to": [
+      "or-ans-open"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "three NodeResults",
+     "text": "each [[node]] → [[orch]]: its NodeResult"
+    },
+    {
+     "from": "or-ans-open",
+     "to": [
+      "pl-ans-open",
+      "pl-opened",
+      "pl-rec1"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "proof, PssEffects, game record 1",
+     "text": "[[orch]] → [[player]]: proof, PssEffects (opened door 2) and game record 1"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Player",
+     "text": "the opened door, 2: with her door 1, it says switching wins unless she already holds the winner"
+    },
+    {
+     "party": "Nodes, orchestrator",
+     "text": "the opened door, 2, and the door commitment; not her door"
+    },
+    {
+     "party": "If two nodes colluded",
+     "text": "her door and the winning door"
+    }
+   ],
+   "bricks": [
+    "state",
+    "outputs",
+    "delivery"
+   ],
+   "pick": "pl-ans-open",
+   "basis": "hand-written",
+   "n": 11
+  },
+  {
+   "phase": "door",
+   "interaction": "open",
+   "title": "The player lands the round: open_door",
+   "text": "The [[player]] sends [[open_door]] from her own wallet with the round's PssEffects and the proof as a capsule. It reads her Game note, verifies the `monty_hall_open_door` proof under `open_vk_hash` with no node signatures, checks the network pin and that game state 0's leaf exists, spends it and pushes game state 1. Last, it requires the played door's commitment to equal her DoorNote's.",
+   "acts": [
+    "player",
+    "open_door"
+   ],
+   "tx": {
+    "id": "0x7c40…1d6e",
+    "by": "player",
+    "entry": "open_door",
+    "item": {
+     "id": "tx-open_door",
+     "label": "Tx 0x7c40…1d6e",
+     "reader": "user",
+     "form": "clear",
+     "fields": [
+      {
+       "k": "sender, fee payer",
+       "v": "the player's account (hidden: a private call)",
+       "reader": "user",
+       "form": "clear"
+      },
+      {
+       "k": "entry, args",
+       "v": "MontyHall.open_door(effects)",
+       "reader": "user",
+       "form": "clear",
+       "note": "in full in the row below"
+      },
+      {
+       "k": "capsule",
+       "v": "ProofData {vk, proof}",
+       "reader": "operator",
+       "form": "clear",
+       "note": "stays in the sender's wallet"
+      },
+      {
+       "k": "to the network",
+       "v": "her wallet's proof; effects: 1 nullifier, 1 note hash; no public call",
+       "reader": "public",
+       "form": "clear"
+      }
+     ],
+     "open": "{",
+     "close": "}"
+    },
+    "args": {
+     "id": "args-open",
+     "label": "open_door(effects: PssEffects<1, 1, 2>",
+     "reader": "user",
+     "form": "clear",
+     "fields": [
+      {
+       "k": "read_leaves",
+       "v": "[game state 0's leaf 0x27bd…c018]",
+       "reader": "shared",
+       "form": "sealed"
+      },
+      {
+       "k": "nullifiers",
+       "v": "[0x2f91…0b6a]",
+       "reader": "shared",
+       "form": "sealed"
+      },
+      {
+       "k": "new_note_hashes",
+       "v": "[game state 1: 0x1e08…77d3]",
+       "reader": "shared",
+       "form": "sealed"
+      },
+      {
+       "k": "npk_app_hash",
+       "v": "0x0f42…a917",
+       "reader": "public",
+       "form": "clear"
+      },
+      {
+       "k": "app_outputs",
+       "v": "[opened door 2, door commitment 0x3a17…e4b8]",
+       "reader": "operator",
+       "form": "clear"
+      }
+     ],
+     "open": "{",
+     "close": "})",
+     "note": "+ capsule {vk, proof}"
+    }
+   },
+   "verifies": [
+    {
+     "function": "open_door",
+     "circuit": "monty_hall_open_door",
+     "public_inputs": {
+      "id": "pi-open",
+      "reader": "public",
+      "label": "public_inputs [10]",
+      "open": "{",
+      "close": "}",
+      "note": "canonical_public_inputs order, rebuilt by the contract",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1 (this contract's address)",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "owner",
+        "v": "0xafafaf (the Config's owner)",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "in_slots",
+        "v": "[0xff02]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "out_slots",
+        "v": "[0xff02]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "app_inputs",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "read_leaves",
+        "v": "[0x27bd…c018]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "nullifiers",
+        "v": "[0x2f91…0b6a]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "new_note_hashes",
+        "v": "[0x1e08…77d3]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "npk_app_hash",
+        "v": "0x0f42…a917",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "app_outputs",
+        "v": "[2, 0x3a17…e4b8]",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ]
+     }
+    }
+   ],
+   "open": [
+    "monty_hall_open_door"
+   ],
+   "effects": [
+    {
+     "op": "remove",
+     "ref": "nd-gs1"
+    },
+    {
+     "op": "remove",
+     "ref": "nd-door-parts"
+    },
+    {
+     "op": "remove",
+     "ref": "nd-req-open"
+    },
+    {
+     "op": "remove",
+     "ref": "or-req-open"
+    },
+    {
+     "op": "remove",
+     "ref": "or-ans-open"
+    },
+    {
+     "op": "remove",
+     "ref": "pl-req-open"
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "pl-tx-open",
+      "label": "sent",
+      "reader": "operator",
+      "form": "clear",
+      "value": "tx 0x7c40…1d6e with the capsule {vk, proof}",
+      "about": "Her open_door transaction; the capsule stays in her wallet."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "nullifiers"
+     },
+     "item": {
+      "id": "k-gs0-null",
+      "label": "nullifier of game state 0",
+      "reader": "shared",
+      "form": "sealed",
+      "value": "0x2f91…0b6a",
+      "about": "Game state 0's nullifier under nsk_app; a stale record re-derives it and fails."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "notes"
+     },
+     "item": {
+      "id": "k-gs1-nh",
+      "label": "note hash of game state 1",
+      "reader": "shared",
+      "form": "sealed",
+      "value": "0x1e08…77d3",
+      "about": "Game state 1 on chain: a hash of parts only the nodes hold.",
+      "note": "leaf 0x30a2…d45e after the kernel's nonce"
+     }
+    },
+    {
+     "op": "spend",
+     "ref": "k-gs0-nh",
+     "note": "nullified at 12"
+    }
+   ],
+   "flows": [
+    {
+     "from": "pl-tx-open",
+     "to": [
+      "tx"
+     ],
+     "kind": "submit",
+     "reader": "operator",
+     "payload": "tx 0x7c40…1d6e",
+     "text": "[[player]] → tx `0x7c40…1d6e` → [[open_door]]: PssEffects, capsule {vk, proof}"
+    },
+    {
+     "from": "pl-game",
+     "to": [
+      "od-game"
+     ],
+     "kind": "read",
+     "reader": "user",
+     "payload": "open_vk_hash, pins",
+     "text": "[[pl-game|her Game note]] → [[open_door]]: `open_vk_hash`, owner, `npk_app_hash`"
+    },
+    {
+     "from": "pl-door",
+     "to": [
+      "od-door"
+     ],
+     "kind": "read",
+     "reader": "user",
+     "payload": "door commitment",
+     "text": "[[pl-door|her DoorNote]] → [[open_door]]: the door commitment"
+    },
+    {
+     "from": "open_door",
+     "to": [
+      "k-gs0-null",
+      "k-gs1-nh"
+     ],
+     "kind": "push",
+     "reader": "shared",
+     "payload": "1 nullifier, 1 note hash",
+     "text": "[[open_door]] → nullifier of game state 0, note hash of game state 1"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Everyone",
+     "text": "one nullifier and one note hash of this contract: not the door, the opened door or the round"
+    },
+    {
+     "party": "Player",
+     "text": "the opened door, now checked by the proof in her own wallet; the network played her committed door"
+    },
+    {
+     "party": "Host, nodes, orchestrator",
+     "text": "nothing new"
+    }
+   ],
+   "bricks": [
+    "path",
+    "submission",
+    "binding",
+    "outputs"
+   ],
+   "pick": "k-gs1-nh",
+   "basis": "hand-written",
+   "n": 12
+  },
+  {
+   "phase": "door",
+   "interaction": "switch",
+   "title": "The player commits to switch: switch_door",
+   "text": "The [[player]] decides to switch and sends [[switch_door]] with `true`. It checks she has a Game and pushes her SwitchNote, a note only she can read. No proof. finish_game will take the choice from this note, never from an argument.",
+   "acts": [
+    "player",
+    "switch_door"
+   ],
+   "tx": {
+    "id": "0x2d95…6f08",
+    "by": "player",
+    "entry": "switch_door",
+    "item": {
+     "id": "tx-switch_door",
+     "label": "Tx 0x2d95…6f08",
+     "reader": "user",
+     "form": "clear",
+     "fields": [
+      {
+       "k": "sender, fee payer",
+       "v": "the player's account (hidden: a private call)",
+       "reader": "user",
+       "form": "clear"
+      },
+      {
+       "k": "entry, args",
+       "v": "MontyHall.switch_door(switch)",
+       "reader": "user",
+       "form": "clear",
+       "note": "in full in the row below"
+      },
+      {
+       "k": "to the network",
+       "v": "her wallet's proof; effects: 1 nullifier, 1 note hash, the SwitchNote's encrypted log; no public call",
+       "reader": "public",
+       "form": "clear"
+      }
+     ],
+     "open": "{",
+     "close": "}"
+    },
+    "args": {
+     "id": "args-switch",
+     "label": "switch_door(",
+     "reader": "user",
+     "form": "clear",
+     "fields": [
+      {
+       "k": "switch",
+       "v": "true",
+       "reader": "user",
+       "form": "clear"
+      }
+     ],
+     "open": "",
+     "close": ")"
+    }
+   },
+   "effects": [
+    {
+     "op": "remove",
+     "ref": "pl-ans-open"
+    },
+    {
+     "op": "remove",
+     "ref": "pl-tx-open"
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "pl-tx-switch",
+      "label": "sent",
+      "reader": "user",
+      "form": "clear",
+      "value": "tx 0x2d95…6f08: switch_door(true)",
+      "about": "Her switch_door transaction."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "notes"
+     },
+     "item": {
+      "id": "k-switch-nh",
+      "label": "SwitchNote hash",
+      "reader": "user",
+      "form": "sealed",
+      "value": "0x19fb…0d6c",
+      "about": "Her stick-or-switch choice on chain, hidden by the note randomness."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "nullifiers"
+     },
+     "item": {
+      "id": "k-switch-init",
+      "label": "SwitchNote initialisation nullifier",
+      "reader": "user",
+      "form": "sealed",
+      "value": "0x0d58…e3f6",
+      "about": "Makes switch_door single-use."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "pl-switch",
+      "label": "SwitchNote",
+      "reader": "user",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "switch",
+        "v": "true",
+        "reader": "user",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Her committed choice; finish_game passes it to the round as the app input.",
+      "to": "→ note hash `0x19fb…0d6c`",
+      "to_reader": "user",
+      "to_form": "sealed"
+     }
+    }
+   ],
+   "flows": [
+    {
+     "from": "pl-tx-switch",
+     "to": [
+      "tx"
+     ],
+     "kind": "submit",
+     "reader": "user",
+     "payload": "tx 0x2d95…6f08",
+     "text": "[[player]] → tx `0x2d95…6f08` → [[switch_door]]: switch = true"
+    },
+    {
+     "from": "pl-game",
+     "to": [
+      "switch_door"
+     ],
+     "kind": "read",
+     "reader": "user",
+     "payload": "Game note",
+     "text": "[[pl-game|her Game note]] → [[switch_door]]: she has a started game"
+    },
+    {
+     "from": "switch_door",
+     "to": [
+      "k-switch-nh",
+      "k-switch-init"
+     ],
+     "kind": "push",
+     "reader": "user",
+     "payload": "1 note hash, 1 nullifier",
+     "text": "[[switch_door]] → the SwitchNote's note hash and initialisation nullifier"
+    },
+    {
+     "from": "switch_door",
+     "to": [
+      "pl-switch"
+     ],
+     "kind": "push",
+     "reader": "user",
+     "payload": "SwitchNote",
+     "text": "[[switch_door]] → her wallet: the [[pl-switch|SwitchNote]]"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Everyone",
+     "text": "a note hash and a nullifier: not the choice"
+    },
+    {
+     "party": "Player",
+     "text": "her own choice: switch"
+    }
+   ],
+   "bricks": [
+    "path"
+   ],
+   "pick": "pl-switch",
+   "basis": "hand-written",
+   "n": 13
+  },
+  {
+   "phase": "finish",
+   "interaction": "finish",
+   "title": "The player asks to finish",
+   "text": "The [[player]] mines game state 1's nonce from open_door's effects (index 0) and asks for [[monty_hall_finish]], reading the game-state key and writing nothing. She presents game record 1 and her choice, `switch: true`, as a public input of the round.",
+   "acts": [
+    "player",
+    "orch"
+   ],
+   "effects": [
+    {
+     "op": "remove",
+     "ref": "pl-tx-switch"
+    },
+    {
+     "op": "move",
+     "ref": "nd-res-open",
+     "to": {
+      "in": "node",
+      "sec": "long_lived"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "pl-req-fin",
+      "label": "Request<Full>",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuit",
+        "v": "monty_hall_finish",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "request_id",
+        "v": "0x3c62…9f58",
+        "reader": "operator",
+        "form": "clear",
+        "note": "128 random bits the player drew"
+       },
+       {
+        "k": "public",
+        "v": "{switch: true, in0_nonce: 0x09c7…3b81}",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "state_keys",
+        "v": "reads [0xff02], writes []",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "shared_inputs",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "records",
+        "v": "",
+        "reader": "shared",
+        "form": "sealed",
+        "fields": [
+         {
+          "k": "record 0xff02",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "key",
+            "v": "0xff02",
+            "reader": "operator",
+            "form": "clear"
+           },
+           {
+            "k": "note_hash",
+            "v": "0x1e08…77d3",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "c",
+            "v": "[third 0, third 1, third 2]",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "sealed by the nodes to themselves; she cannot open it"
+           },
+           {
+            "k": "record_hashes",
+            "v": "[3]: the hash of each third",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "requester",
+        "v": "0x1a4c…77e0 (the player's requester key)",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "Schnorr over the canonical body, by the requester key",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Her finish request: record 1 and her choice.",
+      "same": "req-fin"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "orch",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "or-req-fin",
+      "label": "Request<Full>",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuit",
+        "v": "monty_hall_finish",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "request_id",
+        "v": "0x3c62…9f58",
+        "reader": "operator",
+        "form": "clear",
+        "note": "128 random bits the player drew"
+       },
+       {
+        "k": "public",
+        "v": "{switch: true, in0_nonce: 0x09c7…3b81}",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "state_keys",
+        "v": "reads [0xff02], writes []",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "shared_inputs",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "records",
+        "v": "",
+        "reader": "shared",
+        "form": "sealed",
+        "fields": [
+         {
+          "k": "record 0xff02",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "key",
+            "v": "0xff02",
+            "reader": "operator",
+            "form": "clear"
+           },
+           {
+            "k": "note_hash",
+            "v": "0x1e08…77d3",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "c",
+            "v": "[third 0, third 1, third 2]",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "sealed by the nodes to themselves; she cannot open it"
+           },
+           {
+            "k": "record_hashes",
+            "v": "[3]: the hash of each third",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "requester",
+        "v": "0x1a4c…77e0 (the player's requester key)",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "Schnorr over the canonical body, by the requester key",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The finish request as the orchestrator holds it.",
+      "same": "req-fin"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "nd-req-fin",
+      "label": "Request<ForNode>",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "circuit",
+        "v": "monty_hall_finish",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "request_id",
+        "v": "0x3c62…9f58",
+        "reader": "operator",
+        "form": "clear",
+        "note": "128 random bits the player drew"
+       },
+       {
+        "k": "public",
+        "v": "{switch: true, in0_nonce: 0x09c7…3b81}",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "state_keys",
+        "v": "reads [0xff02], writes []",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "shared_inputs",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "records",
+        "v": "",
+        "reader": "shared",
+        "form": "sealed",
+        "fields": [
+         {
+          "k": "record 0xff02",
+          "v": "",
+          "reader": "shared",
+          "form": "sealed",
+          "fields": [
+           {
+            "k": "key",
+            "v": "0xff02",
+            "reader": "operator",
+            "form": "clear"
+           },
+           {
+            "k": "note_hash",
+            "v": "0x1e08…77d3",
+            "reader": "shared",
+            "form": "sealed"
+           },
+           {
+            "k": "c_i",
+            "v": "node i's third only",
+            "reader": "shared",
+            "form": "sealed",
+            "note": "sealed by the nodes to themselves; she cannot open it"
+           },
+           {
+            "k": "record_hashes",
+            "v": "[3]: the hash of each third",
+            "reader": "operator",
+            "form": "clear"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "k": "requester",
+        "v": "0x1a4c…77e0 (the player's requester key)",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "signature",
+        "v": "Schnorr over the canonical body, by the requester key",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The finish request as node i receives it.",
+      "same": "req-fin"
+     }
+    }
+   ],
+   "flows": [
+    {
+     "from": "k-gs1-nh",
+     "to": [
+      "pl-req-fin"
+     ],
+     "kind": "read",
+     "reader": "public",
+     "payload": "nonce",
+     "text": "game state 1's nonce `0x09c7…3b81`, mined from open_door's effects → her request"
+    },
+    {
+     "from": "pl-rec1",
+     "to": [
+      "pl-req-fin"
+     ],
+     "kind": "read",
+     "reader": "shared",
+     "payload": "game record 1",
+     "text": "[[pl-rec1|game record 1]] → the request"
+    },
+    {
+     "from": "pl-switch",
+     "to": [
+      "pl-req-fin"
+     ],
+     "kind": "read",
+     "reader": "user",
+     "payload": "switch",
+     "text": "[[pl-switch|her choice]] → `switch: true`, a public input of the round"
+    },
+    {
+     "from": "pl-req-fin",
+     "to": [
+      "or-req-fin"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "request 0x3c62…9f58",
+     "text": "[[player]] → [[orch]]: the signed request with the record's thirds"
+    },
+    {
+     "from": "or-req-fin",
+     "to": [
+      "nd-req-fin"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "request, c_i",
+     "text": "[[orch]] → each [[node]]: the request with its own third"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Nodes, orchestrator",
+     "text": "her choice, switch, a public input of this round; the record only as ciphertext"
+    }
+   ],
+   "bricks": [
+    "intake",
+    "state"
+   ],
+   "pick": "pl-req-fin",
+   "basis": "hand-written",
+   "n": 14
+  },
+  {
+   "phase": "finish",
+   "interaction": "finish",
+   "title": "The nodes prove monty_hall_finish",
+   "text": "Each node opens its third of game record 1. Together they run [[monty_hall_finish]]: spend game state 1, check a door was opened, apply the switch (her door becomes 3 − 1 − 2 = 0) and output `win`. Door 0 is the winner, so win = 1. Nothing replaces the state and no record comes back: the game is over.",
+   "acts": [
+    "node",
+    "orch",
+    "player",
+    "monty_hall_finish"
+   ],
+   "runs": [
+    {
+     "circuit": "monty_hall_finish"
+    }
+   ],
+   "open": [
+    "monty_hall_finish"
+   ],
+   "effects": [
+    {
+     "op": "create",
+     "at": {
+      "in": "node",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "nd-res-fin",
+      "label": "NodeResult",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "request_id",
+        "v": "0x3c62…9f58",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof; node i verified it itself",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "public_inputs",
+        "v": "[8]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "stored",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "records",
+        "v": "[]",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "signature_i",
+        "v": "node i's Schnorr signature over the result",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "Node i's result row for the finish round: no records.",
+      "per_node": {
+       "0": "signature_0, third c_0",
+       "1": "signature_1, third c_1",
+       "2": "signature_2, third c_2"
+      }
+     }
+    },
+    {
+     "op": "update",
+     "ref": "nd-consumed",
+     "set": {
+      "value": "seed 0x24c8…6b19 → monty_hall_init; game state 0 0x0c91…5a4f → monty_hall_open_door; game state 1 0x1e08…77d3 → monty_hall_finish"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "orch",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "or-ans-fin",
+      "label": "Response",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof, one per node, all three agreeing",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "effects",
+        "v": "",
+        "reader": "operator",
+        "form": "clear",
+        "note": "PssEffects<1, 0, 1>",
+        "fields": [
+         {
+          "k": "read_leaves",
+          "v": "[game state 1's leaf 0x30a2…d45e]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "nullifiers",
+          "v": "[0x22e6…a90f]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "new_note_hashes",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear",
+          "note": "W = 0: nothing replaces the state"
+         },
+         {
+          "k": "npk_app_hash",
+          "v": "0x0f42…a917",
+          "reader": "public",
+          "form": "clear"
+         },
+         {
+          "k": "app_outputs",
+          "v": "[win 1]",
+          "reader": "operator",
+          "form": "clear"
+         }
+        ]
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The finish answer the orchestrator passes on.",
+      "same": "ans-fin"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "pl-ans-fin",
+      "label": "Response",
+      "reader": "operator",
+      "form": "clear",
+      "fields": [
+       {
+        "k": "proof",
+        "v": "UltraHonk ZK proof, one per node, all three agreeing",
+        "reader": "operator",
+        "form": "clear"
+       },
+       {
+        "k": "effects",
+        "v": "",
+        "reader": "operator",
+        "form": "clear",
+        "note": "PssEffects<1, 0, 1>",
+        "fields": [
+         {
+          "k": "read_leaves",
+          "v": "[game state 1's leaf 0x30a2…d45e]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "nullifiers",
+          "v": "[0x22e6…a90f]",
+          "reader": "shared",
+          "form": "sealed"
+         },
+         {
+          "k": "new_note_hashes",
+          "v": "[]",
+          "reader": "public",
+          "form": "clear",
+          "note": "W = 0: nothing replaces the state"
+         },
+         {
+          "k": "npk_app_hash",
+          "v": "0x0f42…a917",
+          "reader": "public",
+          "form": "clear"
+         },
+         {
+          "k": "app_outputs",
+          "v": "[win 1]",
+          "reader": "operator",
+          "form": "clear"
+         }
+        ]
+       },
+       {
+        "k": "records",
+        "v": "[]: nothing replaces the state",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ],
+      "open": "{",
+      "close": "}",
+      "about": "The finish answer: proof and PssEffects; win = 1.",
+      "same": "ans-fin"
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "long_lived"
+     },
+     "item": {
+      "id": "pl-win",
+      "label": "win",
+      "reader": "operator",
+      "form": "clear",
+      "value": "1",
+      "about": "The result: she switched to door 0, the winning door."
+     }
+    },
+    {
+     "op": "spend",
+     "ref": "pl-rec1",
+     "note": "spent at 15: nothing replaces it"
+    }
+   ],
+   "flows": [
+    {
+     "from": "nd-req-fin",
+     "to": [
+      "monty_hall_finish"
+     ],
+     "kind": "read",
+     "reader": "shared",
+     "payload": "c_i, switch, nonce",
+     "text": "node i opens its third of game record 1 and binds it into [[monty_hall_finish]]"
+    },
+    {
+     "from": "nd-nsk",
+     "to": [
+      "monty_hall_finish"
+     ],
+     "kind": "read",
+     "reader": "shared",
+     "payload": "nsk_app parts",
+     "text": "[[nd-nsk|nsk_app]] → game state 1's nullifier"
+    },
+    {
+     "from": "monty_hall_finish",
+     "to": [
+      "nd-res-fin",
+      "nd-consumed"
+     ],
+     "kind": "push",
+     "reader": "operator",
+     "payload": "result, state 1 spent",
+     "text": "[[monty_hall_finish]] → node i's result row; game state 1 marked spent"
+    },
+    {
+     "from": "nd-res-fin",
+     "to": [
+      "or-ans-fin"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "three NodeResults",
+     "text": "each [[node]] → [[orch]]: its NodeResult"
+    },
+    {
+     "from": "or-ans-fin",
+     "to": [
+      "pl-ans-fin",
+      "pl-win"
+     ],
+     "kind": "send",
+     "reader": "operator",
+     "payload": "proof, PssEffects, win",
+     "text": "[[orch]] → [[player]]: the proof and PssEffects, win = 1"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Player",
+     "text": "win = 1: with her door 1, the opened door 2 and the switch, the winning door was 0"
+    },
+    {
+     "party": "Nodes, orchestrator",
+     "text": "win = 1, the switch and the opened door 2: her door and the winning door are 0 and 1, in some order"
+    },
+    {
+     "party": "Host",
+     "text": "nothing"
+    }
+   ],
+   "bricks": [
+    "outputs",
+    "delivery",
+    "value"
+   ],
+   "pick": "pl-win",
+   "basis": "hand-written",
+   "n": 15
+  },
+  {
+   "phase": "finish",
+   "interaction": "finish",
+   "title": "The player finishes the game: finish_game",
+   "text": "The [[player]] sends [[finish_game]]. It reads her Game note and her SwitchNote, and passes `switch` as the round's app input, so the proof is checked against the choice she committed. It verifies the `monty_hall_finish` proof under `finish_vk_hash`, checks the network pin and game state 1's leaf, and spends it. Nothing replaces it.",
+   "acts": [
+    "player",
+    "finish_game"
+   ],
+   "tx": {
+    "id": "0x6e3c…94b1",
+    "by": "player",
+    "entry": "finish_game",
+    "item": {
+     "id": "tx-finish_game",
+     "label": "Tx 0x6e3c…94b1",
+     "reader": "user",
+     "form": "clear",
+     "fields": [
+      {
+       "k": "sender, fee payer",
+       "v": "the player's account (hidden: a private call)",
+       "reader": "user",
+       "form": "clear"
+      },
+      {
+       "k": "entry, args",
+       "v": "MontyHall.finish_game(read_leaves, nullifiers, npk_app_hash, app_outputs)",
+       "reader": "user",
+       "form": "clear",
+       "note": "in full in the row below"
+      },
+      {
+       "k": "capsule",
+       "v": "ProofData {vk, proof}",
+       "reader": "operator",
+       "form": "clear",
+       "note": "stays in the sender's wallet"
+      },
+      {
+       "k": "to the network",
+       "v": "her wallet's proof; effects: 1 nullifier; no public call",
+       "reader": "public",
+       "form": "clear"
+      }
+     ],
+     "open": "{",
+     "close": "}"
+    },
+    "args": {
+     "id": "args-fin",
+     "label": "finish_game(",
+     "reader": "user",
+     "form": "clear",
+     "fields": [
+      {
+       "k": "read_leaves",
+       "v": "[0x30a2…d45e]",
+       "reader": "shared",
+       "form": "sealed"
+      },
+      {
+       "k": "nullifiers",
+       "v": "[0x22e6…a90f]",
+       "reader": "shared",
+       "form": "sealed"
+      },
+      {
+       "k": "npk_app_hash",
+       "v": "0x0f42…a917",
+       "reader": "public",
+       "form": "clear"
+      },
+      {
+       "k": "app_outputs",
+       "v": "[win 1]",
+       "reader": "operator",
+       "form": "clear"
+      }
+     ],
+     "open": "",
+     "close": ")",
+     "note": "PssEffects<1, 0, 1> field by field, without new_note_hashes"
+    }
+   },
+   "verifies": [
+    {
+     "function": "finish_game",
+     "circuit": "monty_hall_finish",
+     "public_inputs": {
+      "id": "pi-fin",
+      "reader": "public",
+      "label": "public_inputs [8]",
+      "open": "{",
+      "close": "}",
+      "note": "canonical_public_inputs order, rebuilt by the contract",
+      "fields": [
+       {
+        "k": "namespace",
+        "v": "0x2b6e…c3d1 (this contract's address)",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "owner",
+        "v": "0xafafaf (the Config's owner)",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "in_slots",
+        "v": "[0xff02]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "out_slots",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "app_inputs",
+        "v": "[switch 1, from her SwitchNote]",
+        "reader": "user",
+        "form": "clear"
+       },
+       {
+        "k": "read_leaves",
+        "v": "[0x30a2…d45e]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "nullifiers",
+        "v": "[0x22e6…a90f]",
+        "reader": "shared",
+        "form": "sealed"
+       },
+       {
+        "k": "new_note_hashes",
+        "v": "[]",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "npk_app_hash",
+        "v": "0x0f42…a917",
+        "reader": "public",
+        "form": "clear"
+       },
+       {
+        "k": "app_outputs",
+        "v": "[1]",
+        "reader": "operator",
+        "form": "clear"
+       }
+      ]
+     }
+    }
+   ],
+   "open": [
+    "monty_hall_finish"
+   ],
+   "effects": [
+    {
+     "op": "remove",
+     "ref": "pl-req-fin"
+    },
+    {
+     "op": "remove",
+     "ref": "or-req-fin"
+    },
+    {
+     "op": "remove",
+     "ref": "or-ans-fin"
+    },
+    {
+     "op": "remove",
+     "ref": "nd-req-fin"
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "player",
+      "sec": "interaction"
+     },
+     "item": {
+      "id": "pl-tx-fin",
+      "label": "sent",
+      "reader": "operator",
+      "form": "clear",
+      "value": "tx 0x6e3c…94b1 with the capsule {vk, proof}",
+      "about": "Her finish_game transaction."
+     }
+    },
+    {
+     "op": "create",
+     "at": {
+      "in": "mh",
+      "sec": "private",
+      "group": "nullifiers"
+     },
+     "item": {
+      "id": "k-gs1-null",
+      "label": "nullifier of game state 1",
+      "reader": "shared",
+      "form": "sealed",
+      "value": "0x22e6…a90f",
+      "about": "Game state 1's nullifier: the game is over."
+     }
+    },
+    {
+     "op": "spend",
+     "ref": "k-gs1-nh",
+     "note": "nullified at 16"
+    }
+   ],
+   "flows": [
+    {
+     "from": "pl-tx-fin",
+     "to": [
+      "tx"
+     ],
+     "kind": "submit",
+     "reader": "operator",
+     "payload": "tx 0x6e3c…94b1",
+     "text": "[[player]] → tx `0x6e3c…94b1` → [[finish_game]]: read_leaves, nullifiers, npk_app_hash, app_outputs, capsule"
+    },
+    {
+     "from": "pl-game",
+     "to": [
+      "finish_game"
+     ],
+     "kind": "read",
+     "reader": "user",
+     "payload": "finish_vk_hash, pins",
+     "text": "[[pl-game|her Game note]] → [[finish_game]]: `finish_vk_hash`, owner, `npk_app_hash`"
+    },
+    {
+     "from": "pl-switch",
+     "to": [
+      "fg-switch"
+     ],
+     "kind": "read",
+     "reader": "user",
+     "payload": "switch",
+     "text": "[[pl-switch|her SwitchNote]] → [[finish_game]]: `switch`, the app input"
+    },
+    {
+     "from": "finish_game",
+     "to": [
+      "k-gs1-null"
+     ],
+     "kind": "push",
+     "reader": "shared",
+     "payload": "1 nullifier",
+     "text": "[[finish_game]] → nullifier of game state 1"
+    }
+   ],
+   "learns": [
+    {
+     "party": "Everyone",
+     "text": "one nullifier: not the result, which stays off chain"
+    },
+    {
+     "party": "Player",
+     "text": "win = 1, checked by the proof in her own wallet against her committed switch"
+    }
+   ],
+   "bricks": [
+    "path",
+    "submission",
+    "value"
+   ],
+   "pick": "k-gs1-null",
+   "basis": "hand-written",
+   "n": 16
+  }
+ ]
+}

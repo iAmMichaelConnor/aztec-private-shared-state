@@ -1,0 +1,20 @@
+[package]
+name = "pss_public_contract"
+type = "lib"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0 (intake storage, the private and public halves of the
+# result transaction, TestEnvironment); deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+# The note-mode library (apply, anchoring, proof data).
+pss_contract = { path = "../pss_contract" }
+# The tip round helpers: the inputs hash and the chain request id are the
+# ones the round circuits compute (pss_core tip::intake), not a copy.
+pss_core = { path = "../pss_core" }
+# total-noir's `total` library (the fixed-length Poseidon2), a Nargo git
+# dependency at the ref pinned in toolchain.json.
+total = { git = "https://github.com/iAmMichaelConnor/total-noir", tag = "v0.1.0", directory = "noir/total" }
+# Schnorr over Grumpkin in the encoding the nodes sign with (result
+# signatures and receipts).
+schnorr = { tag = "v0.4.0", git = "https://github.com/noir-lang/schnorr" }

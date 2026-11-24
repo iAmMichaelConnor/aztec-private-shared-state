@@ -1,0 +1,17 @@
+[package]
+name = "counter_tip_test"
+type = "lib"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0; deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+counter_tip = { path = "../counter_tip" }
+pss_public_contract = { path = "../../../../noir/pss_public_contract" }
+# the round circuits' own add, so the commitments, note hash and ciphertext
+# the suite lands are the ones a real round makes
+counter_circuit = { path = "../../circuits/counter_tip" }
+pss_core = { path = "../../../../noir/pss_core" }
+# the test network (node keys, signer) and the helpers every tip suite shares,
+# among them a round's landed result and opened outcome log
+pss_tip_test = { path = "../../../../noir/pss_tip_test" }

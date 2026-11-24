@@ -1,0 +1,14 @@
+{
+  "example": "amm-tip",
+  "descriptor": "amm-tip-shared-onchain",
+  "fee": "amm-tip",
+  "config": {},
+  "init": {
+    "method": "init_pool"
+  },
+  "methods": {
+    "amm_swap_tip_shared": {
+      "name": "process_result_shared"
+    }
+  }
+}

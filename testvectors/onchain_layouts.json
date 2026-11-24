@@ -1,0 +1,691 @@
+{
+  "kinds": {
+    "chosen": 1,
+    "clear": 0
+  },
+  "rounds": [
+    {
+      "circuit": "amm_swap_tip_shared",
+      "clear": 0,
+      "corrections": 6,
+      "example": "amm-tip",
+      "kinds": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "AMM_SWAP_TIP_SHARED_LAYOUT",
+      "layouts": "examples/amm-tip/contract/amm_tip/src/layouts.nr",
+      "manifest": "examples/amm-tip/manifests/amm_swap_tip_shared.json",
+      "names": [
+        "amount_in",
+        "direction",
+        "min_out",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "amm_swap_tip_shared",
+      "clear": 0,
+      "corrections": 6,
+      "example": "amm-tip",
+      "kinds": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "AMM_SWAP_TIP_SHARED_ONCHAIN_LAYOUT",
+      "layouts": "examples/amm-tip/contract/amm_tip/src/layouts.nr",
+      "manifest": "examples/amm-tip/manifests/amm_swap_tip_shared_onchain.json",
+      "names": [
+        "amount_in",
+        "direction",
+        "min_out",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "counter_add",
+      "clear": 0,
+      "corrections": 4,
+      "example": "counter-tip",
+      "kinds": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "COUNTER_ADD_LAYOUT",
+      "layouts": "examples/counter-tip/contract/counter_tip/src/layouts.nr",
+      "manifest": "examples/counter-tip/manifests/counter_add.json",
+      "names": [
+        "amount",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "claim",
+      "clear": 0,
+      "corrections": 5,
+      "example": "credits-tip",
+      "kinds": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "CLAIM_LAYOUT",
+      "layouts": "examples/credits-tip/contract/credits_tip/src/layouts.nr",
+      "manifest": "examples/credits-tip/manifests/claim.json",
+      "names": [
+        "key",
+        "amount",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "move",
+      "clear": 0,
+      "corrections": 6,
+      "example": "credits-tip",
+      "kinds": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "MOVE_LAYOUT",
+      "layouts": "examples/credits-tip/contract/credits_tip/src/layouts.nr",
+      "manifest": "examples/credits-tip/manifests/move.json",
+      "names": [
+        "from",
+        "to",
+        "amount",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "pay",
+      "clear": 0,
+      "corrections": 5,
+      "example": "credits-tip",
+      "kinds": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "PAY_LAYOUT",
+      "layouts": "examples/credits-tip/contract/credits_tip/src/layouts.nr",
+      "manifest": "examples/credits-tip/manifests/pay.json",
+      "names": [
+        "key",
+        "amount",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "view",
+      "clear": 0,
+      "corrections": 4,
+      "example": "credits-tip",
+      "kinds": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "VIEW_LAYOUT",
+      "layouts": "examples/credits-tip/contract/credits_tip/src/layouts.nr",
+      "manifest": "examples/credits-tip/manifests/view.json",
+      "names": [
+        "key",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "borrow_oblivious",
+      "clear": 0,
+      "corrections": 7,
+      "example": "lending-tip",
+      "kinds": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "BORROW_OBLIVIOUS_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/borrow_oblivious.json",
+      "names": [
+        "position",
+        "amount",
+        "handle_partial",
+        "handle_key",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "borrow_shared",
+      "clear": 1,
+      "corrections": 6,
+      "example": "lending-tip",
+      "kinds": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "BORROW_SHARED_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/borrow_shared.json",
+      "names": [
+        "position",
+        "amount",
+        "handle_partial",
+        "handle_key",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "deposit_oblivious",
+      "clear": 1,
+      "corrections": 7,
+      "example": "lending-tip",
+      "kinds": [
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "DEPOSIT_OBLIVIOUS_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/deposit_oblivious.json",
+      "names": [
+        "position",
+        "opens",
+        "amount",
+        "handle_partial",
+        "handle_key",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "deposit_shared",
+      "clear": 1,
+      "corrections": 6,
+      "example": "lending-tip",
+      "kinds": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "DEPOSIT_SHARED_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/deposit_shared.json",
+      "names": [
+        "position",
+        "amount",
+        "handle_partial",
+        "handle_key",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "deposit_shared",
+      "clear": 1,
+      "corrections": 6,
+      "example": "lending-tip",
+      "kinds": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "DEPOSIT_SHARED_ONCHAIN_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/deposit_shared_onchain.json",
+      "names": [
+        "position",
+        "amount",
+        "handle_partial",
+        "handle_key",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "liquidate_oblivious",
+      "clear": 1,
+      "corrections": 5,
+      "example": "lending-tip",
+      "kinds": [
+        1,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "LIQUIDATE_OBLIVIOUS_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/liquidate_oblivious.json",
+      "names": [
+        "p1",
+        "count",
+        "budget",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "liquidate_shared",
+      "clear": 2,
+      "corrections": 4,
+      "example": "lending-tip",
+      "kinds": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "LIQUIDATE_SHARED_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/liquidate_shared.json",
+      "names": [
+        "p1",
+        "count",
+        "budget",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "quote_oblivious",
+      "clear": 0,
+      "corrections": 3,
+      "example": "lending-tip",
+      "kinds": [
+        1,
+        1,
+        1
+      ],
+      "layout": "QUOTE_OBLIVIOUS_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/quote_oblivious.json",
+      "names": [
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "quote_shared",
+      "clear": 0,
+      "corrections": 3,
+      "example": "lending-tip",
+      "kinds": [
+        1,
+        1,
+        1
+      ],
+      "layout": "QUOTE_SHARED_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/quote_shared.json",
+      "names": [
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "repay_oblivious",
+      "clear": 0,
+      "corrections": 7,
+      "example": "lending-tip",
+      "kinds": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "REPAY_OBLIVIOUS_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/repay_oblivious.json",
+      "names": [
+        "position",
+        "amount",
+        "handle_partial",
+        "handle_key",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "repay_shared",
+      "clear": 1,
+      "corrections": 6,
+      "example": "lending-tip",
+      "kinds": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "REPAY_SHARED_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/repay_shared.json",
+      "names": [
+        "position",
+        "amount",
+        "handle_partial",
+        "handle_key",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "scan_oblivious",
+      "clear": 1,
+      "corrections": 3,
+      "example": "lending-tip",
+      "kinds": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "layout": "SCAN_OBLIVIOUS_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/scan_oblivious.json",
+      "names": [
+        "start",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "scan_shared",
+      "clear": 1,
+      "corrections": 3,
+      "example": "lending-tip",
+      "kinds": [
+        0,
+        1,
+        1,
+        1
+      ],
+      "layout": "SCAN_SHARED_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/scan_shared.json",
+      "names": [
+        "start",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "supply_oblivious",
+      "clear": 1,
+      "corrections": 5,
+      "example": "lending-tip",
+      "kinds": [
+        1,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "SUPPLY_OBLIVIOUS_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/supply_oblivious.json",
+      "names": [
+        "position",
+        "opens",
+        "amount",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "supply_shared",
+      "clear": 1,
+      "corrections": 4,
+      "example": "lending-tip",
+      "kinds": [
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "SUPPLY_SHARED_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/supply_shared.json",
+      "names": [
+        "position",
+        "amount",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "view_oblivious",
+      "clear": 0,
+      "corrections": 6,
+      "example": "lending-tip",
+      "kinds": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "VIEW_OBLIVIOUS_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/view_oblivious.json",
+      "names": [
+        "position",
+        "handle_partial",
+        "handle_key",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "view_shared",
+      "clear": 1,
+      "corrections": 5,
+      "example": "lending-tip",
+      "kinds": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "VIEW_SHARED_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/view_shared.json",
+      "names": [
+        "position",
+        "handle_partial",
+        "handle_key",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "withdraw_oblivious",
+      "clear": 0,
+      "corrections": 7,
+      "example": "lending-tip",
+      "kinds": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "WITHDRAW_OBLIVIOUS_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/withdraw_oblivious.json",
+      "names": [
+        "position",
+        "amount",
+        "handle_partial",
+        "handle_key",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "withdraw_shared",
+      "clear": 1,
+      "corrections": 6,
+      "example": "lending-tip",
+      "kinds": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "WITHDRAW_SHARED_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/withdraw_shared.json",
+      "names": [
+        "position",
+        "amount",
+        "handle_partial",
+        "handle_key",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "withdraw_supply_oblivious",
+      "clear": 0,
+      "corrections": 5,
+      "example": "lending-tip",
+      "kinds": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "WITHDRAW_SUPPLY_OBLIVIOUS_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/withdraw_supply_oblivious.json",
+      "names": [
+        "position",
+        "shares",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    },
+    {
+      "circuit": "withdraw_supply_shared",
+      "clear": 1,
+      "corrections": 4,
+      "example": "lending-tip",
+      "kinds": [
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "layout": "WITHDRAW_SUPPLY_SHARED_LAYOUT",
+      "layouts": "examples/lending-tip/contract/lending_market/src/layouts.nr",
+      "manifest": "examples/lending-tip/manifests/withdraw_supply_shared.json",
+      "names": [
+        "position",
+        "shares",
+        "$partial_note",
+        "$outcome_key",
+        "$outcome_tag"
+      ]
+    }
+  ],
+  "rule": "Each example round's layout under a secret-shared intake (receipt or on-chain): the kind of each value of C in its order (clear 0, chosen 1; an INPUT_SHARED value is chosen, any other clear), the clear count and the corrections a request log carries (one per chosen value). Written by scripts/gen-intake.py --layouts from the manifest and the main's parameter order, with the contract global (layout, in the generated file layouts) the request function passes; sidecar-tip's onchain_layout and pss-client's onchainLayout derive the same from the compiled circuit's ABI. Under receipt intake the chosen values are the sharing's summand order."
+}

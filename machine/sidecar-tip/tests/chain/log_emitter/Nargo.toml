@@ -1,0 +1,10 @@
+[package]
+name = "log_emitter"
+type = "contract"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0; deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../../../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+# the request log's tag and the sealed-thirds log's domain, as the library emits them
+pss_public_contract = { path = "../../../../../noir/pss_public_contract" }

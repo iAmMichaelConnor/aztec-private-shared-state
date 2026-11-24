@@ -1,0 +1,13 @@
+{
+  "descriptor": 1,
+  "name": "lending-tip-plain",
+  "contract": "lending_tip",
+  "stale_blocks": 50,
+  "packages": [
+    {"name": "lending_init", "circuit": "lending_init", "state_keys": {"reads": [], "writes": ["market"]}},
+    {"name": "deposit", "circuit": "deposit", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "deposit_receipt", "circuit": "deposit", "alias_of": "deposit", "state_keys": {"reads": ["market"], "writes": ["market"]}}
+  ],
+  "init": {"package": "lending_init", "inputs": ["init_liquidity"]},
+  "read_contracts": {"get_price_epoch": "oracle"}
+}

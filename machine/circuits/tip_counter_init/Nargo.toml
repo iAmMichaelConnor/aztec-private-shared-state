@@ -1,0 +1,9 @@
+[package]
+name = "tip_counter_init"
+type = "bin"
+# exact: the round circuits' Noir 1.0.0 (toolchain.json noir.version)
+compiler_version = "=1.0.0"
+
+[dependencies]
+# the tip round helpers: the slot commitment and the store of the vector
+pss_core = { path = "../../../noir/pss_core" }

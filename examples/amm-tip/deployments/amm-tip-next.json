@@ -1,0 +1,12 @@
+{
+  "descriptor": 1,
+  "name": "amm-tip",
+  "contract": "amm_tip",
+  "stale_blocks": 50,
+  "packages": [
+    {"name": "amm_init_tip", "circuit": "amm_init_tip", "state_keys": {"reads": [], "writes": ["pool"]}},
+    {"name": "amm_swap_tip", "circuit": "amm_swap_tip_next", "state_keys": {"reads": ["pool"], "writes": ["pool"]}},
+    {"name": "amm_swap_tip_receipt", "circuit": "amm_swap_tip_next", "alias_of": "amm_swap_tip", "state_keys": {"reads": ["pool"], "writes": ["pool"]}}
+  ],
+  "init": {"package": "amm_init_tip", "inputs": []}
+}

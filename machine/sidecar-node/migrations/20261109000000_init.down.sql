@@ -1,0 +1,11 @@
+DROP TABLE dead_records;
+DROP TABLE tip_blobs;
+DROP TABLE tip_nodes;
+DROP TABLE tip_versions;
+DROP TABLE receipts;
+DROP TABLE "values";
+DROP TABLE requests;
+DROP TABLE consumed;
+DROP TABLE packages;
+DROP TABLE manifests;
+DROP TABLE namespaces;

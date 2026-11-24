@@ -1,0 +1,62 @@
+# The setup every job that builds with the pinned toolchain runs after its
+# checkout: .tools restored from the toolchain job's cache (install-toolchain),
+# Rust, the job's Rust cache when it names one, the nargo git-dependency
+# cache, the CRS cache when asked, and scripts/bootstrap.sh.
+#
+# Every action is pinned to a commit; the comment names its release.
+
+name: pinned setup
+description: Restores the pinned tools, installs Rust, restores the caches and runs scripts/bootstrap.sh.
+
+inputs:
+  tools-key:
+    description: The toolchain job's output `key`, the cache key of .tools.
+    required: true
+  rust-components:
+    description: Rust components beyond the default profile (e.g. clippy).
+    default: ""
+  rust-cache:
+    description: The Swatinem/rust-cache shared key of machine/target; no Rust cache when empty.
+    default: ""
+  crs:
+    description: "\"true\": restore (and save) the CRS cache in machine/data, the first 32,768 G1 points and G2."
+    default: "false"
+  bootstrap:
+    description: "\"false\": stop after Rust and the Rust cache, for a job that runs neither nargo nor scripts/bootstrap.sh."
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .tools
+        key: ${{ inputs.tools-key }}
+        fail-on-cache-miss: true
+    - uses: dtolnay/rust-toolchain@7dcc700092a1a8b9c17ba0e140b4e34e93000946 # 1.90.0 (bootstrap.sh checks it)
+      with:
+        toolchain: 1.90.0
+        components: ${{ inputs.rust-components }}
+    - if: inputs.rust-cache != ''
+      uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+      with:
+        workspaces: machine -> target
+        shared-key: ${{ inputs.rust-cache }}
+    - name: nargo git-dependency cache
+      if: inputs.bootstrap == 'true'
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/nargo
+        key: nargo-${{ hashFiles('toolchain.json', '**/Nargo.toml', '!.tools/**') }}
+        restore-keys: nargo-
+    - name: CRS cache (the first 32,768 G1 points and G2)
+      if: inputs.crs == 'true'
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: |
+          machine/data/bn254_g1.dat
+          machine/data/bn254_g2.dat
+        key: bn254-crs-32768
+    - if: inputs.bootstrap == 'true'
+      shell: bash
+      run: scripts/bootstrap.sh

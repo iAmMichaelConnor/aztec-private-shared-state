@@ -1,0 +1,21 @@
+{
+  "descriptor": 1,
+  "name": "lending-tip-oblivious",
+  "contract": "lending_tip_oblivious",
+  "stale_blocks": 50,
+  "packages": [
+    {"name": "lending_init_oblivious", "circuit": "lending_init_oblivious", "state_keys": {"reads": [], "writes": ["market"]}},
+    {"name": "deposit_oblivious", "circuit": "deposit_oblivious", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "borrow_oblivious", "circuit": "borrow_oblivious", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "repay_oblivious", "circuit": "repay_oblivious", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "view_oblivious", "circuit": "view_oblivious", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "liquidate_oblivious", "circuit": "liquidate_oblivious", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "scan_oblivious", "circuit": "scan_oblivious", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "withdraw_oblivious", "circuit": "withdraw_oblivious", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "supply_oblivious", "circuit": "supply_oblivious", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "withdraw_supply_oblivious", "circuit": "withdraw_supply_oblivious", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "quote_oblivious", "circuit": "quote_oblivious", "state_keys": {"reads": ["market"], "writes": ["market"]}}
+  ],
+  "init": {"package": "lending_init_oblivious", "inputs": ["init_liquidity"]},
+  "read_contracts": {"get_price_epoch": "oracle"}
+}

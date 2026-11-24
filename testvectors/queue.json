@@ -1,0 +1,195 @@
+{
+  "description": "The tip queue's storage slots and done codes (pss_public_contract queue.nr's Queue). Written by sidecar-tip src/chain/layout.rs; read by sidecar-core tests/vectors.rs, pss-client test/result.test.ts (queue.ts QueueSlots and the DONE_ codes) and testvectors/noir/tip_intake_vectors (queue.nr's Queue and DONE_ globals).",
+  "done": {
+    "applied": 1,
+    "pending": 0,
+    "skipped": 2
+  },
+  "map_slot_domain": 4015149901,
+  "rule": "from the slot base the app's #[storage] gives its Queue: requests = base + 0 (Map<u64, Field>), tail = base + 1, head.index = base + 2, head.since = base + 3 (Head packed one field per member), seen = base + 4 (Map<Field, bool>), done = base + 5 (Map<u64, u8>); the slot of map.at(key) is poseidon2_hash_with_separator([map_slot, key], DOM_SEP__PUBLIC_STORAGE_MAP_SLOT), a u64 key as its integer value (aztec-nr derive_storage_slot_in_map, aztec.js deriveStorageSlotInMap); an index is a u64 in hex",
+  "vectors": [
+    {
+      "base": "0x000000000000000000000000000000000000000000000000000000000000000c",
+      "done": [
+        {
+          "index": "0x0",
+          "slot": "0x2acc00a91751b6025e9506841accdb3c82ffc1dbfb4b1222a766f5463862ecec"
+        },
+        {
+          "index": "0x1",
+          "slot": "0x0b8235e7db3cd575ccc0e199bf691f1f47dff50d56cf7c59855c5dd4f36f0f1d"
+        },
+        {
+          "index": "0x2",
+          "slot": "0x0ac8005d5567a981500a572f59a7ebfc198ad3e03db89ef9984f9c01af08b14d"
+        },
+        {
+          "index": "0x10000000000",
+          "slot": "0x28aca55b8918dd521bd993f989461db97eac97029d7c9742655fb1d6d35d8d59"
+        },
+        {
+          "index": "0xffffffffffffffff",
+          "slot": "0x0fd46edbf5f530b047cc1868021e94aa27ca5f38960cff0a6cccd44da34a6ef3"
+        }
+      ],
+      "head_index": "0x000000000000000000000000000000000000000000000000000000000000000e",
+      "head_since": "0x000000000000000000000000000000000000000000000000000000000000000f",
+      "name": "base 12",
+      "requests": [
+        {
+          "index": "0x0",
+          "slot": "0x0b8231a42f1b14f6d5723e64e4e4d3c4061c684f446e5eaaea1b1848ce4fed97"
+        },
+        {
+          "index": "0x1",
+          "slot": "0x1734bbf673a816bc80a7223360b826f1f446bc59afd737ff2119a4e6cb129e2d"
+        },
+        {
+          "index": "0x2",
+          "slot": "0x124aa1a0ff4e1a94901da7f3ade46128d57894d0044e9466670567340b9a009d"
+        },
+        {
+          "index": "0x10000000000",
+          "slot": "0x19f3a2cedfb41e5224366e39b57fb61e2c6b0e7a949baf1ef7f4b96a0d6a91f4"
+        },
+        {
+          "index": "0xffffffffffffffff",
+          "slot": "0x18c2dde0544a4b6e0b07a876908498195101482523fae64a1490441d3faf0f19"
+        }
+      ],
+      "seen": [
+        {
+          "request_id": "0x00000000000000000000000000000000000000000000000000000000000000a1",
+          "slot": "0x2508af14acd99fac2f9e3c66b2042e61a52510ba7070c8d11ef477add048b2c2"
+        },
+        {
+          "request_id": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+          "slot": "0x22b68ba8bf1e5413bc9848f5a88a69995d59b3abf79fa8f61ce2564acb30f677"
+        }
+      ],
+      "tail": "0x000000000000000000000000000000000000000000000000000000000000000d"
+    },
+    {
+      "base": "0x000000000000000000000000000000000000000000000000000000000000000f",
+      "done": [
+        {
+          "index": "0x0",
+          "slot": "0x10bed7fcedbedf90b22886c809a806321e36ed640bd16da0bdbc6dc9229efaea"
+        },
+        {
+          "index": "0x1",
+          "slot": "0x2e10a9d653e31c676055f67035b0764559d579e0c4e4dd7ccf0b8d9ecabeaf54"
+        },
+        {
+          "index": "0x2",
+          "slot": "0x2b797045545c332f8e0e6d296caf357ee34fe1a7066869651b997606a52ffbca"
+        },
+        {
+          "index": "0x10000000000",
+          "slot": "0x00727651ca3b3a89f6f7f78be448355ac686f1cfb28aa002c9f2d22109706085"
+        },
+        {
+          "index": "0xffffffffffffffff",
+          "slot": "0x2f63c56b52d8bbfebf88497bccd048ec3c473808158ba337468651444e09f988"
+        }
+      ],
+      "head_index": "0x0000000000000000000000000000000000000000000000000000000000000011",
+      "head_since": "0x0000000000000000000000000000000000000000000000000000000000000012",
+      "name": "base 15 (PssPublicTest's queue)",
+      "requests": [
+        {
+          "index": "0x0",
+          "slot": "0x2b53c30fc2f7134ae3ce27a25bbe9c630f19fdd69de91463baf10cdbda97ee19"
+        },
+        {
+          "index": "0x1",
+          "slot": "0x1a1b696e0bee39da8dac5f43ea0af379d9825d8131fcfe530f79cd29a795f5fd"
+        },
+        {
+          "index": "0x2",
+          "slot": "0x29dd978dc8a1beac3ed29e5bae264bf837aede75c1ca1357474aa92be818fa6c"
+        },
+        {
+          "index": "0x10000000000",
+          "slot": "0x02ebfdcc25abec7176cced3943794342d64668cb2a7a5d8a999a9807efc0bb0b"
+        },
+        {
+          "index": "0xffffffffffffffff",
+          "slot": "0x1f1993fa250dbd9c9d31f83738794155ae0e871e72922b1cd0ed61dd790417e3"
+        }
+      ],
+      "seen": [
+        {
+          "request_id": "0x00000000000000000000000000000000000000000000000000000000000000a1",
+          "slot": "0x25b8adfc865df505d508a2315b13cb6f8e7451c8e11167ee537f97d3fa60e7e4"
+        },
+        {
+          "request_id": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+          "slot": "0x23d1d4033c7afdae747fa18bc7fef3a6e278ff0409c52cbfc568b464bb9d1d90"
+        }
+      ],
+      "tail": "0x0000000000000000000000000000000000000000000000000000000000000010"
+    },
+    {
+      "base": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593effffff1",
+      "done": [
+        {
+          "index": "0x0",
+          "slot": "0x1ec197ce3d6dbd56305c3bc8198d255e62c5842b5af326a17730dac5478afa15"
+        },
+        {
+          "index": "0x1",
+          "slot": "0x023ff437b07969ed959ac5abb76905525125bfc356cc36aff8a2933cb179b5b4"
+        },
+        {
+          "index": "0x2",
+          "slot": "0x10d26943e9b76e1602ec631eabf999a32a4080c797e6d74383e4efa4121475db"
+        },
+        {
+          "index": "0x10000000000",
+          "slot": "0x12c944cf5c71211ba7fc3878a173c2f38e4a19320cf832121a99a93e4cd5a8f8"
+        },
+        {
+          "index": "0xffffffffffffffff",
+          "slot": "0x0bd29e29ebb3c626543f60f2adf54c3691697257689623fdd2539845b54a14a5"
+        }
+      ],
+      "head_index": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593effffff3",
+      "head_since": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593effffff4",
+      "name": "base p - 16, the field's last base with room for six slots",
+      "requests": [
+        {
+          "index": "0x0",
+          "slot": "0x06603afd74826ed138b26683acc2287463e4aae94a0480a5dd9e7826c05abad4"
+        },
+        {
+          "index": "0x1",
+          "slot": "0x1d9aba4851a2a2b12df43a7aacc1948b3468670d672d7fcbc1e29a634ec44d06"
+        },
+        {
+          "index": "0x2",
+          "slot": "0x117039fdd82faf16e28237df33a4204e437b7ffd23707508da6935b5abf32e77"
+        },
+        {
+          "index": "0x10000000000",
+          "slot": "0x155ad4355495f379750e8bea672e575d87c7c1f6c26e7121c5e81782ec39819b"
+        },
+        {
+          "index": "0xffffffffffffffff",
+          "slot": "0x2df77466a209a6e61baa181e200e8034c6f4bc8da29392eafb26e951e2f04811"
+        }
+      ],
+      "seen": [
+        {
+          "request_id": "0x00000000000000000000000000000000000000000000000000000000000000a1",
+          "slot": "0x1aaa8a0441581eade008a5c2079bafe505e4e16e24b8fa99159196a4c9ef760b"
+        },
+        {
+          "request_id": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+          "slot": "0x1a776d0b29ac305840e49ab315ad4abe1c05434cb3e8f7c376b07e24a43f03f8"
+        }
+      ],
+      "tail": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593effffff2"
+    }
+  ]
+}

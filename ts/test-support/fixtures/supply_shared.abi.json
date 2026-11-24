@@ -1,0 +1,337 @@
+{
+ "noir_version": "1.0.0+275d3ab1a5c916c6ea73e8d6b943f685f574500c",
+ "abi": {
+  "abi_version": 1,
+  "parameters": [
+   {
+    "name": "namespace",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "public"
+   },
+   {
+    "name": "vk_hash",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "public"
+   },
+   {
+    "name": "in_slots",
+    "type": {
+     "kind": "array",
+     "length": 1,
+     "type": {
+      "kind": "field"
+     }
+    },
+    "visibility": "public"
+   },
+   {
+    "name": "out_slots",
+    "type": {
+     "kind": "array",
+     "length": 1,
+     "type": {
+      "kind": "field"
+     }
+    },
+    "visibility": "public"
+   },
+   {
+    "name": "price",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "public"
+   },
+   {
+    "name": "price_epoch",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "public"
+   },
+   {
+    "name": "clock",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "public"
+   },
+   {
+    "name": "inputs_hash",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "position",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "amount",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "partial_note",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "outcome_key",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "outcome_tag",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "blinding",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "leaves",
+    "type": {
+     "kind": "array",
+     "length": 2,
+     "type": {
+      "kind": "array",
+      "length": 8,
+      "type": {
+       "kind": "field"
+      }
+     }
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "old_hashes",
+    "type": {
+     "kind": "array",
+     "length": 2,
+     "type": {
+      "kind": "field"
+     }
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "siblings",
+    "type": {
+     "kind": "array",
+     "length": 2,
+     "type": {
+      "kind": "array",
+      "length": 16,
+      "type": {
+       "kind": "field"
+      }
+     }
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "indices",
+    "type": {
+     "kind": "array",
+     "length": 2,
+     "type": {
+      "kind": "field"
+     }
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "new_leaf",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "r_new",
+    "type": {
+     "kind": "array",
+     "length": 2,
+     "type": {
+      "kind": "field"
+     }
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "nsk_app",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   }
+  ],
+  "return_type": {
+   "abi_type": {
+    "kind": "struct",
+    "path": "lending_tip::pss_core::tip::handle::Delivered",
+    "fields": [
+     {
+      "name": "request_id",
+      "type": {
+       "kind": "field"
+      }
+     },
+     {
+      "name": "machine_request_id",
+      "type": {
+       "kind": "field"
+      }
+     },
+     {
+      "name": "old_commitments",
+      "type": {
+       "kind": "array",
+       "length": 1,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     {
+      "name": "new_commitments",
+      "type": {
+       "kind": "array",
+       "length": 1,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     {
+      "name": "npk_app_hash",
+      "type": {
+       "kind": "field"
+      }
+     },
+     {
+      "name": "new_hashes",
+      "type": {
+       "kind": "array",
+       "length": 2,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     {
+      "name": "outcome_tag",
+      "type": {
+       "kind": "field"
+      }
+     },
+     {
+      "name": "note_hashes",
+      "type": {
+       "kind": "array",
+       "length": 1,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     {
+      "name": "ciphertext",
+      "type": {
+       "kind": "array",
+       "length": 8,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     {
+      "name": "app_values",
+      "type": {
+       "kind": "array",
+       "length": 3,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     {
+      "name": "deliveries",
+      "type": {
+       "kind": "array",
+       "length": 1,
+       "type": {
+        "kind": "struct",
+        "path": "lending_tip::pss_core::tip::handle::Delivery",
+        "fields": [
+         {
+          "name": "tag",
+          "type": {
+           "kind": "field"
+          }
+         },
+         {
+          "name": "note_hash",
+          "type": {
+           "kind": "field"
+          }
+         },
+         {
+          "name": "ciphertext",
+          "type": {
+           "kind": "array",
+           "length": 9,
+           "type": {
+            "kind": "field"
+           }
+          }
+         }
+        ]
+       }
+      }
+     }
+    ]
+   },
+   "visibility": "public"
+  },
+  "error_types": {
+   "9566563482225775565": {
+    "error_kind": "string",
+    "string": "mul_div_wide identity"
+   },
+   "12469291177396340830": {
+    "error_kind": "string",
+    "string": "call to assert_max_bit_size"
+   },
+   "14401109495927734611": {
+    "error_kind": "string",
+    "string": "Field failed to decompose into specified 16 limbs"
+   },
+   "15323353066555508404": {
+    "error_kind": "string",
+    "string": "tip tree: a loaded leaf does not match its old hash (diverged store)"
+   }
+  }
+ }
+}

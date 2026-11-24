@@ -1,0 +1,55 @@
+{
+  "description": "The slot commitment of a chain-held tip key: what its contract slot holds, the old_c and new_c a round outputs. Written by sidecar-tip tests/write_vectors; read by sidecar-core tests/vectors.rs, pss-client test/vectors.test.ts and testvectors/noir/tip_round_vectors (pss_core tip::slot::commitment).",
+  "hash": "poseidon2 is the width-4 sponge of docs/ARCHITECTURE.md section 1 (IV len << 64 in the capacity element; Noir std Poseidon2::hash, protocol_types poseidon2_hash, total-noir p2_hash, aztec.js poseidon2Hash)",
+  "rule": "commitment = poseidon2([TIP_STATE_SEP, namespace, slot, fields..., blinding]) (total-noir p2_hash_sep([namespace, slot, fields..., blinding], TIP_STATE_SEP)); namespace the app contract's address, slot the key's storage slot, fields the stored vector before its blinding",
+  "tip_state_sep": "0x000000000000000000000000000000000000007073732e7469702e7374617465",
+  "vectors": [
+    {
+      "blinding": "0x000000000000000000000000000000000000000000000000000000000000014d",
+      "commitment": "0x216c4005a3578abf5f829fbf121dc857749f82d555c519c24b4984c7c7b7a399",
+      "fields": [
+        "0x000000000000000000000000000000000000000000000000000000000014be0d",
+        "0x00000000000000000000000000000000000000000000000000000000001c43ab"
+      ],
+      "name": "amm-tip fixture: the pool Pool::from_seed(111) under blinding 333 (amm_init_tip's Prover.toml new_c)",
+      "namespace": "0x0000000000000000000000000000000000000000000000000000000000c0ffee",
+      "slot": "0x000000000000000000000000000000000000000000000000000000000000a002"
+    },
+    {
+      "blinding": "0x0000000000000000000000000000000000000000000000000000000000000009",
+      "commitment": "0x02287d35b5d246184a62f5b852b33baec3fe5a2cc541549a84a56506d7e485b1",
+      "fields": [
+        "0x0000000000000000000000000000000000000000000000000000000000000007"
+      ],
+      "name": "one field",
+      "namespace": "0x0000000000000000000000000000000000000000000000000000000000c0ffee",
+      "slot": "0x000000000000000000000000000000000000000000000000000000000000a003"
+    },
+    {
+      "blinding": "0x000000000000000000000000000000000000000000000000000000000000feed",
+      "commitment": "0x0063dea460dd9dcbaa17f0a9cfc972321639dacab442b526b31903ba25513371",
+      "fields": [
+        "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "0x0000000000000000000000000000000000000000000000000000000000000002",
+        "0x0000000000000000000000000000000000000000000000000000000000000003"
+      ],
+      "name": "three fields",
+      "namespace": "0x1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f809",
+      "slot": "0x0000000000000000000000000000000000000000000000000000000000001234"
+    },
+    {
+      "blinding": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+      "commitment": "0x2a5eeb34757d53bbce853961248b7c87650831d8abca98384ee772af20eeb571",
+      "fields": [
+        "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+        "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+        "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+        "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+        "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000"
+      ],
+      "name": "five fields, field-sized values (p - 1) in every position",
+      "namespace": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+      "slot": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000"
+    }
+  ]
+}

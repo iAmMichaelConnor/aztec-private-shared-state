@@ -1,0 +1,15 @@
+# reserve_x + amount_in = 1359373 + (2^64 - 1359373) = 2^64: rejected with
+# code 4 (the baseline's u64 addition overflows)
+namespace = "0xc0ffee"
+owner = "0x1234"
+in_slots = ["0xa002"]
+out_slots = ["0xa002"]
+amount_in = "18446744073708192243"
+direction = "0"
+# the pool examples/amm/circuits/amm_init/Prover.toml creates: Pool::from_seed(111)
+in0_fields = ["1359373", "1852331"]
+in0_randomness = "333"
+# compute_note_hash_nonce(first_nullifier=8, index=0)
+in0_nonce = "0x17bad57eb7869a9ec5c83647e40b5332e91091d9c5622c32286b2170177bffae"
+out0_randomness = "444"
+nsk_app = "777"

@@ -1,0 +1,8 @@
+[package]
+name = "move"
+type = "bin"
+compiler_version = "=1.0.0"
+
+[dependencies]
+# the rounds over the keyed map and the secret-shared intake's finisher
+credits_tip = { path = "../credits_tip" }

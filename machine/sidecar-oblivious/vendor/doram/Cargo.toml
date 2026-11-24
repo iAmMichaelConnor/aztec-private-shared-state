@@ -1,0 +1,24 @@
+[package]
+name = "gigadoram-doram"
+description = "GigaDoram: a three-party distributed oblivious RAM (vendored from TaceoLabs/gigadoram-rs; see PROVENANCE.md)"
+version = "0.1.0"
+edition = "2024"
+rust-version.workspace = true
+license = "MIT OR Apache-2.0"
+publish = false
+
+[lib]
+name = "doram"
+
+[dependencies]
+ark-ff.workspace = true
+circuits = { path = "../circuits", package = "gigadoram-circuits" }
+data-structures = { path = "../data-structures", package = "gigadoram-data-structures" }
+eyre.workspace = true
+mpc_core.workspace = true
+mpc_net.workspace = true
+primitives = { path = "../primitives", package = "gigadoram-primitives" }
+
+[dev-dependencies]
+primitives = { path = "../primitives", package = "gigadoram-primitives", features = ["testing"] }
+rand.workspace = true

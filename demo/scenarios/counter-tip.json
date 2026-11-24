@@ -1,0 +1,879 @@
+{
+  "id": "counter-tip",
+  "label": "counter-tip",
+  "path": "tip",
+  "example": "counter_tip",
+  "title": "Alice adds 5 to a private counter",
+  "summary": "The minimal tip app: one node-held counter [total, blinding] under secret-shared receipt intake, with a private outcome that completes the requester's partial note inside the co-SNARK. The total starts at 0 and Alice adds 5.",
+  "basis": "hand-written",
+  "source": {
+    "files": [
+      "examples/counter-tip/contract/counter_tip/src/main.nr",
+      "examples/counter-tip/contract/counter_tip/src/app.nr",
+      "examples/counter-tip/contract/counter_tip/src/layouts.nr",
+      "examples/counter-tip/circuits/counter_add/src/main.nr",
+      "examples/counter-tip/circuits/counter_init/src/main.nr",
+      "examples/counter-tip/circuits/counter_tip/src/shared.nr",
+      "examples/counter-tip/circuits/counter_tip/src/counter.nr",
+      "examples/counter-tip/manifests/counter_add.json",
+      "examples/counter-tip/manifests/counter_init.json",
+      "noir/pss_public_contract/src/shared_intake.nr",
+      "noir/pss_public_contract/src/intake.nr",
+      "noir/pss_public_contract/src/partial_note.nr",
+      "noir/pss_public_contract/src/receipt.nr",
+      "noir/pss_public_contract/src/result.nr",
+      "noir/pss_public_contract/src/outcome.nr",
+      "noir/pss_public_contract/src/queue.nr",
+      "noir/pss_public_contract/src/init.nr",
+      "noir/pss_public_contract/src/configure.nr",
+      "noir/pss_public_contract/src/key_epoch.nr",
+      "noir/pss_contract/src/lib.nr",
+      "noir/pss_core/src/tip/family.nr",
+      "noir/pss_core/src/tip/slot.nr",
+      "noir/pss_core/src/tip/outcome.nr",
+      "examples/counter-tip/client/counter.ts"
+    ]
+  },
+  "phases": [
+    { "id": "setup", "label": "Setup · once" },
+    { "id": "request", "label": "Request · Alice adds 5" },
+    { "id": "round", "label": "Round · the nodes" },
+    { "id": "land", "label": "Land · the relayer" },
+    { "id": "read", "label": "Read · Alice" }
+  ],
+  "interactions": { "add5": "Alice adds 5" },
+  "addons": [],
+
+  "entities": [
+    { "id": "orch", "kind": "orchestrator", "label": "Orchestrator", "role": "the operator's front door; runs the scheduler" },
+    { "id": "node", "kind": "node", "label": "Node i", "copies": 3, "role": "watches the chain",
+      "meta": "The three nodes hold the same rows except their own keys, their two parts of each shared value (i and i−1, mod 3) and their own signatures. Any two nodes' parts together reveal a shared value; one node's never do.",
+      "circuits": [
+        { "id": "counter_add", "summary": "adds the shared amount to the total and seals [code, total] to the requester; no check can fail the proof",
+          "vk_hash": "0x2b7e…11c9", "verified_by": "process_result", "total": true,
+          "total_note": "A total circuit: no assert. Every check sets a code, so a proof always exists and the queue always moves; the code reaches only Alice, inside the ciphertext.",
+          "params": { "id": "cx-add-params", "label": "counter_add", "open": "(", "close": ")", "reader": "public", "note": "every parameter of main, with where the manifest fills it from",
+            "fields": [
+              { "k": "namespace", "v": "$namespace 0x2c1a…9f04", "src": "PUBLIC", "reader": "public" },
+              { "k": "vk_hash", "v": "$vk_hash 0x2b7e…11c9", "src": "PUBLIC", "reader": "public" },
+              { "k": "in_slots, out_slots", "v": "$state_keys.reads[0], writes[0]: [counter], [counter]", "src": "PUBLIC", "reader": "public" },
+              { "k": "inputs_hash", "v": "$inputs_hash: C 0x1d93…a6e0", "src": "PUBLIC", "reader": "user", "form": "sealed", "note": "Alice's commitment; a private witness the manifest fills from the request" },
+              { "k": "amount", "v": "amount", "src": "INPUT_SHARED", "reader": "shared", "form": "part", "note": "5, in parts" },
+              { "k": "partial_note, outcome_key, outcome_tag", "v": "$partial_note, $outcome_key, $outcome_tag", "src": "INPUT_SHARED", "reader": "shared", "form": "part", "note": "P, her key and tag, in parts" },
+              { "k": "blinding", "v": "$blinding", "src": "INPUT_SHARED", "reader": "shared", "form": "part", "note": "C's last element, in parts" },
+              { "k": "total, r_old", "v": "$state_keys.reads[0], slices [0, 1] and [1, 2]", "src": "LOAD", "reader": "shared", "form": "part", "note": "[0], r0: state c0" },
+              { "k": "r_new", "v": "1", "src": "SAMPLE", "reader": "shared", "form": "part", "note": "r1, drawn together" },
+              { "k": "nsk_app", "v": "nsk_app", "src": "LOAD", "reader": "shared", "form": "part" }
+            ] },
+          "logic": [
+            { "kind": "load", "text": "the counter key: total and r_old as loaded, r_new as sampled; c0 = commitment(namespace, slot, [total], r_old) (`slot::load`)" },
+            { "kind": "flag", "text": "C opens to [amount, partial_note, outcome_key, outcome_tag] under blinding (`SharedIntake::check`)", "code": "code 1, CODE_INPUTS_MISMATCH" },
+            { "kind": "flag", "text": "total + amount fits a u64 (`add_or::<64>`); the earlier code wins", "code": "code 2, CODE_OVERFLOW" },
+            { "kind": "write", "text": "the counter under the fresh blinding r_new on every outcome: the new total when C opens and the add is ok, the loaded total otherwise; c1 = its commitment (`Loaded::finish_private`)" },
+            { "kind": "compute", "text": "request id = poseidon2(namespace, vk_hash, C); machine request id = poseidon2(PSS_ATTEMPT, request id, c0)" },
+            { "kind": "compute", "text": "the plaintext [code, total], the total masked to 0 when the add failed; [1, 0] when C does not open (`outcome_fields`)" },
+            { "kind": "complete", "text": "her partial note: note hash = p2_hash_sep([OUTCOME_SLOT 1, P, code, total, request id], note hash domain) (`completed_note_hash`)" },
+            { "kind": "seal", "text": "[code, total] under outcome_key with the nonce poseidon2(note hash, outcome domain), the mismatch domain when C does not open: 2 fields + the AEAD tag (`seal_nonce`)" },
+            { "kind": "compute", "text": "npk_app_hash from nsk_app" },
+            { "kind": "store", "text": "[total, r_new] as out0 at the counter key: each node keeps its parts (`Finished::stored`)" }
+          ],
+          "outputs": { "id": "cx-add-out", "label": "SharedAdd = Private<1, 1, 0, 1, 3>", "reader": "public", "note": "public outputs, after the four public parameters: 14 public inputs",
+            "to": "no amount, total or requester among them",
+            "fields": [
+              { "k": "request_id, machine_request_id", "v": "0x07be…41d2, 0x31f6…8d27", "reader": "public" },
+              { "k": "old_commitments, new_commitments", "v": "[c0 0x19c4…03ab], [c1 0x0e5f…b872]", "reader": "shared", "form": "sealed" },
+              { "k": "npk_app_hash, outcome_tag", "v": "0x0f42…a917, 0x1c77…20aa", "reader": "public" },
+              { "k": "note_hashes", "v": "[0x0b3d…c6f4]", "reader": "user", "form": "sealed", "note": "her completed note" },
+              { "k": "ciphertext", "v": "[3 fields]", "reader": "user", "form": "sealed", "note": "[code, total] + tag" }
+            ] } },
+        { "id": "counter_init", "summary": "creates the counter, total 0 under a sampled blinding, and outputs its commitment c0; nothing can fail",
+          "vk_hash": "0x61a9…e305", "verified_by": "init_counter", "total": true,
+          "total_note": "A total circuit with no check at all.",
+          "params": { "id": "cx-init-params", "label": "counter_init", "open": "(", "close": ")", "reader": "public",
+            "fields": [
+              { "k": "namespace, vk_hash", "v": "$namespace, $vk_hash: 0x2c1a…9f04, 0x61a9…e305", "src": "PUBLIC", "reader": "public" },
+              { "k": "out_slots", "v": "[$state_keys.writes[0]]: [counter]", "src": "PUBLIC", "reader": "public" },
+              { "k": "r_new", "v": "1", "src": "SAMPLE", "reader": "shared", "form": "part", "note": "r0, drawn together" },
+              { "k": "nsk_app", "v": "nsk_app", "src": "LOAD", "reader": "shared", "form": "part" }
+            ] },
+          "logic": [
+            { "kind": "write", "text": "create the counter key: [0] under r_new; c0 = its commitment, the old commitment 0 (`slot::create`)" },
+            { "kind": "compute", "text": "the init request id = chain_request_id(namespace, vk_hash, inputs_hash([]), 0)" },
+            { "kind": "compute", "text": "npk_app_hash from nsk_app" },
+            { "kind": "store", "text": "[0, r_new] as out0 at the counter key" }
+          ],
+          "outputs": { "id": "cx-init-out", "label": "Init<0>", "reader": "public", "note": "public outputs: 7 public inputs with the three parameters",
+            "fields": [
+              { "k": "request_id", "v": "0x5d3a…0e17", "reader": "public", "note": "the init request id" },
+              { "k": "old_c, new_c", "v": "0, c0 0x19c4…03ab", "reader": "shared", "form": "sealed" },
+              { "k": "npk_app_hash", "v": "0x0f42…a917", "reader": "public" }
+            ] } }
+      ] },
+    { "id": "relayer", "kind": "relayer", "label": "Relayer", "role": "the operator's wallet; sends the init and result transactions" },
+    { "id": "alice", "kind": "user", "label": "Alice", "role": "a user's wallet (PXE)" },
+    { "id": "bob", "kind": "user", "label": "Bob", "role": "another user", "idle": "not part of this interaction" },
+    { "id": "dev", "kind": "developer", "label": "Developer", "role": "the operator's deployment: builds, registers, deploys and configures the app" }
+  ],
+
+  "contracts": [
+    { "id": "ct", "label": "CounterTip contract", "address": "0x2c1a…9f04",
+      "groups": {
+        "public": [
+          { "id": "set_once", "label": "long-lived · set once, by the constructor and [[configure]]" },
+          { "id": "rotated", "label": "long-lived · rewritten by [[rotate_keys]]" },
+          { "id": "round", "label": "long-lived · rewritten by every round" },
+          { "id": "interaction", "label": "this interaction" }
+        ],
+        "private": [
+          { "id": "notes", "label": "long-lived · outcome_notes: every user's completed notes, as hashes" },
+          { "id": "interaction", "label": "this interaction" }
+        ]
+      },
+      "functions": [
+        { "id": "constructor", "kind": "public", "summary": "writes Config: the stale period, the node signing keys, the circuit pins", "called": "called directly, at deploy",
+          "logic": [
+            { "kind": "assert", "text": "the package list is well formed (`CircuitPins::assert_valid`): not empty, no package listed twice, every listed package has a vk hash", "msg": "empty package list" },
+            { "kind": "write", "text": "[[k-config|Config]], once (`PublicImmutable::initialize`)", "item": "k-config" }
+          ] },
+        { "id": "set_configured", "kind": "public", "badges": ["only_self"], "summary": "writes configured, once",
+          "logic": [ { "kind": "write", "text": "[[k-configured|configured]], once: `initialize` reverts on a second call", "item": "k-configured" } ] },
+        { "id": "apply_init", "kind": "public", "badges": ["only_self"], "summary": "writes the first commitment c0 into the empty counter slot",
+          "logic": [
+            { "kind": "assert", "text": "the [[k-ctr|counter]] slot holds 0", "msg": "already initialised", "item": "k-ctr" },
+            { "kind": "assert", "text": "c0 ≠ 0", "msg": "zero commitment" },
+            { "kind": "write", "text": "[[k-ctr|counter]] := c0", "item": "k-ctr" },
+            { "kind": "compute", "text": "no state log: the state is node-held (`NodeHeld::log`)" }
+          ] },
+        { "id": "append_receipt", "kind": "public", "badges": ["only_self"], "summary": "queues a request: the contract is configured, the counter initialised, the receipt not expired, the request new",
+          "logic": [
+            { "kind": "assert", "text": "[[k-configured|configured]] is set (`assert_configured_in_public`)", "msg": "not configured", "item": "k-configured" },
+            { "kind": "assert", "text": "the [[k-ctr|counter]] is initialised (`assert_initialised`)", "msg": "state not initialised", "item": "k-ctr" },
+            { "kind": "assert", "text": "this block < expiry_block (`append_before`)", "msg": "receipt expired" },
+            { "kind": "assert", "text": "[[k-seen|seen]][request id] is false", "msg": "duplicate request", "item": "k-seen" },
+            { "kind": "write", "text": "[[k-seen|seen]][request id] := true", "item": "k-seen" },
+            { "kind": "read", "text": "the [[k-queue|queue]]'s tail and head", "item": "k-queue" },
+            { "kind": "write", "text": "head.since := this block when the queue was empty; [[k-req|requests]][tail] := request id; tail := tail + 1", "item": "k-req" }
+          ] },
+        { "id": "apply_result", "kind": "public", "badges": ["only_self"], "summary": "checks the queue head and the old commitment c0; writes c1 and moves the head (`apply_round`)",
+          "logic": [
+            { "kind": "compute", "text": "no pinned reads to re-make: the app has none (`assert_pinned_reads` over `no_pinned_reads()`)" },
+            { "kind": "read", "text": "the [[k-queue|queue]]'s head and tail", "item": "k-queue" },
+            { "kind": "assert", "text": "head.index < tail", "msg": "queue is empty" },
+            { "kind": "assert", "text": "[[k-req|requests]][head] is the request id", "msg": "not the head", "item": "k-req" },
+            { "kind": "assert", "text": "the [[k-ctr|counter]] slot holds the old commitment c0", "msg": "state moved", "item": "k-ctr" },
+            { "kind": "write", "text": "[[k-ctr|counter]] := c1, whatever the outcome: a private outcome writes every round", "item": "k-ctr" },
+            { "kind": "write", "text": "head := {index + 1, this block}; [[k-done|done]][index] := 1, applied (`Queue::finish_head`)", "item": "k-queue" },
+            { "kind": "compute", "text": "no state log: the state is node-held" }
+          ] },
+        { "id": "assert_key_epoch", "kind": "public", "badges": ["only_self"], "summary": "checks the signatures' key epoch is the stored one, or the one before it within the grace period",
+          "logic": [
+            { "kind": "read", "text": "the stored [[k-epoch|node keys]] head: epoch, rotated_at, grace (`read_stored_head`)", "item": "k-epoch" },
+            { "kind": "assert", "text": "epoch is the stored epoch, or (unless current_only) the one before it while this block ≤ rotated_at + grace", "msg": "key epoch expired" }
+          ] },
+        { "id": "skip", "kind": "public", "summary": "moves a stale head on: done[head] := 2", "called": "called directly, by anyone",
+          "logic": [
+            { "kind": "read", "text": "the stale period from [[k-configured|configured]] (`stale_blocks_in_public`)" },
+            { "kind": "assert", "text": "skipping is enabled", "msg": "skip is disabled" },
+            { "kind": "assert", "text": "the queue is not empty", "msg": "queue is empty" },
+            { "kind": "assert", "text": "this block − head.since ≥ stale_blocks", "msg": "head is not stale" },
+            { "kind": "write", "text": "head := {index + 1, this block}; done[index] := 2, skipped" }
+          ] },
+        { "id": "set_node_keys", "kind": "public", "badges": ["only_self"], "summary": "installs the next epoch's node keys",
+          "logic": [
+            { "kind": "assert", "text": "the new epoch is the stored epoch + 1 (`KeyEpochs::install`, called as `Keys::install`)", "msg": "the epoch is not the stored epoch + 1" },
+            { "kind": "write", "text": "[[k-epoch|node keys]]: the new set, the previous set, rotated_at := this block" },
+            { "kind": "compute", "text": "no node enc keys to void: `Keys` is `KeyEpochs<NoEncKeys>`, as no package takes secret-shared on-chain intake" }
+          ] },
+        { "id": "get_state", "kind": "view", "summary": "reads Config, configured, the queue, the counter and the outcome slot; changes nothing", "called": "called directly" },
+        { "id": "get_node_keys", "kind": "view", "summary": "reads the stored node keys; changes nothing", "called": "called directly" },
+        { "id": "request_at", "kind": "view", "summary": "reads requests[index]", "called": "called directly; the relayer and the client poll it" },
+        { "id": "done_at", "kind": "view", "summary": "reads done[index]: 0 queued, 1 applied, 2 skipped", "called": "called directly; Alice's client polls it" },
+
+        { "id": "add", "kind": "private", "summary": "the app's own function: queues an add of a shared amount",
+          "check": "checks that the summands open C and the 3 node receipts; no proof",
+          "runs_in": "runs in Alice's wallet", "enqueues": ["assert_key_epoch", "append_receipt"],
+          "logic": [
+            { "kind": "read", "text": "the add row's pins in force: the counter_add vk hash and the node keys (`rounds(configured_in_force(), counter).add`)", "item": "k-configured" },
+            { "kind": "compute", "text": "P = partial_commitment(sender, rho) (`outcome_request` with `SharedReceiptArgs`, then `partial_note::commit`)" },
+            { "kind": "push", "text": "the use nullifier poseidon2(P, PSS_PARTIAL_USED): P completes only once", "item": "p-used" },
+            { "kind": "assert", "text": "for each shared value of C and the blinding: s0 + s1 + s2 equals it (`opened_sharing`)", "msg": "the summands do not add up to a shared value of C" },
+            { "kind": "compute", "text": "S_j = poseidon2(SUMMANDS_DOMAIN, s_j, salt_j); D = sharing_digest(S_0, S_1, S_2, `COUNTER_ADD_LAYOUT`, clear values); C = poseidon2([amount, P, key, tag, blinding])" },
+            { "kind": "assert", "text": "counter_add is deployed: its vk pin ≠ 0 (`assert_deployed`)", "msg": "package not in this deployment" },
+            { "kind": "assert", "text": "`valid_add([amount])`: the amount is a u64", "msg": "invalid inputs" },
+            { "kind": "compute", "text": "request id = poseidon2(namespace, vk hash, C) (`shared_chain_request_id`)" },
+            { "kind": "read", "text": "the [[k-epoch|node keys]] at the anchor block: epoch 0, the Config's keys (`key_epoch::at_anchor`)", "item": "k-epoch" },
+            { "kind": "enqueue", "text": "[[assert_key_epoch]](0, false): the key set the receipts verify under", "id": "add-enq-ake" },
+            { "kind": "assert", "text": "receipt i verifies under node i's sig key over poseidon2(RECEIPT_DOMAIN, request id, C, expiry_block, D), for i = 0, 1, 2", "msg": "invalid receipt from node 0" },
+            { "kind": "enqueue", "text": "[[append_receipt]](request id, expiry_block): the `ReceiptRequest` `outcome_request` returns", "id": "add-enq-ar" }
+          ] },
+        { "id": "configure", "kind": "private", "summary": "pins npk_app_hash once the three nodes have signed the registry answer",
+          "check": "checks the 3 nodes' signed registry answer; no proof", "enqueues": ["set_configured"],
+          "runs_in": "runs in the developer's wallet",
+          "logic": [
+            { "kind": "read", "text": "[[k-config|Config]]: the node sig keys, the manifest hash, the package list", "item": "k-config" },
+            { "kind": "compute", "text": "packages_hash over the list; for each node i, manifest_message(namespace, manifest_hash, packages_hash, npk_app_hash, seq, i)" },
+            { "kind": "assert", "text": "node i's signature verifies over its message, for i = 0, 1, 2 (`check_answer`)", "msg": "node 0's manifest signature does not verify" },
+            { "kind": "enqueue", "text": "[[set_configured]](Configured { configured: true, pins, npk_app_hash })", "id": "cfg-enq-sc" }
+          ] },
+        { "id": "configured_in_force", "kind": "private", "badges": ["internal"], "summary": "the circuit pins every round row is built from: the constructor's pins for good (`FixedCircuits::in_force`)",
+          "called": "called inside add, init_counter and process_result",
+          "logic": [ { "kind": "read", "text": "[[k-configured|configured]]: npk_app_hash and the pins", "item": "k-configured" } ] },
+        { "id": "init_counter", "kind": "private", "summary": "lands the init round once, outside the queue (`process_init`)",
+          "verifies": { "circuit": "counter_init", "vk_source": "pinned in configured", "signatures": "3 node signatures" },
+          "runs_in": "runs in the relayer's wallet", "enqueues": ["assert_key_epoch", "apply_init"],
+          "logic": [
+            { "kind": "read", "text": "the init row's pins in force: the counter_init vk hash, npk_app_hash, the node keys", "item": "k-configured" },
+            { "kind": "assert", "text": "counter_init is deployed: its vk pin ≠ 0", "msg": "package not in this deployment" },
+            { "kind": "compute", "text": "the init request id = chain_request_id(namespace, vk hash, inputs_hash([]), 0)" },
+            { "kind": "assert", "text": "pop the capsule; poseidon2(vk) = the pinned vk hash (`verify_pinned`)", "msg": "unexpected verification key" },
+            { "kind": "assert", "text": "the proof verifies (UltraHonk ZK) over the 7 init public inputs" },
+            { "kind": "read", "text": "the [[k-epoch|node keys]] at the anchor block", "item": "k-epoch" },
+            { "kind": "enqueue", "text": "[[assert_key_epoch]](0, false)", "id": "ic-enq-ake" },
+            { "kind": "assert", "text": "node i's result signature verifies over poseidon2(RESULT_DOMAIN, namespace, machine request id, c0, i, 0), the machine request id over old commitment 0", "msg": "node 0's result signature does not verify" },
+            { "kind": "enqueue", "text": "[[apply_init]](request id, c0)", "id": "ic-enq-ai" }
+          ] },
+        { "id": "process_result", "kind": "private", "summary": "lands a round's private outcome: verifies the proof and the node signatures, pushes the completed note hash and emits the outcome log (`check_round` with `Private::of`)",
+          "verifies": { "circuit": "counter_add", "vk_source": "pinned in configured", "signatures": "3 node signatures" },
+          "runs_in": "runs in the relayer's wallet", "enqueues": ["assert_key_epoch", "apply_result"],
+          "logic": [
+            { "kind": "read", "text": "the add row's pins in force ([[k-configured|configured]]): the counter_add vk hash, npk_app_hash, the node keys", "item": "k-configured" },
+            { "kind": "assert", "text": "the outcome notes' slot is the circuits' OUTCOME_SLOT 1 (`assert_outcome_slot`)", "msg": "the outcome notes are not at the slot the round circuits hash them at" },
+            { "kind": "assert", "text": "counter_add is deployed: its vk pin ≠ 0", "msg": "package not in this deployment" },
+            { "kind": "assert", "text": "the transaction is in its revertible phase (`Private::admit`)", "msg": "a private outcome lands only in the revertible phase" },
+            { "kind": "compute", "text": "machine request id = poseidon2(PSS_ATTEMPT, request id, c0)" },
+            { "kind": "assert", "text": "pop the capsule; poseidon2(vk) = the pinned vk hash", "msg": "unexpected verification key" },
+            { "kind": "assert", "text": "the proof verifies (UltraHonk ZK) over the 14 public inputs (`outcome_public_inputs`)" },
+            { "kind": "read", "text": "the [[k-epoch|node keys]] at the anchor block", "item": "k-epoch" },
+            { "kind": "enqueue", "text": "[[assert_key_epoch]](0, false): the key set the signatures verify under", "id": "pr-enq-ake" },
+            { "kind": "assert", "text": "node i's result signature verifies over poseidon2(RESULT_DOMAIN, namespace, machine request id, c1, i, 0), for i = 0, 1, 2", "msg": "node 0's result signature does not verify" },
+            { "kind": "push", "text": "the completed note hash, Alice's outcome note", "item": "p-note" },
+            { "kind": "emit", "text": "a private log under the outcome tag: [note hash, ciphertext, padding] (`outcome_log`)", "item": "p-log" },
+            { "kind": "enqueue", "text": "[[apply_result]](AddApply { request id, [c0], [c1] })", "id": "pr-enq-ar" }
+          ] },
+        { "id": "rotate_keys", "kind": "private", "summary": "moves the node keys to the next epoch",
+          "check": "2 of 3 current node signatures; no proof", "enqueues": ["set_node_keys"],
+          "logic": [
+            { "kind": "read", "text": "the node keys at the anchor block (`key_epoch::check_rotation`)" },
+            { "kind": "assert", "text": "epoch = the current epoch + 1", "msg": "the epoch is not the current epoch + 1" },
+            { "kind": "assert", "text": "every new sig and enc key is a Grumpkin point; no key repeats", "msg": "the new set repeats a sig key" },
+            { "kind": "assert", "text": "at least two current nodes signed the rotation message", "msg": "a key set rotation needs two current node signatures" },
+            { "kind": "enqueue", "text": "[[set_node_keys]](the new NodeKeys)" }
+          ] },
+        { "id": "deliver_outcome", "kind": "utility", "summary": "hands Alice's PXE the completed note her client rebuilt from the outcome log; runs in her wallet, no transaction",
+          "logic": [
+            { "kind": "compute", "text": "the note content [owner, outcome_notes slot, rho, code, total, request id] (`deliver_outcome_note`)" },
+            { "kind": "read", "text": "the transaction's unique note hashes and first nullifier: the note's nonce is found among them, or the note is dropped (`process_private_note_msg`)" },
+            { "kind": "store", "text": "the note in her PXE under her scope" }
+          ] }
+      ] }
+  ],
+
+  "initial": [
+    { "op": "create", "at": { "in": "orch", "sec": "long_lived" }, "item": { "id": "or-keys", "label": "the three nodes' public keys", "reader": "public" } },
+    { "op": "create", "at": { "in": "node", "sec": "long_lived" }, "item": { "id": "nd-keys", "label": "node i's signing key and envelope key", "reader": "operator",
+      "per_node": { "0": "sig 0x0f4c…a006, enc 0x2d81…7c3e", "1": "sig 0x2871…2a4f, enc 0x13b9…e015", "2": "sig 0x1ac7…4083, enc 0x0b52…9d6a" } } },
+    { "op": "create", "at": { "in": "relayer", "sec": "long_lived" }, "item": { "id": "rl-keys", "label": "its account keys and fee balance", "reader": "operator" } },
+    { "op": "create", "at": { "in": "alice", "sec": "long_lived" }, "item": { "id": "al-keys", "label": "account keys; the wallet secret every request's secrets derive from", "reader": "user" } },
+    { "op": "create", "at": { "in": "alice", "sec": "long_lived" }, "item": { "id": "al-nodekeys", "label": "the three nodes' public keys", "reader": "public" } },
+    { "op": "create", "at": { "in": "dev", "sec": "long_lived" }, "item": { "id": "dev-keys", "label": "the deployer's account keys; the namespace owner key REGISTER signs with", "reader": "operator" } }
+  ],
+
+  "steps": [
+    { "n": 1, "phase": "setup", "title": "The developer builds the app",
+      "text": "The developer compiles the two circuits, [[counter_init]] and [[counter_add]], hashes their verification keys, builds the contract manifest that lists them, draws a deployment salt and computes the contract's address. The address commits to the constructor's Config, so it commits to these circuits.",
+      "acts": ["dev"],
+      "effects": [
+        { "op": "create", "at": { "in": "dev", "sec": "code" }, "item": { "id": "dev-pkgs", "label": "ContractManifest", "reader": "public", "about": "The list of the app's circuits in REGISTER order, each with its verification key's hash, and the manifests that say where each input comes from.",
+          "fields": [
+            { "k": "packages", "v": "[counter_init 0x3c07…a1d4, counter_add 0x1f8b…62e0]", "reader": "public", "note": "package_hash of each name" },
+            { "k": "vk_hashes", "v": "[0x61a9…e305, 0x2b7e…11c9]", "reader": "public" },
+            { "k": "manifests", "v": "manifests/counter_init.json, manifests/counter_add.json", "reader": "public" }
+          ], "to": "→ manifest_hash `0x44d0…7c12`" } },
+        { "op": "create", "at": { "in": "dev", "sec": "code" }, "item": { "id": "dev-artifact", "label": "CounterTip deployment", "reader": "public",
+          "fields": [
+            { "k": "class", "v": "the compiled contract", "reader": "public" },
+            { "k": "salt", "v": "0x6e3d…91b0", "reader": "public" },
+            { "k": "Config", "v": "stale_blocks 50, the node sig keys, the circuit pins", "reader": "public" }
+          ], "to": "→ address `0x2c1a…9f04`, the app's namespace" } }
+      ],
+      "flows": [],
+      "learns": [ { "party": "Developer", "text": "The circuits, their key hashes and the address-to-be. Nothing is sent yet." } ],
+      "bricks": ["upgrades"], "pick": "dev-pkgs" },
+
+    { "n": 2, "phase": "setup", "title": "REGISTER: the nodes take the circuits and derive the app's nullifier secret",
+      "text": "The developer sends the manifest and the circuits through the orchestrator to the three nodes. Each node stores them; together they derive the app's nullifier secret `nsk_app` as shares, which no node ever holds whole, and its public hash `npk_app_hash`. Each signs the registry answer over the namespace, the manifest hash, the package list, `npk_app_hash` and the sequence number.",
+      "acts": ["dev", "orch", "node"],
+      "effects": [
+        { "op": "create", "at": { "in": "orch", "sec": "code" }, "item": { "id": "or-circuits", "label": "copies of the registered circuits, their keys and manifests", "note": "the logic: under Node i", "reader": "public" } },
+        { "op": "create", "at": { "in": "orch", "sec": "long_lived" }, "item": { "id": "or-app", "label": "the app's entry: namespace `0x2c1a…9f04`, owner key, npk_app_hash `0x0f42…a917`", "reader": "public" } },
+        { "op": "create", "at": { "in": "node", "sec": "code" }, "item": { "id": "nd-code", "label": "counter_init, counter_add: circuit, verification key, manifest", "note": "registered at 2; the logic below", "reader": "public" } },
+        { "op": "create", "at": { "in": "node", "sec": "long_lived" }, "item": { "id": "nd-nsk", "label": "nsk_app", "note": "the app's nullifier secret, parts i, i−1", "reader": "shared", "form": "part", "same": "nsk",
+          "about": "The app's nullifier secret key, derived jointly at REGISTER and held only as Rep3 parts: each node holds two of three summands.",
+          "per_node": { "0": "summands 0 and 2", "1": "summands 1 and 0", "2": "summands 2 and 1" } } },
+        { "op": "create", "at": { "in": "dev", "sec": "long_lived" }, "item": { "id": "dev-answer", "label": "RegistryAnswer", "reader": "public",
+          "fields": [
+            { "k": "seq", "v": "0", "reader": "public" },
+            { "k": "npk_app_hash", "v": "0x0f42…a917", "reader": "public", "note": "the hash of nsk_app" },
+            { "k": "signatures", "v": "[node 0's, node 1's, node 2's]", "reader": "public", "note": "each over manifest_message(namespace, manifest_hash, packages_hash, npk_app_hash, 0, i)" }
+          ] } }
+      ],
+      "flows": [
+        { "from": "dev-pkgs", "to": ["orch"], "kind": "send", "reader": "public", "payload": "manifest, circuits", "text": "Developer → orchestrator: the contract manifest and the two circuits (REGISTER)" },
+        { "from": "or-circuits", "to": ["nd-code"], "kind": "send", "reader": "public", "payload": "manifest, circuits", "text": "Orchestrator → each node: the manifest and the circuits" },
+        { "from": "nd-nsk", "to": ["or-app"], "kind": "send", "reader": "public", "payload": "npk_app_hash, signatures", "text": "Each node → orchestrator: `npk_app_hash` and its signature on the registry answer" },
+        { "from": "or-app", "to": ["dev-answer"], "kind": "send", "reader": "public", "payload": "registry answer", "text": "Orchestrator → developer: the [[dev-answer|registry answer]] with the three signatures" }
+      ],
+      "learns": [
+        { "party": "Everyone the developer tells", "text": "The circuits and `npk_app_hash`." },
+        { "party": "Nodes", "text": "Each holds its two parts of `nsk_app`; none can compute it alone." },
+        { "party": "If two nodes colluded", "text": "`nsk_app`, and so every nullifier the app's rounds compute." }
+      ],
+      "bricks": ["node_keys"], "pick": "nd-nsk" },
+
+    { "n": 3, "phase": "setup", "title": "The developer deploys the contract: the constructor writes Config",
+      "text": "A deploy transaction with a public call to [[constructor]]: it checks the package list and writes Config, the stale period, the three nodes' signing keys (epoch 0) and the circuit pins. The queue and the counter slot exist and are empty; no node keys are stored yet, which reads as epoch 0 under Config's keys.",
+      "acts": ["dev", "constructor"],
+      "tx": { "id": "0x3f02…11ab", "by": "dev", "entry": "constructor",
+        "item": { "id": "tx3-obj", "label": "Tx", "reader": "public", "fields": [
+          { "k": "sender, fee_payer", "v": "the developer's account", "reader": "public" },
+          { "k": "entry", "v": "CounterTip.constructor", "reader": "public", "note": "a public call: everyone sees it and its arguments" },
+          { "k": "deploys", "v": "the class and the instance at 0x2c1a…9f04", "reader": "public" },
+          { "k": "to the network", "v": "1 public call, its public data writes", "reader": "public" }
+        ] },
+        "args": { "id": "tx3-args", "label": "constructor(config: Config", "open": "{", "close": "})", "reader": "public", "fields": [
+          { "k": "tip: TipPins", "reader": "public", "fields": [
+            { "k": "stale_blocks", "v": "{ enabled: true, blocks: 50 }", "reader": "public" },
+            { "k": "node_sig_keys", "v": "[node 0's, node 1's, node 2's] (Grumpkin points)", "reader": "public" },
+            { "k": "circuits", "v": "{ manifest_hash 0x44d0…7c12, packages [0x3c07…a1d4, 0x1f8b…62e0], vk_hashes [0x61a9…e305, 0x2b7e…11c9] }", "reader": "public" }
+          ] }
+        ] } },
+      "effects": [
+        { "op": "create", "at": { "in": "dev", "sec": "long_lived" }, "item": { "id": "dev-tx3", "label": "sent: deploy tx", "value": "0x3f02…11ab", "reader": "public" } },
+        { "op": "create", "at": { "in": "ct", "sec": "public", "group": "set_once" }, "item": { "id": "k-config", "label": "Config", "reader": "public", "about": "The constructor's pins: the stale period, the node signing keys of epoch 0, the manifest hash and each package's vk hash. The address commits to it.",
+          "fields": [
+            { "k": "stale_blocks", "v": "{ enabled: true, blocks: 50 }", "reader": "public" },
+            { "k": "node_sig_keys", "v": "[node 0, node 1, node 2]", "reader": "public", "note": "epoch 0" },
+            { "k": "manifest_hash", "v": "0x44d0…7c12", "reader": "public" },
+            { "k": "packages", "v": "counter_init vk 0x61a9…e305, counter_add vk 0x2b7e…11c9", "reader": "public" }
+          ] } },
+        { "op": "create", "at": { "in": "ct", "sec": "public", "group": "rotated" }, "item": { "id": "k-epoch", "label": "node keys", "value": "nothing stored: epoch 0, Config's keys", "reader": "public", "note": "rotated_at 0, grace 50",
+          "about": "The node key epochs: the current and previous signing keys and when they rotated. Epoch 0 has no stored value and reads as the constructor's keys." } },
+        { "op": "create", "at": { "in": "ct", "sec": "public", "group": "round" }, "item": { "id": "k-ctr", "label": "counter", "value": "0 (empty until init_counter)", "reader": "public", "same": "counter",
+          "about": "The counter key's slot: the commitment to [total, blinding], the only copy of it on chain. Its storage slot is the key id every manifest names." } },
+        { "op": "create", "at": { "in": "ct", "sec": "public", "group": "round" }, "item": { "id": "k-queue", "label": "queue", "value": "head {0, since 0} · tail 0", "reader": "public",
+          "about": "The request queue: requests[index], tail, head {index, since}, seen[request id] and done[index]." } },
+        { "op": "create", "at": { "in": "relayer", "sec": "code" }, "item": { "id": "rl-code", "label": "the contract's compiled code; the circuits' key hashes", "reader": "public" } },
+        { "op": "create", "at": { "in": "alice", "sec": "code" }, "item": { "id": "al-code", "label": "the contract's compiled code; the circuits' manifests and key hashes", "reader": "public" } }
+      ],
+      "flows": [
+        { "from": "dev-tx3", "to": ["tx"], "kind": "submit", "reader": "public", "payload": "deploy tx", "text": "Developer → deploy transaction `0x3f02…11ab`" },
+        { "from": "tx", "to": ["constructor"], "kind": "submit", "reader": "public", "payload": "Config", "text": "Transaction → [[constructor]](Config): every argument public" },
+        { "from": "constructor", "to": ["k-config"], "kind": "write", "reader": "public", "payload": "Config", "text": "[[constructor]] → [[k-config|Config]]: written once" }
+      ],
+      "learns": [ { "party": "Everyone", "text": "The contract, its circuits' key hashes, the nodes' signing keys and the stale period." } ],
+      "bricks": ["node_keys", "upgrades"], "pick": "k-config" },
+
+    { "n": 4, "phase": "setup", "title": "The developer configures: the signed registry answer pins npk_app_hash",
+      "text": "[[configure]] checks the three nodes' signatures on the registry answer against the keys in Config, then enqueues [[set_configured]], which writes `configured` once: Config's pins with `npk_app_hash`, the network's identity every result is checked against. No proof is verified.",
+      "acts": ["dev", "configure", "set_configured"],
+      "tx": { "id": "0x6c55…9e38", "by": "dev", "entry": "configure",
+        "item": { "id": "tx4-obj", "label": "Tx", "reader": "public", "fields": [
+          { "k": "sender, fee_payer", "v": "the developer's account", "reader": "public" },
+          { "k": "entry", "v": "CounterTip.configure", "reader": "operator", "note": "a private call: the chain does not see which function ran" },
+          { "k": "to the network", "v": "the wallet's proof; 1 enqueued public call: set_configured(Configured)", "reader": "public" }
+        ] },
+        "args": { "id": "tx4-args", "label": "configure", "open": "(", "close": ")", "reader": "public", "fields": [
+          { "k": "npk_app_hash", "v": "0x0f42…a917", "reader": "public" },
+          { "k": "answer: RegistryAnswer", "reader": "public", "fields": [
+            { "k": "seq", "v": "0", "reader": "public" },
+            { "k": "signatures", "v": "[node 0's, node 1's, node 2's]", "reader": "public" }
+          ] }
+        ] } },
+      "calls": [
+        { "caller": "configure", "callee": "set_configured", "kind": "private_to_public_enqueue",
+          "args": { "id": "call4-sc", "label": "set_configured(configured: Configured", "open": "{", "close": "})", "reader": "public", "fields": [
+            { "k": "configured", "v": "true", "reader": "public" },
+            { "k": "npk_app_hash", "v": "0x0f42…a917", "reader": "public" },
+            { "k": "pins", "v": "Config's TipPins", "reader": "public" }
+          ] } }
+      ],
+      "effects": [
+        { "op": "create", "at": { "in": "dev", "sec": "long_lived" }, "item": { "id": "dev-tx4", "label": "sent: configure tx", "value": "0x6c55…9e38", "reader": "public" } },
+        { "op": "create", "at": { "in": "ct", "sec": "public", "group": "set_once" }, "item": { "id": "k-configured", "label": "configured", "reader": "public",
+          "about": "The pins every round row is built from: Config's pins and npk_app_hash, written once by set_configured.",
+          "fields": [
+            { "k": "configured", "v": "true", "reader": "public" },
+            { "k": "npk_app_hash", "v": "0x0f42…a917", "reader": "public", "note": "the network's identity" },
+            { "k": "pins", "v": "Config's: stale period, node keys, vk hashes", "reader": "public" }
+          ] } }
+      ],
+      "flows": [
+        { "from": "dev-tx4", "to": ["tx"], "kind": "submit", "reader": "public", "payload": "configure tx", "text": "Developer → configure transaction `0x6c55…9e38`" },
+        { "from": "tx", "to": ["configure"], "kind": "submit", "reader": "public", "payload": "npk_app_hash, answer", "text": "Transaction → [[configure]](npk_app_hash, the registry answer)" },
+        { "from": "k-config", "to": ["configure"], "kind": "read", "reader": "public", "payload": "node keys, pins", "text": "[[k-config|Config]] → [[configure]]: the node sig keys, the manifest hash and the package list" },
+        { "from": "cfg-enq-sc", "to": ["set_configured"], "kind": "call", "reader": "public", "payload": "Configured", "text": "[[configure]] → [[set_configured]](Configured { true, pins, npk_app_hash })" },
+        { "from": "set_configured", "to": ["k-configured"], "kind": "write", "reader": "public", "payload": "configured", "text": "[[set_configured]] → [[k-configured|configured]]: written once" }
+      ],
+      "learns": [ { "party": "Everyone", "text": "`npk_app_hash`, and that the three nodes vouched for these circuits." } ],
+      "bricks": ["upgrades", "node_keys"], "pick": "k-configured" },
+
+    { "n": 5, "phase": "setup", "title": "The init round: the nodes prove counter_init",
+      "text": "The scheduler sees the counter slot empty and sends the nodes an init attempt. Together they draw a blinding r0 and prove [[counter_init]]: the counter starts at 0, committed as c0. Each node keeps its parts of [0, r0] and signs the result.",
+      "acts": ["orch", "node", "counter_init"], "runs": [ { "circuit": "counter_init" } ],
+      "effects": [
+        { "op": "create", "at": { "in": "orch", "sec": "long_lived" }, "item": { "id": "or-init-attempt", "label": "init attempt", "value": "counter_init, request id `0x5d3a…0e17`", "reader": "operator", "note": "the slot was empty" } },
+        { "op": "create", "at": { "in": "node", "sec": "long_lived" }, "item": { "id": "nd-c0", "label": "CounterState c0", "reader": "shared", "form": "part", "same": "state-c0",
+          "about": "The counter's state at version 0: [total 0, blinding r0], held as parts; its commitment c0 is what the chain holds.",
+          "fields": [
+            { "k": "total", "v": "parts i, i−1 of 0", "reader": "shared", "form": "part" },
+            { "k": "blinding", "v": "parts i, i−1 of r0", "reader": "shared", "form": "part" }
+          ], "to": "→ c0 `0x19c4…03ab`", "to_reader": "shared", "to_form": "sealed" } },
+        { "op": "create", "at": { "in": "node", "sec": "long_lived" }, "item": { "id": "nd-init-row", "label": "init result row", "value": "proof, 7 public inputs, node i's signature", "reader": "operator" } },
+        { "op": "create", "at": { "in": "orch", "sec": "long_lived" }, "item": { "id": "or-init-result", "label": "init result", "value": "proof, Init outputs, three signatures", "reader": "operator" } }
+      ],
+      "flows": [
+        { "from": "k-ctr", "to": ["or-init-attempt"], "kind": "read", "reader": "public", "payload": "slot empty", "text": "[[k-ctr|counter]] → the scheduler: the slot holds 0, so the init round is due" },
+        { "from": "or-init-attempt", "to": ["node"], "kind": "send", "reader": "operator", "payload": "init attempt", "text": "Orchestrator → each node: the init attempt" },
+        { "from": "node", "to": ["nd-c0"], "kind": "push", "reader": "shared", "payload": "parts of [0, r0]", "text": "The round → each node: its parts of the new state [0, r0] (out0)" },
+        { "from": "nd-init-row", "to": ["or-init-result"], "kind": "push", "reader": "operator", "payload": "result rows", "text": "Each node → orchestrator: the proof, the outputs and its signature" }
+      ],
+      "learns": [
+        { "party": "Nodes, orchestrator", "text": "c0, a commitment that hides the total behind r0." },
+        { "party": "If two nodes colluded", "text": "That the total is 0, which everyone can guess." }
+      ],
+      "bricks": ["state", "shape"], "pick": "nd-c0" },
+
+    { "n": 6, "phase": "setup", "title": "The relayer lands the init: init_counter verifies counter_init",
+      "text": "The relayer fetches the init result and sends a transaction to [[init_counter]], which verifies the [[counter_init]] proof under the pinned vk and the three node signatures in the relayer's wallet, then enqueues [[assert_key_epoch]] and [[apply_init]]. [[apply_init]] writes c0 into the empty slot. The relayer's send returns once the transaction is in a proposed block.",
+      "acts": ["orch", "relayer", "init_counter", "configured_in_force", "assert_key_epoch", "apply_init"],
+      "tx": { "id": "0x48b1…c2f7", "by": "relayer", "entry": "init_counter",
+        "item": { "id": "tx6-obj", "label": "Tx", "reader": "public", "fields": [
+          { "k": "sender, fee_payer", "v": "the relayer's account", "reader": "public" },
+          { "k": "entry", "v": "CounterTip.init_counter", "reader": "operator", "note": "a private call" },
+          { "k": "capsule", "v": "ProofData { vk, proof }", "reader": "operator", "note": "stays in the wallet" },
+          { "k": "to the network", "v": "the wallet's proof; 2 enqueued public calls with their arguments", "reader": "public" }
+        ] },
+        "args": { "id": "tx6-args", "label": "init_counter", "open": "(", "close": ")", "reader": "public", "fields": [
+          { "k": "new_c", "v": "c0 0x19c4…03ab", "reader": "shared", "form": "sealed" },
+          { "k": "signatures", "v": "[node 0's, node 1's, node 2's]", "reader": "operator" }
+        ] } },
+      "calls": [
+        { "caller": "init_counter", "callee": "configured_in_force", "kind": "private_to_private" },
+        { "caller": "init_counter", "callee": "assert_key_epoch", "kind": "private_to_public_enqueue",
+          "args": { "id": "call6-ake", "label": "assert_key_epoch", "open": "(", "close": ")", "reader": "public", "fields": [ { "k": "epoch", "v": "0", "reader": "public" }, { "k": "current_only", "v": "false", "reader": "public" } ] } },
+        { "caller": "init_counter", "callee": "apply_init", "kind": "private_to_public_enqueue",
+          "args": { "id": "call6-ai", "label": "apply_init", "open": "(", "close": ")", "reader": "public", "fields": [ { "k": "request_id", "v": "0x5d3a…0e17", "reader": "public" }, { "k": "new_c", "v": "c0 0x19c4…03ab", "reader": "shared", "form": "sealed" } ] } }
+      ],
+      "verifies": [ { "function": "init_counter", "circuit": "counter_init",
+        "public_inputs": { "id": "pi6", "label": "public_inputs [7]", "reader": "public", "note": "the proof is checked over these", "fields": [
+          { "k": "namespace, vk_hash", "v": "0x2c1a…9f04, 0x61a9…e305", "reader": "public" },
+          { "k": "out_slots", "v": "[counter]", "reader": "public" },
+          { "k": "request_id", "v": "0x5d3a…0e17", "reader": "public" },
+          { "k": "old_c, new_c", "v": "0, c0 0x19c4…03ab", "reader": "shared", "form": "sealed" },
+          { "k": "npk_app_hash", "v": "0x0f42…a917", "reader": "public", "note": "from configured" }
+        ] } } ],
+      "effects": [
+        { "op": "create", "at": { "in": "relayer", "sec": "long_lived" }, "item": { "id": "rl-init", "label": "fetched init result", "value": "proof, vk, Init outputs, three signatures", "reader": "operator" } },
+        { "op": "create", "at": { "in": "relayer", "sec": "long_lived" }, "item": { "id": "rl-tx6", "label": "sent: init tx", "value": "0x48b1…c2f7", "reader": "public", "note": "it pays the fee" } },
+        { "op": "update", "ref": "k-ctr", "set": { "value": "c0 `0x19c4…03ab`", "reader": "shared", "form": "sealed" } }
+      ],
+      "flows": [
+        { "from": "or-init-result", "to": ["rl-init"], "kind": "send", "reader": "operator", "payload": "FETCH", "text": "Orchestrator → relayer: the init result (FETCH)" },
+        { "from": "rl-tx6", "to": ["tx"], "kind": "submit", "reader": "public", "payload": "tx 0x48b1…c2f7", "text": "Relayer → init transaction `0x48b1…c2f7`" },
+        { "from": "tx", "to": ["init_counter"], "kind": "submit", "reader": "operator", "payload": "c0, signatures, capsule", "text": "Transaction → [[init_counter]](c0, three signatures) with the capsule { vk, proof }" },
+        { "from": "k-configured", "to": ["init_counter"], "kind": "read", "reader": "public", "payload": "vk pin, npk_app_hash, keys", "text": "[[k-configured|configured]] → [[init_counter]]: the counter_init vk hash, npk_app_hash, the node keys" },
+        { "from": "ic-enq-ake", "to": ["assert_key_epoch"], "kind": "call", "reader": "public", "payload": "(0, false)", "text": "[[init_counter]] → [[assert_key_epoch]](epoch 0, current_only false)" },
+        { "from": "ic-enq-ai", "to": ["apply_init"], "kind": "call", "reader": "public", "payload": "(id, c0)", "text": "[[init_counter]] → [[apply_init]](request id `0x5d3a…0e17`, c0)" },
+        { "from": "k-epoch", "to": ["assert_key_epoch"], "kind": "read", "reader": "public", "payload": "epoch 0", "text": "[[k-epoch|node keys]] → [[assert_key_epoch]]: nothing stored, epoch 0" },
+        { "from": "k-ctr", "to": ["apply_init"], "kind": "read", "reader": "public", "payload": "slot empty", "text": "[[k-ctr|counter]] → [[apply_init]]: the slot holds 0" },
+        { "from": "apply_init", "to": ["k-ctr"], "kind": "write", "reader": "shared", "payload": "c0", "text": "[[apply_init]] → [[k-ctr|counter]]: c0 `0x19c4…03ab`" }
+      ],
+      "learns": [
+        { "party": "Everyone", "text": "c0, and that the counter exists. The relayer's account as fee payer." },
+        { "party": "Not on chain", "text": "The co-SNARK proof and the node signatures: checked inside the relayer's private function." }
+      ],
+      "bricks": ["submission", "node_keys", "state"], "pick": "k-ctr" },
+
+    { "n": 7, "phase": "request", "interaction": "add5", "title": "Alice prepares her request: secrets, partial note, C and the three sharings",
+      "text": "Alice's client (`requestOutcome`) derives `rho`, an outcome key and tag and a blinding from her wallet secret (`SecretStore`). It computes her partial note P, the commitment C over [amount, P, key, tag] and the blinding, and the request id. It splits the five values into three summand vectors, salts and hashes each into S_j, hashes the three into D, and seals each node's two vectors to that node.",
+      "acts": ["alice"],
+      "effects": [
+        { "op": "create", "at": { "in": "alice", "sec": "interaction" }, "item": { "id": "al-P", "label": "PartialNote", "reader": "user", "same": "P",
+          "about": "Alice's partial note commitment P = partial_commitment(owner, rho): the round completes it into her outcome note.",
+          "fields": [
+            { "k": "owner", "v": "Alice", "reader": "user" },
+            { "k": "rho", "v": "0x4e21…d013", "reader": "user", "note": "from her wallet secret" }
+          ], "to": "→ P `0x6a0f…3b5c`", "to_reader": "user", "to_form": "sealed" } },
+        { "op": "create", "at": { "in": "alice", "sec": "interaction" }, "item": { "id": "al-C", "label": "InputsCommitment", "reader": "user", "same": "C",
+          "about": "C = poseidon2([amount, P, outcome_key, outcome_tag, blinding]): binds the request's inputs without showing them. The request id is poseidon2(namespace, vk hash, C).",
+          "fields": [
+            { "k": "amount", "v": "5", "reader": "user" },
+            { "k": "partial_note", "v": "P 0x6a0f…3b5c", "reader": "user", "form": "sealed" },
+            { "k": "outcome_key", "v": "0x11c8…7a40", "reader": "user" },
+            { "k": "outcome_tag", "v": "0x1c77…20aa", "reader": "user" },
+            { "k": "blinding", "v": "0x7d0e…5a92", "reader": "user" }
+          ], "to": "→ C `0x1d93…a6e0` · request id `0x07be…41d2`", "to_reader": "user", "to_form": "sealed" } },
+        { "op": "create", "at": { "in": "alice", "sec": "interaction" }, "item": { "id": "al-sharing", "label": "Sharing<5>", "reader": "user",
+          "about": "Three Rep3 summand vectors of [amount, P, key, tag, blinding] and their salts: s0 + s1 + s2 is each value. Node i gets s_i and s_i−1.",
+          "fields": [
+            { "k": "summands", "v": "[s0, s1, s2]", "reader": "user", "note": "each [amount, P, key, tag, blinding]; s0 + s1 + s2 = the values" },
+            { "k": "salts", "v": "[σ0, σ1, σ2]", "reader": "user" },
+            { "k": "S_0, S_1, S_2", "v": "0x3b10…77c2, 0x52ee…0d19, 0x0a64…e8f3", "reader": "user", "form": "sealed", "note": "poseidon2(SUMMANDS_DOMAIN, s_j, σ_j)" }
+          ], "to": "→ D `0x5c1e…09ad`", "to_reader": "user", "to_form": "sealed" } },
+        { "op": "create", "at": { "in": "alice", "sec": "interaction" }, "item": { "id": "al-env", "label": "envelopes [3]", "value": "node i's opens to s_i, s_i−1 and their salts", "reader": "shared", "form": "sealed", "note": "sealed to each node's envelope key" } }
+      ],
+      "flows": [
+        { "from": "al-keys", "to": ["al-P", "al-C"], "kind": "push", "reader": "user", "payload": "secrets", "text": "Alice's wallet secret → her [[al-P|partial note]] and [[al-C|C]]: `rho`, the outcome key and tag, the blinding" },
+        { "from": "al-C", "to": ["al-sharing", "al-env"], "kind": "push", "reader": "user", "payload": "summands, salts", "text": "C's values → the [[al-sharing|sharing]] and the three [[al-env|envelopes]]" }
+      ],
+      "learns": [ { "party": "Alice", "text": "Everything she drew. Nobody else learns anything yet." } ],
+      "bricks": ["intake", "value", "outputs"], "pick": "al-C" },
+
+    { "n": 8, "phase": "request", "interaction": "add5", "title": "Alice sends C, the S_j, D and the envelopes to the orchestrator",
+      "text": "The orchestrator checks that D is the digest of the S_j, fixes the expiry block (143) and passes each node its envelope. It learns Alice's network address beside the request id, and nothing of her inputs.",
+      "acts": ["alice", "orch"],
+      "effects": [
+        { "op": "create", "at": { "in": "orch", "sec": "interaction" }, "item": { "id": "or-req", "label": "IntakeRequest", "reader": "operator", "fields": [
+          { "k": "request_id", "v": "0x07be…41d2", "reader": "public" },
+          { "k": "C", "v": "0x1d93…a6e0", "reader": "user", "form": "sealed" },
+          { "k": "S_0, S_1, S_2, D", "v": "0x3b10…77c2, 0x52ee…0d19, 0x0a64…e8f3, 0x5c1e…09ad", "reader": "user", "form": "sealed" },
+          { "k": "expiry_block", "v": "143", "reader": "public" },
+          { "k": "envelopes", "v": "[node 0's, node 1's, node 2's]", "reader": "shared", "form": "sealed", "note": "it cannot open them" }
+        ] } },
+        { "op": "create", "at": { "in": "orch", "sec": "interaction" }, "item": { "id": "or-addr", "label": "Alice's network address, beside her request id", "reader": "operator" } }
+      ],
+      "flows": [
+        { "from": "al-env", "to": ["or-req"], "kind": "send", "reader": "user", "payload": "C, S_j, D, envelopes", "text": "Alice → orchestrator: C, S_0..S_2, D and the three sealed envelopes (HTTPS)" },
+        { "from": "or-req", "to": ["node"], "kind": "send", "reader": "shared", "payload": "its envelope, expiry", "text": "Orchestrator → each node: C, the S_j, D, the expiry and its own envelope" }
+      ],
+      "learns": [
+        { "party": "Orchestrator", "text": "Alice's address and her request id; C and D, which hide her inputs." },
+        { "party": "Nodes", "text": "Nothing yet: the envelopes are opened at the next step." }
+      ],
+      "bricks": ["intake"], "pick": "or-req" },
+
+    { "n": 9, "phase": "request", "interaction": "add5", "title": "Each node checks its two vectors and signs a receipt",
+      "text": "Node i opens its envelope, checks that its two vectors hash to S_i and S_i−1 and that D is the digest of the three S_j, the layout and the clear values, stores its parts, and signs a receipt over [request id, C, expiry, D]. It never sees a shared value: one vector of each pair is a random-looking summand.",
+      "acts": ["node", "orch", "alice"],
+      "effects": [
+        { "op": "create", "at": { "in": "node", "sec": "interaction" }, "item": { "id": "nd-env", "label": "Envelope", "reader": "shared", "form": "part",
+          "fields": [
+            { "k": "s_i", "v": "[amount, P, key, tag, blinding]", "reader": "shared", "form": "part", "note": "summand i" },
+            { "k": "s_i−1", "v": "[amount, P, key, tag, blinding]", "reader": "shared", "form": "part", "note": "summand i−1" },
+            { "k": "salts", "v": "σ_i, σ_i−1", "reader": "operator" }
+          ], "to": "checked against S_i, S_i−1 and D",
+          "per_node": { "0": "s0, s2", "1": "s1, s0", "2": "s2, s1" } } },
+        { "op": "create", "at": { "in": "node", "sec": "interaction" }, "item": { "id": "nd-rcpt", "label": "ReceiptRow", "reader": "operator",
+          "fields": [
+            { "k": "C", "v": "0x1d93…a6e0", "reader": "user", "form": "sealed" },
+            { "k": "request_id, expiry", "v": "0x07be…41d2, 143", "reader": "public" },
+            { "k": "D", "v": "0x5c1e…09ad", "reader": "user", "form": "sealed" },
+            { "k": "signature", "v": "node i's, over poseidon2(RECEIPT_DOMAIN, request id, C, 143, D)", "reader": "operator" }
+          ] } },
+        { "op": "create", "at": { "in": "alice", "sec": "interaction" }, "item": { "id": "al-rcpts", "label": "receipts [3]", "value": "node 0's, node 1's, node 2's", "reader": "operator", "note": "each over [request id, C, expiry 143, D]" } }
+      ],
+      "flows": [
+        { "from": "nd-rcpt", "to": ["orch"], "kind": "send", "reader": "operator", "payload": "receipt", "text": "Each node → orchestrator: its signed receipt" },
+        { "from": "or-req", "to": ["al-rcpts"], "kind": "send", "reader": "operator", "payload": "3 receipts", "text": "Orchestrator → Alice: the three receipts" }
+      ],
+      "learns": [
+        { "party": "Node i", "text": "Its two summand vectors: random-looking without the third." },
+        { "party": "If two nodes colluded", "text": "All three vectors, so the amount 5, P and her outcome key and tag. Not her account address." }
+      ],
+      "bricks": ["intake"], "pick": "nd-env" },
+
+    { "n": 10, "phase": "request", "interaction": "add5", "title": "Alice's request transaction: add checks the sharing and the receipts, append_receipt queues it",
+      "text": "Alice's wallet runs [[add]]: it commits her partial note and pushes its use nullifier, checks that the summands add up to the values behind C, recomputes D and C, checks the amount is a u64, computes the request id and checks the three receipts. It enqueues [[assert_key_epoch]] and [[append_receipt]], which queues the request id. Only the request id and the expiry reach the chain. Her wallet's send returns once the transaction is in a proposed block.",
+      "acts": ["alice", "add", "configured_in_force", "assert_key_epoch", "append_receipt"],
+      "tx": { "id": "0x7a3c…b520", "by": "alice", "entry": "add",
+        "item": { "id": "tx10-obj", "label": "Tx", "reader": "public", "fields": [
+          { "k": "sender", "v": "Alice's account", "reader": "user", "note": "hidden: a private call" },
+          { "k": "fee_payer", "v": "wFJ, the private fee-payment contract", "reader": "public", "note": "her account never shows as the fee payer" },
+          { "k": "entry, args", "v": "CounterTip.add(…)", "reader": "user", "note": "in full in add's row below" },
+          { "k": "to the network", "v": "her wallet's proof; 1 nullifier; 2 enqueued public calls: assert_key_epoch(0, false), append_receipt(0x07be…41d2, 143)", "reader": "public" }
+        ] },
+        "args": { "id": "tx10-args", "label": "add", "open": "(", "close": ")", "reader": "user", "to": "computed P `0x6a0f…3b5c`, C `0x1d93…a6e0`, D `0x5c1e…09ad`, request id `0x07be…41d2`", "fields": [
+          { "k": "amount", "v": "5", "reader": "user" },
+          { "k": "rho", "v": "0x4e21…d013", "reader": "user" },
+          { "k": "outcome_key", "v": "0x11c8…7a40", "reader": "user" },
+          { "k": "outcome_tag", "v": "0x1c77…20aa", "reader": "user" },
+          { "k": "sharing", "v": "Sharing<5>", "reader": "user", "fields": [
+            { "k": "summands", "v": "[s0, s1, s2]", "reader": "user", "note": "each [amount, P, key, tag, blinding]" },
+            { "k": "salts", "v": "[σ0, σ1, σ2]", "reader": "user" }
+          ] },
+          { "k": "expiry_block", "v": "143", "reader": "public" },
+          { "k": "receipts", "v": "[node 0, node 1, node 2]", "reader": "operator" }
+        ] } },
+      "calls": [
+        { "caller": "add", "callee": "configured_in_force", "kind": "private_to_private" },
+        { "caller": "add", "callee": "assert_key_epoch", "kind": "private_to_public_enqueue",
+          "args": { "id": "call10-ake", "label": "assert_key_epoch", "open": "(", "close": ")", "reader": "public", "fields": [ { "k": "epoch", "v": "0", "reader": "public" }, { "k": "current_only", "v": "false", "reader": "public" } ] } },
+        { "caller": "add", "callee": "append_receipt", "kind": "private_to_public_enqueue",
+          "args": { "id": "call10-ar", "label": "append_receipt", "open": "(", "close": ")", "reader": "public", "fields": [ { "k": "request_id", "v": "0x07be…41d2", "reader": "user", "form": "sealed" }, { "k": "expiry_block", "v": "143", "reader": "public" } ] } }
+      ],
+      "effects": [
+        { "op": "create", "at": { "in": "alice", "sec": "interaction" }, "item": { "id": "al-tx10", "label": "sent: request tx", "value": "0x7a3c…b520", "reader": "user" } },
+        { "op": "create", "at": { "in": "ct", "sec": "private", "group": "interaction" }, "item": { "id": "p-used", "label": "PartialUsed", "reader": "user",
+          "fields": [ { "k": "partial", "v": "P 0x6a0f…3b5c", "reader": "user", "form": "sealed", "note": "= partial_commitment(Alice, rho)" } ],
+          "to": "→ nullifier `0x2a08…77e1` · P completes only once", "to_reader": "user", "to_form": "sealed" } },
+        { "op": "create", "at": { "in": "ct", "sec": "public", "group": "interaction" }, "item": { "id": "k-req", "label": "requests[0]", "value": "`0x07be…41d2`", "reader": "user", "form": "sealed", "note": "names nobody" } },
+        { "op": "create", "at": { "in": "ct", "sec": "public", "group": "interaction" }, "item": { "id": "k-seen", "label": "seen[0x07be…41d2]", "value": "true", "reader": "public" } },
+        { "op": "update", "ref": "k-queue", "set": { "value": "head {0, since 131} · tail 1" } }
+      ],
+      "flows": [
+        { "from": "al-tx10", "to": ["tx"], "kind": "submit", "reader": "user", "payload": "tx 0x7a3c…b520", "text": "Alice → request transaction `0x7a3c…b520`" },
+        { "from": "tx", "to": ["add"], "kind": "submit", "reader": "user", "payload": "amount, rho, key, tag, sharing, receipts", "text": "Transaction → [[add]](amount, rho, key, tag, Sharing<5>, expiry 143, receipts): private arguments, in her wallet only" },
+        { "from": "k-configured", "to": ["add"], "kind": "read", "reader": "public", "payload": "vk pin, keys", "text": "[[k-configured|configured]] → [[add]]: the counter_add vk hash and the node keys" },
+        { "from": "add", "to": ["p-used"], "kind": "emit", "reader": "user", "payload": "nullifier", "text": "[[add]] → the [[p-used|use nullifier]] of P" },
+        { "from": "add-enq-ake", "to": ["assert_key_epoch"], "kind": "call", "reader": "public", "payload": "(0, false)", "text": "[[add]] → [[assert_key_epoch]](0, false)" },
+        { "from": "add-enq-ar", "to": ["append_receipt"], "kind": "call", "reader": "public", "payload": "(id, 143)", "text": "[[add]] → [[append_receipt]](request id `0x07be…41d2`, expiry 143)" },
+        { "from": "k-epoch", "to": ["assert_key_epoch"], "kind": "read", "reader": "public", "payload": "epoch 0", "text": "[[k-epoch|node keys]] → [[assert_key_epoch]]: epoch 0" },
+        { "from": "k-ctr", "to": ["append_receipt"], "kind": "read", "reader": "shared", "payload": "initialised", "text": "[[k-ctr|counter]] and [[k-configured|configured]] → [[append_receipt]]: configured, the counter initialised" },
+        { "from": "append_receipt", "to": ["k-req", "k-seen", "k-queue"], "kind": "write", "reader": "public", "payload": "requests[0], seen, tail", "text": "[[append_receipt]] → [[k-req|requests[0]]], [[k-seen|seen]], the [[k-queue|queue]]'s tail 1 and head.since" }
+      ],
+      "learns": [
+        { "party": "Everyone", "text": "A request id at queue index 0 with expiry 143, and one nullifier. Not the amount, the round type's inputs or who asked." },
+        { "party": "Alice", "text": "That her request is queued." }
+      ],
+      "bricks": ["intake", "path", "binding", "node_keys"], "pick": "k-req" },
+
+    { "n": 11, "phase": "round", "interaction": "add5", "title": "The scheduler builds the attempt",
+      "text": "The head is request 0. The scheduler reads the head, requests[0] and the counter's commitment c0 from the chain at the proposed tip, and sends the three nodes an attempt that names the request and the state it runs against (binding: turn).",
+      "acts": ["orch"],
+      "effects": [
+        { "op": "create", "at": { "in": "orch", "sec": "interaction" }, "item": { "id": "or-attempt", "label": "Attempt", "reader": "operator", "fields": [
+          { "k": "id", "v": "0x23aa…5e09", "reader": "public" },
+          { "k": "queue_index, request_id", "v": "0, 0x07be…41d2", "reader": "public" },
+          { "k": "old_commitment", "v": "c0 0x19c4…03ab", "reader": "shared", "form": "sealed" }
+        ], "to": "sent to the three nodes" } }
+      ],
+      "flows": [
+        { "from": "k-queue", "to": ["or-attempt"], "kind": "read", "reader": "public", "payload": "head 0", "text": "[[k-queue|queue]] → the scheduler: head index 0" },
+        { "from": "k-req", "to": ["or-attempt"], "kind": "read", "reader": "user", "payload": "requests[0]", "text": "[[k-req|requests[0]]] → the scheduler: `0x07be…41d2`" },
+        { "from": "k-ctr", "to": ["or-attempt"], "kind": "read", "reader": "shared", "payload": "c0", "text": "[[k-ctr|counter]] → the scheduler: c0, the state the round runs against" },
+        { "from": "or-attempt", "to": ["node"], "kind": "send", "reader": "operator", "payload": "attempt", "text": "Orchestrator → each node: the [[or-attempt|attempt]]" }
+      ],
+      "learns": [ { "party": "Orchestrator, nodes", "text": "Which request runs next and against which commitment: all public already." } ],
+      "bricks": ["binding", "path"], "pick": "or-attempt" },
+
+    { "n": 12, "phase": "round", "interaction": "add5", "title": "Each node re-reads the chain",
+      "text": "Each node's chain verifier checks the attempt against what its own Aztec node shows at the proposed tip: the head, requests[0] and c0. A node refuses an attempt that differs from the chain, so the orchestrator cannot make the nodes run a request out of turn or against another state.",
+      "acts": ["node"],
+      "effects": [
+        { "op": "create", "at": { "in": "node", "sec": "interaction" }, "item": { "id": "nd-attempt", "label": "attempt `0x23aa…5e09`", "value": "checked: head 0, requests[0], c0", "reader": "operator" } }
+      ],
+      "flows": [
+        { "from": "k-queue", "to": ["nd-attempt"], "kind": "read", "reader": "public", "payload": "head", "text": "[[k-queue|queue]] → each node, through its own Aztec node: head 0" },
+        { "from": "k-req", "to": ["nd-attempt"], "kind": "read", "reader": "user", "payload": "requests[0]", "text": "[[k-req|requests[0]]] → each node" },
+        { "from": "k-ctr", "to": ["nd-attempt"], "kind": "read", "reader": "shared", "payload": "c0", "text": "[[k-ctr|counter]] → each node: c0" }
+      ],
+      "learns": [ { "party": "Nodes", "text": "Nothing new: the chain's public state." } ],
+      "bricks": ["binding"], "pick": "nd-attempt" },
+
+    { "n": 13, "phase": "round", "interaction": "add5", "title": "The nodes load the round's inputs",
+      "text": "Each node opens its envelope into its parts of the inputs and loads its parts of the counter state c0 and of `nsk_app`, as the manifest says. The three compare hashes of what they hold in common, so they hold one sharing, and draw the new blinding r1 together. [[counter_add]]'s parameters are now filled.",
+      "acts": ["node", "counter_add"], "runs": [ { "circuit": "counter_add" } ],
+      "effects": [
+        { "op": "create", "at": { "in": "node", "sec": "interaction" }, "item": { "id": "nd-r1", "label": "r1", "value": "parts i, i−1", "note": "the new blinding, drawn together (SAMPLE 1)", "reader": "shared", "form": "part" } }
+      ],
+      "flows": [
+        { "from": "nd-env", "to": ["counter_add"], "kind": "push", "reader": "shared", "payload": "INPUT_SHARED", "text": "[[nd-env|Envelope]] → [[counter_add]]: amount, P, key, tag and blinding, in parts" },
+        { "from": "nd-c0", "to": ["counter_add"], "kind": "push", "reader": "shared", "payload": "LOAD", "text": "[[nd-c0|CounterState c0]] → [[counter_add]]: total and r_old, in parts" },
+        { "from": "nd-nsk", "to": ["counter_add"], "kind": "push", "reader": "shared", "payload": "LOAD nsk_app", "text": "[[nd-nsk|nsk_app]] → [[counter_add]], in parts" },
+        { "from": "nd-r1", "to": ["counter_add"], "kind": "push", "reader": "shared", "payload": "SAMPLE", "text": "[[nd-r1|r1]] → [[counter_add]]: r_new" }
+      ],
+      "learns": [
+        { "party": "Nodes", "text": "Only that their parts match: hashes of the shares they hold in common." },
+        { "party": "If two nodes colluded", "text": "The amount, the total 0 and Alice's outcome key." }
+      ],
+      "bricks": ["intake", "state", "shape"], "pick": "nd-r1" },
+
+    { "n": 14, "phase": "round", "interaction": "add5", "title": "The nodes prove counter_add together",
+      "text": "The three nodes run [[counter_add]] as a co-SNARK: C opens, 0 + 5 fits a u64, so the code is 0 and the new total 5 is written under r1. The round completes Alice's partial note with [0, 5, request id] and seals [0, 5] to her outcome key. Each node checks the proof, signs the result over the machine request id and c1 when the round ends, without reading the chain again, and keeps its parts of the new state.",
+      "acts": ["node", "counter_add", "orch"], "runs": [ { "circuit": "counter_add" } ],
+      "effects": [
+        { "op": "create", "at": { "in": "node", "sec": "interaction" }, "item": { "id": "nd-c1", "label": "CounterState c1", "reader": "shared", "form": "part", "same": "state-c1",
+          "about": "The counter's state after Alice's add: [total 5, blinding r1], held as parts; its commitment c1 is what the round outputs and the chain will hold.",
+          "fields": [
+            { "k": "total", "v": "parts i, i−1 of 5", "reader": "shared", "form": "part" },
+            { "k": "blinding", "v": "parts i, i−1 of r1", "reader": "shared", "form": "part" }
+          ], "to": "→ c1 `0x0e5f…b872` · moves to long-lived when it lands", "to_reader": "shared", "to_form": "sealed" } },
+        { "op": "create", "at": { "in": "node", "sec": "interaction" }, "item": { "id": "nd-result", "label": "ResultRow", "reader": "operator",
+          "fields": [
+            { "k": "request_id, attempt", "v": "0x07be…41d2, 0x23aa…5e09", "reader": "public" },
+            { "k": "proof", "v": "UltraHonk ZK of [[counter_add]], made jointly", "reader": "operator", "note": "the same bytes at every node" },
+            { "k": "public_inputs [14]", "reader": "public", "fields": [
+              { "k": "namespace, vk_hash", "v": "0x2c1a…9f04, 0x2b7e…11c9", "reader": "public" },
+              { "k": "in_slots, out_slots", "v": "[counter], [counter]", "reader": "public" },
+              { "k": "request_id, machine_request_id", "v": "0x07be…41d2, 0x31f6…8d27", "reader": "public" },
+              { "k": "old, new commitments", "v": "[c0 0x19c4…03ab], [c1 0x0e5f…b872]", "reader": "shared", "form": "sealed" },
+              { "k": "npk_app_hash, outcome_tag", "v": "0x0f42…a917, 0x1c77…20aa", "reader": "public" },
+              { "k": "note_hashes, ciphertext", "v": "[0x0b3d…c6f4], [3 fields]", "reader": "user", "form": "sealed" }
+            ] },
+            { "k": "signature", "v": "node i's, over poseidon2(RESULT_DOMAIN, namespace, 0x31f6…8d27, c1, i, 0)", "reader": "operator" }
+          ] } },
+        { "op": "create", "at": { "in": "orch", "sec": "interaction" }, "item": { "id": "or-result", "label": "the result", "value": "proof, 14 public inputs, three signatures", "reader": "operator", "note": "served to the relayer on FETCH" } }
+      ],
+      "flows": [
+        { "from": "counter_add", "to": ["nd-c1"], "kind": "push", "reader": "shared", "payload": "out0", "text": "[[counter_add]] → each node: its parts of [5, r1] (STORE out0)" },
+        { "from": "counter_add", "to": ["nd-result"], "kind": "push", "reader": "operator", "payload": "proof, outputs", "text": "[[counter_add]] → each node's [[nd-result|result row]]: the proof and the 14 public inputs" },
+        { "from": "nd-result", "to": ["or-result"], "kind": "push", "reader": "operator", "payload": "result row", "text": "Each node → orchestrator: the result with its signature" }
+      ],
+      "learns": [
+        { "party": "Nodes, orchestrator", "text": "c1, the note hash and the ciphertext: none of them shows the amount, the total or Alice." },
+        { "party": "If two nodes colluded", "text": "The new total 5." }
+      ],
+      "bricks": ["outputs", "value", "delivery", "state", "shape"], "pick": "nd-c1" },
+
+    { "n": 15, "phase": "land", "interaction": "add5", "title": "The relayer fetches the result",
+      "text": "The relayer reads the queue head at the proposed tip. With the head at index 0 it fetches the result for request `0x07be…41d2` from the orchestrator: the proof, its verification key, the public inputs and the three signatures.",
+      "acts": ["relayer", "orch"],
+      "effects": [
+        { "op": "create", "at": { "in": "relayer", "sec": "interaction" }, "item": { "id": "rl-fetched", "label": "FetchedResult", "reader": "operator",
+          "fields": [
+            { "k": "request_id, attempt", "v": "0x07be…41d2, 0x23aa…5e09", "reader": "public" },
+            { "k": "proof", "v": "the nodes' UltraHonk ZK proof", "reader": "operator" },
+            { "k": "vk", "v": "counter_add's", "reader": "operator", "note": "its hash is the pinned 0x2b7e…11c9" },
+            { "k": "result: AddResult", "v": "AddApply { 0x07be…41d2, [c0], [c1] }, tag 0x1c77…20aa, [0x0b3d…c6f4], [3 fields]", "reader": "public" },
+            { "k": "signatures", "v": "[node 0's, node 1's, node 2's]", "reader": "operator" }
+          ], "to": "from the orchestrator (FETCH), after the head reached index 0" } }
+      ],
+      "flows": [
+        { "from": "k-queue", "to": ["relayer"], "kind": "read", "reader": "public", "payload": "head 0", "text": "[[k-queue|queue]] → relayer: the head is index 0" },
+        { "from": "or-result", "to": ["rl-fetched"], "kind": "send", "reader": "operator", "payload": "FETCH", "text": "Orchestrator → relayer: proof, vk, public inputs, three signatures (FETCH)" }
+      ],
+      "learns": [ { "party": "Relayer", "text": "The result: no amount, no total, no requester." } ],
+      "bricks": ["submission"], "pick": "rl-fetched" },
+
+    { "n": 16, "phase": "land", "interaction": "add5", "title": "The relayer lands the result: process_result enqueues apply_result",
+      "text": "The relayer's wallet runs [[process_result]]: it verifies the co-SNARK proof under the pinned [[counter_add]] vk and the three node signatures, pushes Alice's completed note hash and emits her sealed outcome log. It enqueues two public calls, which run after it: [[assert_key_epoch]] (the signatures' key set is still valid) and [[apply_result]], which checks that the head is this request and the counter still holds c0, then writes c1 and moves the head. Nothing in the transaction names Alice. The relayer's send returns once the transaction is in a proposed block.",
+      "acts": ["relayer", "process_result", "configured_in_force", "assert_key_epoch", "apply_result", "node"],
+      "tx": { "id": "0x5e2d…a019", "by": "relayer", "entry": "process_result",
+        "item": { "id": "tx16-obj", "label": "Tx", "reader": "public", "fields": [
+          { "k": "sender, fee_payer", "v": "the relayer's account", "reader": "public" },
+          { "k": "entry", "v": "CounterTip.process_result", "reader": "operator", "note": "a private call: the chain does not see which function ran" },
+          { "k": "args", "v": "result: AddResult, signatures [3]", "reader": "operator", "note": "in full in process_result's row below; they stay in the relayer's wallet" },
+          { "k": "capsule", "v": "ProofData { vk, proof }", "reader": "operator", "note": "stays in the wallet" },
+          { "k": "to the network", "v": "the wallet's proof; 1 note hash, 1 private log, 2 enqueued public calls with their arguments", "reader": "public" }
+        ] },
+        "args": { "id": "tx16-args", "label": "process_result", "open": "(", "close": ") + capsule ProofData { vk, proof }", "reader": "public", "fields": [
+          { "k": "result: AddResult", "reader": "public", "fields": [
+            { "k": "apply", "v": "AddApply { request_id 0x07be…41d2, old_commitments [c0], values [c1] }", "reader": "public" },
+            { "k": "outcome_tag", "v": "0x1c77…20aa", "reader": "public" },
+            { "k": "note_hashes", "v": "[0x0b3d…c6f4]", "reader": "user", "form": "sealed" },
+            { "k": "ciphertext", "v": "[3 fields]", "reader": "user", "form": "sealed" }
+          ] },
+          { "k": "signatures", "v": "[node 0's, node 1's, node 2's]", "reader": "operator" }
+        ] } },
+      "calls": [
+        { "caller": "process_result", "callee": "configured_in_force", "kind": "private_to_private" },
+        { "caller": "process_result", "callee": "assert_key_epoch", "kind": "private_to_public_enqueue",
+          "args": { "id": "call16-ake", "label": "assert_key_epoch", "open": "(", "close": ") passed by process_result", "reader": "public", "fields": [ { "k": "epoch", "v": "0", "reader": "public" }, { "k": "current_only", "v": "false", "reader": "public" } ] } },
+        { "caller": "process_result", "callee": "apply_result", "kind": "private_to_public_enqueue",
+          "args": { "id": "call16-ar", "label": "apply_result(apply: AddApply", "open": "{", "close": "}) passed by process_result", "reader": "public", "fields": [
+            { "k": "request_id", "v": "0x07be…41d2", "reader": "public" },
+            { "k": "old_commitments", "v": "[c0 0x19c4…03ab]", "reader": "shared", "form": "sealed" },
+            { "k": "values", "v": "[c1 0x0e5f…b872]", "reader": "shared", "form": "sealed", "note": "new commitments; no pinned reads" }
+          ] } }
+      ],
+      "verifies": [ { "function": "process_result", "circuit": "counter_add",
+        "public_inputs": { "id": "pi16", "label": "public_inputs [14]", "reader": "public", "note": "the proof is checked over these", "fields": [
+          { "k": "namespace", "v": "0x2c1a…9f04", "reader": "public", "note": "this contract" },
+          { "k": "vk_hash", "v": "0x2b7e…11c9", "reader": "public", "note": "the pin, not an argument" },
+          { "k": "in_slots, out_slots", "v": "[counter], [counter]", "reader": "public", "note": "storage slots as key ids" },
+          { "k": "request_id", "v": "0x07be…41d2", "reader": "public" },
+          { "k": "machine_request_id", "v": "0x31f6…8d27", "reader": "public", "note": "= poseidon2(PSS_ATTEMPT, request id, c0)" },
+          { "k": "old_commitments", "v": "[c0 0x19c4…03ab]", "reader": "shared", "form": "sealed" },
+          { "k": "new_commitments", "v": "[c1 0x0e5f…b872]", "reader": "shared", "form": "sealed" },
+          { "k": "npk_app_hash", "v": "0x0f42…a917", "reader": "public", "note": "from configured" },
+          { "k": "outcome_tag", "v": "0x1c77…20aa", "reader": "public" },
+          { "k": "note_hashes", "v": "[0x0b3d…c6f4]", "reader": "user", "form": "sealed" },
+          { "k": "ciphertext", "v": "[3 fields]", "reader": "user", "form": "sealed", "note": "[code, total] sealed to her outcome key" }
+        ] } } ],
+      "effects": [
+        { "op": "create", "at": { "in": "relayer", "sec": "interaction" }, "item": { "id": "rl-cap", "label": "ProofData capsule", "reader": "operator",
+          "fields": [ { "k": "vk", "v": "counter_add's", "reader": "operator" }, { "k": "proof", "v": "the nodes' proof", "reader": "operator" } ],
+          "to": "staged at slot 0x10 under its own address; process_result pops it" } },
+        { "op": "create", "at": { "in": "relayer", "sec": "interaction" }, "item": { "id": "rl-tx16", "label": "sent: result tx", "value": "0x5e2d…a019", "reader": "public", "note": "it pays the fee" } },
+        { "op": "create", "at": { "in": "ct", "sec": "private", "group": "notes" }, "item": { "id": "p-notes", "label": "a completed note", "value": "`0x0b3d…c6f4`", "reader": "user", "form": "sealed", "note": "the chain cannot tell whose", "same": "outcome-note" } },
+        { "op": "create", "at": { "in": "ct", "sec": "private", "group": "interaction" }, "item": { "id": "p-note", "label": "AddOutcomeNote", "reader": "user", "same": "outcome-note",
+          "about": "Alice's outcome note [code, total, request id] at the outcome_notes slot, completed from her partial note P inside the co-SNARK. Nothing spends it.",
+          "fields": [
+            { "k": "owner", "v": "Alice", "reader": "user", "note": "inside P" },
+            { "k": "storage_slot", "v": "1", "reader": "public", "note": "outcome_notes" },
+            { "k": "partial", "v": "P 0x6a0f…3b5c", "reader": "user", "form": "sealed" },
+            { "k": "code, total", "v": "0, 5", "reader": "user" },
+            { "k": "request_id", "v": "0x07be…41d2", "reader": "public" }
+          ], "to": "→ note hash `0x0b3d…c6f4` · completed inside the co-SNARK", "to_reader": "user", "to_form": "sealed" } },
+        { "op": "create", "at": { "in": "ct", "sec": "private", "group": "interaction" }, "item": { "id": "p-log", "label": "OutcomeLog", "reader": "user",
+          "about": "A private log under Alice's outcome tag: the note hash, the 3-field ciphertext of [code, total] and padding derived from the tag, 15 fields in all.",
+          "fields": [
+            { "k": "tag", "v": "0x1c77…20aa", "reader": "public", "note": "Alice finds it by this" },
+            { "k": "note_hash", "v": "0x0b3d…c6f4", "reader": "user", "form": "sealed", "note": "the AEAD nonce derives from it" },
+            { "k": "ciphertext", "v": "[3 fields]", "reader": "user", "form": "sealed", "note": "[code 0, total 5] under her outcome key" },
+            { "k": "padding", "v": "poseidon2([tag, i]) for i = 4..14", "reader": "public" }
+          ], "to": "a private log of the full length, so its length tells nothing" } },
+        { "op": "update", "ref": "k-ctr", "set": { "value": "c1 `0x0e5f…b872`" } },
+        { "op": "update", "ref": "k-queue", "set": { "value": "head {1, since 136} · tail 1" } },
+        { "op": "create", "at": { "in": "ct", "sec": "public", "group": "interaction" }, "item": { "id": "k-done", "label": "done[0]", "value": "1", "note": "applied", "reader": "public" } },
+        { "op": "spend", "ref": "nd-c0", "note": "replaced at 16" },
+        { "op": "move", "ref": "nd-c1", "to": { "in": "node", "sec": "long_lived" } }
+      ],
+      "flows": [
+        { "from": "rl-tx16", "to": ["tx"], "kind": "submit", "reader": "public", "payload": "tx 0x5e2d…a019", "text": "Relayer → result transaction `0x5e2d…a019` (sent, fee paid)" },
+        { "from": "tx", "to": ["process_result"], "kind": "submit", "reader": "operator", "payload": "AddResult, signatures, capsule", "text": "Transaction → [[process_result]]: AddResult, three signatures, capsule { vk, proof } (they stay in the relayer's wallet)" },
+        { "from": "k-configured", "to": ["process_result"], "kind": "read", "reader": "public", "payload": "vk pin, npk_app_hash, keys", "text": "[[k-configured|configured]] → [[process_result]]: the counter_add vk hash, npk_app_hash, the node keys" },
+        { "from": "pr-enq-ake", "to": ["assert_key_epoch"], "kind": "call", "reader": "public", "payload": "(0, false)", "text": "[[process_result]] → [[assert_key_epoch]](epoch 0, current_only false)" },
+        { "from": "pr-enq-ar", "to": ["apply_result"], "kind": "call", "reader": "public", "payload": "AddApply {id, c0, c1}", "text": "[[process_result]] → [[apply_result]](AddApply { `0x07be…41d2`, [c0], [c1] })" },
+        { "from": "process_result", "to": ["p-note", "p-notes"], "kind": "emit", "reader": "user", "payload": "note hash 0x0b3d…", "text": "[[process_result]] → note hash `0x0b3d…c6f4` (into outcome_notes)" },
+        { "from": "process_result", "to": ["p-log"], "kind": "emit", "reader": "user", "payload": "tag + ciphertext", "text": "[[process_result]] → [[p-log|outcome log]]: tag `0x1c77…20aa`, the note hash, the 3-field ciphertext" },
+        { "from": "k-epoch", "to": ["assert_key_epoch"], "kind": "read", "reader": "public", "payload": "epoch 0", "text": "[[k-epoch|node keys]] → [[assert_key_epoch]]: stored epoch 0" },
+        { "from": "k-req", "to": ["apply_result"], "kind": "read", "reader": "user", "payload": "requests[0]", "text": "[[k-req|requests[0]]] → [[apply_result]]: the head's request id `0x07be…41d2`" },
+        { "from": "k-ctr", "to": ["apply_result"], "kind": "read", "reader": "shared", "payload": "c0", "text": "[[k-ctr|counter]] → [[apply_result]]: c0, checked against old_commitments" },
+        { "from": "apply_result", "to": ["k-ctr"], "kind": "write", "reader": "shared", "payload": "c1", "text": "[[apply_result]] → [[k-ctr|counter]]: c1 `0x0e5f…b872`" },
+        { "from": "apply_result", "to": ["k-queue", "k-done"], "kind": "write", "reader": "public", "payload": "head 1, done[0] = 1", "text": "[[apply_result]] → [[k-queue|queue]]: head 0 → 1, [[k-done|done[0]]] = 1" },
+        { "from": "k-ctr", "to": ["nd-c1"], "kind": "read", "reader": "shared", "payload": "c1 landed", "text": "[[k-ctr|counter]] → Node i: each node's chain reader sees c1 land and moves its parts of [[nd-c1|c1]] to long-lived" }
+      ],
+      "learns": [
+        { "party": "Everyone", "text": "That the request at queue index 0 was applied: c1, the moved head, done[0]. One new note hash and one tagged log that nobody else can open and that name nobody. The relayer's account as fee payer. Not the amount, the total or who asked." },
+        { "party": "Not on chain", "text": "The co-SNARK proof, its verification key and the three node signatures: they are checked inside the relayer's private function, and only the wallet's proof of that function reaches the chain." },
+        { "party": "Relayer", "text": "Nothing new: it already held the result it fetched at step 15." },
+        { "party": "Nodes, orchestrator", "text": "That the result landed. Each node moves its parts of c1 to long-lived state." },
+        { "party": "Alice", "text": "Nothing yet. She polls at step 17 and opens her outcome at step 18." },
+        { "party": "If two nodes colluded", "text": "The amount 5, the new total 5 and Alice's outcome key. Still not her account address." }
+      ],
+      "bricks": ["path", "submission", "outputs", "value", "delivery", "node_keys", "state", "binding"], "pick": "k-ctr" },
+
+    { "n": 17, "phase": "read", "interaction": "add5", "title": "Alice sees her request applied",
+      "text": "Alice's client polls the queue at the proposed tip (`waitForRequest`): done[0] is 1, so her request was applied (2 would mean it was skipped as stale).",
+      "acts": ["alice", "done_at"],
+      "effects": [
+        { "op": "create", "at": { "in": "alice", "sec": "interaction" }, "item": { "id": "al-status", "label": "status of `0x07be…41d2`", "value": "applied, done[0] = 1", "reader": "user" } }
+      ],
+      "flows": [
+        { "from": "k-done", "to": ["al-status"], "kind": "read", "reader": "public", "payload": "done[0] = 1", "text": "[[k-done|done[0]]] → Alice, through [[done_at]]: 1, applied" }
+      ],
+      "learns": [ { "party": "Alice", "text": "Her request landed. Everyone could see that index 0 landed; only she knows it was hers." } ],
+      "bricks": [], "pick": "k-done" },
+
+    { "n": 18, "phase": "read", "interaction": "add5", "title": "Alice opens her outcome and stores her note",
+      "text": "Alice's client (`readAndDeliverOutcome`) finds the outcome log by her tag, derives the nonce from the note hash it carries and decrypts [code 0, total 5] with her outcome key. It rebuilds the completed note from P, the plaintext and the request id, compares its hash with the note hash the log carries, and [[deliver_outcome]] hands the note to her PXE. No transaction.",
+      "acts": ["alice", "deliver_outcome"],
+      "effects": [
+        { "op": "create", "at": { "in": "alice", "sec": "interaction" }, "item": { "id": "al-plain", "label": "the outcome", "value": "[code 0, total 5]", "reader": "user", "note": "decrypted with her outcome key" } },
+        { "op": "create", "at": { "in": "alice", "sec": "long_lived" }, "item": { "id": "al-note", "label": "AddOutcomeNote", "reader": "user", "same": "outcome-note",
+          "fields": [
+            { "k": "code", "v": "0", "reader": "user" },
+            { "k": "total", "v": "5", "reader": "user" },
+            { "k": "request_id", "v": "0x07be…41d2", "reader": "public" },
+            { "k": "randomness", "v": "rho 0x4e21…d013", "reader": "user" }
+          ], "to": "→ note hash `0x0b3d…c6f4`, found in tx 0x5e2d…a019", "to_reader": "user", "to_form": "sealed" } }
+      ],
+      "flows": [
+        { "from": "p-log", "to": ["al-plain"], "kind": "read", "reader": "user", "payload": "log by tag", "text": "[[p-log|outcome log]] → Alice: found by tag `0x1c77…20aa`, opened with her outcome key" },
+        { "from": "deliver_outcome", "to": ["al-note"], "kind": "push", "reader": "user", "payload": "the note", "text": "[[deliver_outcome]] → Alice's PXE: her note [0, 5, `0x07be…41d2`]" }
+      ],
+      "learns": [ { "party": "Alice", "text": "The total after her add: 5. Nobody else learns it." } ],
+      "bricks": ["outputs", "delivery", "value"], "pick": "al-note" }
+  ]
+}

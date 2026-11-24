@@ -1,0 +1,240 @@
+# The heavy suites, nightly and on demand, on GitHub-hosted ubuntu-24.04 runners
+# (4 cores, 16 GB).
+#
+# Every job is sized to finish within 30 minutes on such a runner, and its
+# timeout-minutes is at most 30: the TXE runs one shard per test package of
+# txe.json (lending_tip_test two), the co-noir witness extension one per
+# example (lending-tip two), and the full nextest run builds in two groups and
+# runs their archives in partitions. docs/TESTING.md
+# ("Continuous integration") lists each job, its shards and the measured cost
+# they are sized from, and the gates that run by hand instead (the e2e).
+
+name: nightly
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  # Short scratch root for the TXE's and the nodes' Unix sockets (see ci.yml).
+  TXE_TMP_ROOT: /home/runner/pss
+
+jobs:
+  toolchain:
+    name: pinned toolchain
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      key: ${{ steps.tools.outputs.key }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: tools
+        uses: ./.github/actions/install-toolchain
+
+  shards:
+    # The TXE matrix: every test package of txe.json, read from it so that a
+    # new package is never left out, each one shard except the packages
+    # TXE_SPLIT names, which run as that many shards (scripts/txe.sh --shard).
+    name: shards
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      txe: ${{ steps.list.outputs.txe }}
+    env:
+      # lending_tip_test runs as two shards to stay within the budget.
+      TXE_SPLIT: '{"examples/lending-tip/contract/lending_tip_test": 2}'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: list
+        run: |
+          set -euo pipefail
+          txe="$(jq -c --argjson split "$TXE_SPLIT" '[.packages[]
+            | (if type == "string" then . else .path end) as $p
+            | ($split[$p] // 1) as $n
+            | range(1; $n + 1) as $k
+            | {package: $p, shard: "\($k)/\($n)"}]' txe.json)"
+          echo "txe=$txe" >> "$GITHUB_OUTPUT"
+          echo "txe: $txe"
+
+  txe:
+    name: TXE, ${{ matrix.package }} (shard ${{ matrix.shard }})
+    needs: [toolchain, shards]
+    runs-on: ubuntu-24.04
+    # One package (or one shard of it) with the contracts it deploys
+    # (scripts/txe.sh --only), at four test threads.
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.shards.outputs.txe) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: scripts/txe/package-lock.json
+      - uses: ./.github/actions/pinned-setup
+        with:
+          tools-key: ${{ needs.toolchain.outputs.key }}
+      - run: npm ci --prefix scripts/txe --no-audit --no-fund
+      - name: scripts/txe.sh --contracts --only ${{ matrix.package }} (its contracts compiled, vks by bb aztec_process)
+        env:
+          TXE_TEST_THREADS: "4"
+          PACKAGE: ${{ matrix.package }}
+          SHARD: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          shard=()
+          [[ $SHARD == 1/1 ]] || shard=(--shard "$SHARD")
+          scripts/txe.sh --contracts --only "$PACKAGE" "${shard[@]}"
+      - if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: txe-report-${{ strategy.job-index }}
+          path: .runs/txe/*/report.json
+          if-no-files-found: ignore
+
+  witness-extend:
+    name: co-noir witness extension, ${{ matrix.example }} (shard ${{ matrix.shard }})
+    needs: toolchain
+    runs-on: ubuntu-24.04
+    # The checker's release build, then one co-noir extension per fixture;
+    # lending-tip, with the most fixtures, runs as two shards.
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { example: examples/amm-tip, shard: 1/1 }
+          - { example: examples/lending-tip, shard: 1/2 }
+          - { example: examples/lending-tip, shard: 2/2 }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/pinned-setup
+        with:
+          tools-key: ${{ needs.toolchain.outputs.key }}
+          rust-cache: machine-witness-extend
+      - name: the circuits sidecar-core's build embeds (machine/data)
+        run: scripts/prepare-data.sh machine
+      - name: scripts/witness-extend.sh --shard ${{ matrix.shard }} ${{ matrix.example }}
+        env:
+          EXAMPLE: ${{ matrix.example }}
+          SHARD: ${{ matrix.shard }}
+        run: scripts/witness-extend.sh --shard "$SHARD" "$EXAMPLE"
+
+  nextest-build:
+    # Builds the test binaries once per group and hands them to the
+    # nextest-full shards as a nextest archive, with the prepared data they
+    # read. The groups are ci.yml's rust-test groups, with the same caches.
+    name: machine, build the test binaries (release), ${{ matrix.group }}
+    needs: toolchain
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - group: orchestrator
+            packages: -p sidecar-orchestrator
+          - group: rest
+            packages: --workspace --exclude sidecar-orchestrator
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/pinned-setup
+        with:
+          tools-key: ${{ needs.toolchain.outputs.key }}
+          rust-cache: machine-${{ matrix.group }}
+          crs: "true"
+      - uses: taiki-e/install-action@cfdb7ed4ccc7c7dce37759eae89dc5674b469b39 # v2.90.3
+        with:
+          tool: cargo-nextest@0.9.103   # toolchain.json cargo_nextest
+      - name: circuits and CRS into machine/data
+        run: scripts/prepare-data.sh
+      - name: cargo nextest archive --release
+        working-directory: machine
+        env:
+          PACKAGES: ${{ matrix.packages }}
+        run: |
+          # shellcheck disable=SC2086 # PACKAGES is a list of cargo arguments
+          cargo nextest archive --release --locked $PACKAGES --archive-file "$RUNNER_TEMP/machine-tests.tar.zst"
+      - name: the prepared data beside the archive
+        run: tar -czf "$RUNNER_TEMP/machine-data.tgz" machine/data
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: machine-tests-${{ matrix.group }}
+          path: |
+            ${{ runner.temp }}/machine-tests.tar.zst
+            ${{ runner.temp }}/machine-data.tgz
+          retention-days: 1
+
+  nextest-full:
+    name: machine, every test (proving binaries included), ${{ matrix.group }} ${{ matrix.partition }}
+    needs: [toolchain, nextest-build]
+    runs-on: ubuntu-24.04
+    # Every test of one group's archive, the three-party proving tests one
+    # at a time (each counts as 8 test threads); the orchestrator's archive
+    # runs in two partitions.
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { group: orchestrator, partition: "count:1/2" }
+          - { group: orchestrator, partition: "count:2/2" }
+          - { group: rest, partition: "count:1/1" }
+    services:
+      postgres:
+        image: postgres:16.14-alpine3.24@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      SIDECAR_TEST_POSTGRES_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+      PSS_REQUIRE_POSTGRES: "1"
+      # The prepared data comes with the archive: a test that skips for
+      # missing prepared data fails here instead.
+      PSS_REQUIRE_DATA: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/pinned-setup
+        with:
+          tools-key: ${{ needs.toolchain.outputs.key }}
+          bootstrap: "false"
+      - uses: taiki-e/install-action@cfdb7ed4ccc7c7dce37759eae89dc5674b469b39 # v2.90.3
+        with:
+          tool: cargo-nextest@0.9.103   # toolchain.json cargo_nextest
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: machine-tests-${{ matrix.group }}
+          path: ${{ runner.temp }}/machine-tests
+      - name: the prepared data, and dev TLS material into machine/data/keys
+        run: |
+          set -euo pipefail
+          tar -xzf "$RUNNER_TEMP/machine-tests/machine-data.tgz"
+          scripts/gen-dev-certs.sh
+      - name: every test of the group's archive, this partition
+        env:
+          PARTITION: ${{ matrix.partition }}
+        run: |
+          set -euo pipefail
+          source scripts/toolchain.sh   # NARGO_BIN and BB_BIN for the fresh-compile and vk cross-checks
+          cd machine
+          cargo nextest run --archive-file "$RUNNER_TEMP/machine-tests/machine-tests.tar.zst" \
+            --workspace-remap . --partition "$PARTITION"

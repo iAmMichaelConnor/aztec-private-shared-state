@@ -1,0 +1,22 @@
+[package]
+name = "amm_tip"
+type = "lib"
+# a range: a library, built by the packages that depend on it under either
+# compiler (the round circuits' 1.0.0, the contracts' 1.0.0-rc.3)
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# The swap arithmetic: amm_total (examples/amm-swap-total,
+# imported from total-noir) by path, never a copy: swap_tip calls its
+# swap_total with the tip's inputs, so a fix there reaches this example
+# and the swap's codes 1 to 7 stay one definition (DECISIONS.md, "One
+# total AMM swap").
+amm_total = { path = "../../../amm-swap-total/circuits/amm_total" }
+# total-noir's `total` library, a Nargo git dependency at the ref pinned in
+# toolchain.json; the same package amm_total uses, so one copy is
+# compiled. Used for the fixed-length Poseidon2 (p2_hash, p2_hash_sep),
+# the min_out comparison and Outcome.
+total = { git = "https://github.com/iAmMichaelConnor/total-noir", tag = "v0.1.0", directory = "noir/total" }
+# pss_core's tip round helpers (the slot commitment, the blinding rule, the
+# round over a chain-held key), the same for every tip example.
+pss_core = { path = "../../../../noir/pss_core" }

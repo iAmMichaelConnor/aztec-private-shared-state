@@ -1,0 +1,2 @@
+[workspace]
+members = ["counter_tip", "counter_tip_test"]

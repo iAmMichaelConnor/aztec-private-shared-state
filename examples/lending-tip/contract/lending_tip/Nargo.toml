@@ -1,0 +1,13 @@
+[package]
+name = "lending_tip"
+type = "contract"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0; deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+# the tip library: queue, intakes, process_result and apply
+pss_public_contract = { path = "../../../../noir/pss_public_contract" }
+# the market's contract library: everything this contract shares with
+# lending_tip_oblivious (types, pins, round table, layouts, the bodies)
+lending_market = { path = "../lending_market" }

@@ -1,0 +1,8 @@
+{
+  "description": "The manifest bounds REGISTER enforces and pss-client mirrors: a clear tree's depth (1 ..= max_tree_depth) and window (at most max_tree_window), a keyed map's depth (min_map_depth ..= max_map_depth) and a registered name's length in bytes (at most max_name_bytes). Written by sidecar-oblivious's layout tests (write_manifest_limits_vector).",
+  "max_map_depth": 120,
+  "max_name_bytes": 256,
+  "max_tree_depth": 32,
+  "max_tree_window": 8,
+  "min_map_depth": 32
+}

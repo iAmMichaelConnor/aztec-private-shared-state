@@ -1,0 +1,406 @@
+{
+  "bodies": [
+    {
+      "body": {
+        "circuits": {
+          "pss_seed": {
+            "abi": {
+              "abi_version": 1,
+              "error_types": {
+                "12469291177396340830": {
+                  "error_kind": "string",
+                  "string": "call to assert_max_bit_size"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "namespace",
+                  "type": {
+                    "kind": "field"
+                  },
+                  "visibility": "public"
+                },
+                {
+                  "name": "owner",
+                  "type": {
+                    "kind": "field"
+                  },
+                  "visibility": "public"
+                },
+                {
+                  "name": "out_slots",
+                  "type": {
+                    "kind": "array",
+                    "length": 1,
+                    "type": {
+                      "kind": "field"
+                    }
+                  },
+                  "visibility": "public"
+                },
+                {
+                  "name": "out0_randomness",
+                  "type": {
+                    "kind": "field"
+                  },
+                  "visibility": "private"
+                },
+                {
+                  "name": "rand_seed",
+                  "type": {
+                    "kind": "field"
+                  },
+                  "visibility": "private"
+                }
+              ],
+              "return_type": {
+                "abi_type": {
+                  "fields": [
+                    {
+                      "name": "read_leaves",
+                      "type": {
+                        "kind": "array",
+                        "length": 0,
+                        "type": {
+                          "kind": "field"
+                        }
+                      }
+                    },
+                    {
+                      "name": "nullifiers",
+                      "type": {
+                        "kind": "array",
+                        "length": 0,
+                        "type": {
+                          "kind": "field"
+                        }
+                      }
+                    },
+                    {
+                      "name": "new_note_hashes",
+                      "type": {
+                        "kind": "array",
+                        "length": 1,
+                        "type": {
+                          "kind": "field"
+                        }
+                      }
+                    },
+                    {
+                      "name": "npk_app_hash",
+                      "type": {
+                        "kind": "field"
+                      }
+                    },
+                    {
+                      "name": "app_outputs",
+                      "type": {
+                        "kind": "array",
+                        "length": 0,
+                        "type": {
+                          "kind": "field"
+                        }
+                      }
+                    }
+                  ],
+                  "kind": "struct",
+                  "path": "pss_core::effects::PssEffects"
+                },
+                "visibility": "public"
+              }
+            },
+            "bytecode": "H4sIAAAAAAAA/wMAAAAAAAAAAAA=",
+            "debug_symbols": "q1ZKSU0qTY/PzEvLL1ayio6tBQA=",
+            "file_map": {},
+            "hash": 1234,
+            "noir_version": "1.0.0"
+          }
+        },
+        "manifest": {
+          "circuits": {
+            "pss_seed": {
+              "vk_hash": "0x000000000000000000000000000000000000000000000000000000000000abcd"
+            }
+          },
+          "contract_manifest": 1,
+          "name": "pss_seed",
+          "node_keys": "fixed",
+          "packages": [
+            {
+              "circuit": "pss_seed",
+              "manifest": {
+                "circuit": "pss_seed",
+                "consume": [],
+                "manifest": 1,
+                "namespace_param": "namespace",
+                "outputs": [
+                  {
+                    "STORE": "$state_keys.writes[0]",
+                    "TACEO_store": "out0",
+                    "len": 2,
+                    "note_hash": "new_note_hashes[0]"
+                  }
+                ],
+                "state": {
+                  "$state_keys.writes[0]": "node"
+                },
+                "state_keys": {
+                  "reads": 0,
+                  "writes": 1
+                },
+                "witness": [
+                  {
+                    "from": {
+                      "PUBLIC": "$namespace"
+                    },
+                    "param": "namespace"
+                  },
+                  {
+                    "from": {
+                      "PUBLIC": {
+                        "const": "0xafafaf"
+                      }
+                    },
+                    "param": "owner"
+                  },
+                  {
+                    "from": {
+                      "PUBLIC": [
+                        "$state_keys.writes[0]"
+                      ]
+                    },
+                    "param": "out_slots"
+                  },
+                  {
+                    "from": {
+                      "SAMPLE": 1
+                    },
+                    "param": "out0_randomness"
+                  },
+                  {
+                    "from": {
+                      "SAMPLE": 1
+                    },
+                    "param": "rand_seed"
+                  }
+                ]
+              },
+              "name": "pss_seed"
+            }
+          ],
+          "upgrades": "fixed"
+        },
+        "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+        "owner_pubkey": {
+          "x": "0x09f0c96b72c2688fc47281a522d22a50c4eda0af8bc5856d50389d6a70c5d960",
+          "y": "0x1c457e7c50df9b99ea44ad877a1e2e4d685b058d34bb27adf7ebf37228126cd1"
+        },
+        "seq": 2,
+        "signature": {
+          "e": [
+            "0x000000000000000000000000000000005a1adba61c29465f7185896ed596e866",
+            "0x00000000000000000000000000000000287520f59bb5d9342834b4ed1348a543"
+          ],
+          "s": [
+            "0x000000000000000000000000000000002360c1452d1237f3893114c056e83c2c",
+            "0x000000000000000000000000000000001c86e98d49574c45cc8d249256b2185a"
+          ]
+        }
+      },
+      "canonical": "{\"circuits\":{\"pss_seed\":{\"abi\":{\"abi_version\":1,\"error_types\":{\"12469291177396340830\":{\"error_kind\":\"string\",\"string\":\"call to assert_max_bit_size\"}},\"parameters\":[{\"name\":\"namespace\",\"type\":{\"kind\":\"field\"},\"visibility\":\"public\"},{\"name\":\"owner\",\"type\":{\"kind\":\"field\"},\"visibility\":\"public\"},{\"name\":\"out_slots\",\"type\":{\"kind\":\"array\",\"length\":1,\"type\":{\"kind\":\"field\"}},\"visibility\":\"public\"},{\"name\":\"out0_randomness\",\"type\":{\"kind\":\"field\"},\"visibility\":\"private\"},{\"name\":\"rand_seed\",\"type\":{\"kind\":\"field\"},\"visibility\":\"private\"}],\"return_type\":{\"abi_type\":{\"fields\":[{\"name\":\"read_leaves\",\"type\":{\"kind\":\"array\",\"length\":0,\"type\":{\"kind\":\"field\"}}},{\"name\":\"nullifiers\",\"type\":{\"kind\":\"array\",\"length\":0,\"type\":{\"kind\":\"field\"}}},{\"name\":\"new_note_hashes\",\"type\":{\"kind\":\"array\",\"length\":1,\"type\":{\"kind\":\"field\"}}},{\"name\":\"npk_app_hash\",\"type\":{\"kind\":\"field\"}},{\"name\":\"app_outputs\",\"type\":{\"kind\":\"array\",\"length\":0,\"type\":{\"kind\":\"field\"}}}],\"kind\":\"struct\",\"path\":\"pss_core::effects::PssEffects\"},\"visibility\":\"public\"}},\"bytecode\":\"H4sIAAAAAAAA/wMAAAAAAAAAAAA=\",\"debug_symbols\":\"q1ZKSU0qTY/PzEvLL1ayio6tBQA=\",\"file_map\":{},\"hash\":1234,\"noir_version\":\"1.0.0\"}},\"manifest\":{\"circuits\":{\"pss_seed\":{\"vk_hash\":\"0x000000000000000000000000000000000000000000000000000000000000abcd\"}},\"contract_manifest\":1,\"name\":\"pss_seed\",\"node_keys\":\"fixed\",\"packages\":[{\"circuit\":\"pss_seed\",\"manifest\":{\"circuit\":\"pss_seed\",\"consume\":[],\"manifest\":1,\"namespace_param\":\"namespace\",\"outputs\":[{\"STORE\":\"$state_keys.writes[0]\",\"TACEO_store\":\"out0\",\"len\":2,\"note_hash\":\"new_note_hashes[0]\"}],\"state\":{\"$state_keys.writes[0]\":\"node\"},\"state_keys\":{\"reads\":0,\"writes\":1},\"witness\":[{\"from\":{\"PUBLIC\":\"$namespace\"},\"param\":\"namespace\"},{\"from\":{\"PUBLIC\":{\"const\":\"0xafafaf\"}},\"param\":\"owner\"},{\"from\":{\"PUBLIC\":[\"$state_keys.writes[0]\"]},\"param\":\"out_slots\"},{\"from\":{\"SAMPLE\":1},\"param\":\"out0_randomness\"},{\"from\":{\"SAMPLE\":1},\"param\":\"rand_seed\"}]},\"name\":\"pss_seed\"}],\"upgrades\":\"fixed\"},\"namespace\":\"0x000000000000000000000000000000000000000000000000000000001f2ea9c0\",\"owner_pubkey\":{\"x\":\"0x09f0c96b72c2688fc47281a522d22a50c4eda0af8bc5856d50389d6a70c5d960\",\"y\":\"0x1c457e7c50df9b99ea44ad877a1e2e4d685b058d34bb27adf7ebf37228126cd1\"},\"seq\":2}",
+      "domain": "cosnark-sidecar/v1/register",
+      "message": "0x2adaeb952036329d57189e83058e3ee7fe18034348d124c4e0758eb9ed1744b4",
+      "name": "register",
+      "pubkey": {
+        "x": "0x09f0c96b72c2688fc47281a522d22a50c4eda0af8bc5856d50389d6a70c5d960",
+        "y": "0x1c457e7c50df9b99ea44ad877a1e2e4d685b058d34bb27adf7ebf37228126cd1"
+      },
+      "secret": "0x1d6b9c2f0a4e8d7c6b5a49382716f5e4d3c2b1a09f8e7d6c5b4a392817060504",
+      "signer": "owner"
+    },
+    {
+      "body": {
+        "circuit": "pss_seed",
+        "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+        "owner_pubkey": {
+          "x": "0x09f0c96b72c2688fc47281a522d22a50c4eda0af8bc5856d50389d6a70c5d960",
+          "y": "0x1c457e7c50df9b99ea44ad877a1e2e4d685b058d34bb27adf7ebf37228126cd1"
+        },
+        "seq": 3,
+        "signature": {
+          "e": [
+            "0x0000000000000000000000000000000061baaab00d6546600e2b806eb8703c8b",
+            "0x0000000000000000000000000000000026806f920d7416f5c17e1884faeaf572"
+          ],
+          "s": [
+            "0x00000000000000000000000000000000f107169b7dfd97d52d90a50b186a7ee9",
+            "0x000000000000000000000000000000002b5c8c7be28ede12eb39246e67034ad3"
+          ]
+        }
+      },
+      "canonical": "{\"circuit\":\"pss_seed\",\"namespace\":\"0x000000000000000000000000000000000000000000000000000000001f2ea9c0\",\"owner_pubkey\":{\"x\":\"0x09f0c96b72c2688fc47281a522d22a50c4eda0af8bc5856d50389d6a70c5d960\",\"y\":\"0x1c457e7c50df9b99ea44ad877a1e2e4d685b058d34bb27adf7ebf37228126cd1\"},\"seq\":3}",
+      "domain": "cosnark-sidecar/v1/disable",
+      "message": "0x0297cebcb3a9a1d57ac93d29e0436c5a895f3d15b6a9c94c2b3748d580275a1f",
+      "name": "disable",
+      "pubkey": {
+        "x": "0x09f0c96b72c2688fc47281a522d22a50c4eda0af8bc5856d50389d6a70c5d960",
+        "y": "0x1c457e7c50df9b99ea44ad877a1e2e4d685b058d34bb27adf7ebf37228126cd1"
+      },
+      "secret": "0x1d6b9c2f0a4e8d7c6b5a49382716f5e4d3c2b1a09f8e7d6c5b4a392817060504",
+      "signer": "owner"
+    },
+    {
+      "body": {
+        "circuit": "monty_hall_open_door",
+        "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+        "public": {
+          "in0_nonce": "0x000000000000000000000000000000000000000000000000000000000d935b18"
+        },
+        "records": [
+          {
+            "c": [
+              "0x0f404a022508c8ac16bcf5a3f29ad6b5d13d803c1da00fe80474011d795a4ac798dd93d95bc101ab0c5793f4138d35a8da1134f3d3826d0e80bd4653f51a7753c992a917b511445707ce647e75e5777c17d59693e958296a04a1e68798d25e7a29708e3f19dec6f619f2b1d7f6fc9f2c47f4d4d914f3397c410489e90b0ccfe36f661141e92bf72512245aa65f1835340ff82d749e1cd6e9dcd585441ddf67509d68de7daaa91a281e25f0701c58a3ee6108e6ce4e685b45ac62a74cc277f20680e81283a081f9611d1fb9d45c148b0f7e2c23294f448d93f96b3b03e13da2bac59c17f50f0207bf",
+              "0x2441273ce650277500a167feee9b826bde9b9bc08be05d1228425783a362a1c1f765773f13cc84d122a523705cecff1571bd82708ad28d4ed91bee5983e7be7e11868bf5091716b5119574e657ff5b8ecc1ab1a7d2e67062e3c2d60a2a7d13db3d665cbb57cc3372222733814e68821bd9ea63d3b53d93a62fc55132e4216e2d92ff02151616d1491c8619381a8c62c466b6f1e64523e4ac694aaea29649259018390d03ccc966a119daf41d17dd52848caa61e64f70d50b44ed9744fdb10425ebf3be23869bb44030208d88b81091dbc779409b7512da59cc9e72d208b50062dffc7e46f6365e9e",
+              "0x11669f16214b996c0ca430192fb0374c84d9bf0eb7b04c4897a6011e2355b35a212086d7538208961d67545ae3b502801378cc0529baa66a0e9e36d0fb406eef397af3d544c2f4071fbeecc03a17ef2cc9687efa7f2fcf657459d523ce15870229d240fd3b49a25f0901bd2818132a240ead7d7718c793ea86e94bc6befcf1a45fd39df0f5b3ca0d2e525a023825b31b8d39eb65b5e4143775872ae4db25657427e994390b8a6c8214cbce4e5dda3f304fd2f5b1c7b6bcfb45c744ed51e8a1db3bb5cb777a49e0b6059cf8477d613fd9fd8bb10391d95aac1d6d3a09d7075b002927fb86ed1cb869"
+            ],
+            "key": "0xb001",
+            "note_hash": "0x0000000000000000000000000000000000000000000000000000000000000077",
+            "record_hashes": [
+              "0x1b2d206eee8ca1f92d59897c35ccd74c4a9668a3158be6d360be94fb89a46991",
+              "0x1bac23fb8616cda8e334a7f341730b3220c6e9fea47eee470882ff7dd34085e8",
+              "0x2bd5315720d27ac73b53644046ddfd34e000b5099cdf0919904e682694d9eb52"
+            ]
+          }
+        ],
+        "request_id": "0x0000000000000000000000000000000041d3000000000000000000000000beef",
+        "requester": {
+          "x": "0x1b0986d603033be6321c1804f6f8b4b14aef014e65a64d9544a6430582694387",
+          "y": "0x1abea81d71f73426f65a8c459264a01ac86750c6d8f6f4eae608fe0c8e2d982d"
+        },
+        "shared_inputs": [
+          {
+            "name": "door",
+            "share_hashes": [
+              "0x10efd56b580bc8e1b5f53b86f89c8e392613e3d0f3b61e94ba641667f689db7c",
+              "0x2446d21a8823628167c3e2f2f2c5a722fe909182ebe8f148a516d449dec5528c",
+              "0x2c9d8345986e55d88e7aad9393e03f846f5a88294ff1836a99018b317c0d9d8e"
+            ],
+            "shares": [
+              {
+                "ct": [
+                  "0x22e485797725af146a32d195cccabbde1abd55bcb385e3fba386ba5aa36e43c3",
+                  "0x2c46662b139e079b4b6e16b5398c9bca4acd23a3f34eb08fbac10a2917f53072"
+                ],
+                "eph": {
+                  "x": "0x29f9f460da6877afec9a98770e023e278dd065949d9e3fe0a59a70082ead6412",
+                  "y": "0x09804a828475a32263a1e988dace6549c069b55d02b6197b0ec874e81e8bb7a9"
+                },
+                "tag": "0x288cf3bfcac983596c789bfcaf8d5dbfc2e850e9d2b1fc8526167ebcc0d30c49"
+              },
+              {
+                "ct": [
+                  "0x04c8c4fa5de42dda3884abd65a7867f255946b4d81dcbdaf9dc79da398acb70f",
+                  "0x1c4198b7d5d651508cba7ffa47b249270fc575d0c07c647a5fc659b99b7c805c"
+                ],
+                "eph": {
+                  "x": "0x0f63cb420fcb9cbf5830d72064402d42a21cb90ef0c8232387c02e428f9c1185",
+                  "y": "0x27c972f322b031b46acb70b94d792f15d89fb8fe44c791dcdd7c08ac6e5d4a6d"
+                },
+                "tag": "0x023c32aaa95ff4de803991d1975acb47164df3c3d00b5946c15a54e9a38ebb57"
+              },
+              {
+                "ct": [
+                  "0x29045cc70960a55290d471e819c8d5307ef10ce5dad4f7adcfd4f3e7c860a1d1",
+                  "0x08ca50976c73d07c991b0e1f98ac16c62f6f8591ed81765af494c13d2602b7c5"
+                ],
+                "eph": {
+                  "x": "0x05c2881bb0af42f3622a3e4b0d0c94e23cbe9da82e78e596dd8d444d6c529141",
+                  "y": "0x1ea549680063f323611e77223dfd1aae7542095acd41763f39b9b018be6551b4"
+                },
+                "tag": "0x0ce361f7aac88edb73270efc364ca0fc50678522c83c59108c7c722f5add3f91"
+              }
+            ]
+          },
+          {
+            "name": "door_randomness",
+            "share_hashes": [
+              "0x28340b28e83723c3d6b5e9b1b0cab370650ff7a34bfbc4950a872971c03b1f24",
+              "0x18dd1509244c40bac78c6c351af35bd672a19b26ad5ad538611b1a75deacbac2",
+              "0x1a2dcaf5852a7fad4c70026ad829d9b13c6a5c0a0e14602f99d0943d95805b14"
+            ],
+            "shares": [
+              {
+                "ct": [
+                  "0x12661a14fbc0336d46394075dc568d51deee7f0303eb9818603ac3888ffa6693",
+                  "0x1feca9a9bbf8b0bb9f96382fb87ac16f28306c34bc7b1f97195a017fc9ff54ae"
+                ],
+                "eph": {
+                  "x": "0x242d1586e961bcad47c93cc3506ab346c14623998e5ff02430cf9793d90ea7d2",
+                  "y": "0x10887645e32299af997b002061060083a43a27877f41dae340a87ce014fa0d37"
+                },
+                "tag": "0x07ecab105b2ad5b6c4cd77130adfb439d50c6c1317c60451f3d8c1853836d370"
+              },
+              {
+                "ct": [
+                  "0x0b9da5c968b0fae1c98cd08bd65373a5b6107b1fe6de1983bc20123643396f92",
+                  "0x2f9b4bc7b93b3b52a4767bfff38654ff857606a59c9966ed0e5226a6eff10312"
+                ],
+                "eph": {
+                  "x": "0x1730cb2ed94fd744f5ce8db4d8923b2b4b03e87049dac62eed5c72ed2046a8f0",
+                  "y": "0x22215b3096a4901c21f96f03cea40d49209ef5eeb2d97c298063927c277008ba"
+                },
+                "tag": "0x161a8e104626f18ca8052ade3786d636b7ab88b8df65322be2cb4c12b2ee1e42"
+              },
+              {
+                "ct": [
+                  "0x0555d51b8a68eedc3dc18903fc90923fe018a3ecd43cc70b043e309acc941744",
+                  "0x29d32cbaea9ac2f63c2865f8d8de4656a570e9b25205739485de464d6726af29"
+                ],
+                "eph": {
+                  "x": "0x04c7aee0f7b88aced7b7a59bfca41261238db526818f5b8a6aaba48d9bdfb9bf",
+                  "y": "0x22c8a0208419845c6f418e48517b6b7720ceae07dd96472e50016b4e42ac877c"
+                },
+                "tag": "0x1ce9cad3920dfb97b99e041de0069c62a639db5040c37d90928e35e0ca9258d0"
+              }
+            ]
+          }
+        ],
+        "signature": {
+          "e": [
+            "0x00000000000000000000000000000000a37ef8e7ecc2b169c3334eca37ce7e34",
+            "0x000000000000000000000000000000002126d1666ddc737212be5f81c18afc88"
+          ],
+          "s": [
+            "0x000000000000000000000000000000008f34578d5e533a9a56418e63c8c5704b",
+            "0x0000000000000000000000000000000005bfbaed65e8dab1a2fbf02736252b27"
+          ]
+        },
+        "state_keys": {
+          "reads": [
+            "0xb001"
+          ],
+          "writes": [
+            "0xb001"
+          ]
+        }
+      },
+      "canonical": "{\"circuit\":\"monty_hall_open_door\",\"namespace\":\"0x000000000000000000000000000000000000000000000000000000001f2ea9c0\",\"public\":{\"in0_nonce\":\"0x000000000000000000000000000000000000000000000000000000000d935b18\"},\"records\":[{\"key\":\"0xb001\",\"note_hash\":\"0x0000000000000000000000000000000000000000000000000000000000000077\",\"record_hashes\":[\"0x1b2d206eee8ca1f92d59897c35ccd74c4a9668a3158be6d360be94fb89a46991\",\"0x1bac23fb8616cda8e334a7f341730b3220c6e9fea47eee470882ff7dd34085e8\",\"0x2bd5315720d27ac73b53644046ddfd34e000b5099cdf0919904e682694d9eb52\"]}],\"request_id\":\"0x0000000000000000000000000000000041d3000000000000000000000000beef\",\"requester\":{\"x\":\"0x1b0986d603033be6321c1804f6f8b4b14aef014e65a64d9544a6430582694387\",\"y\":\"0x1abea81d71f73426f65a8c459264a01ac86750c6d8f6f4eae608fe0c8e2d982d\"},\"shared_inputs\":[{\"name\":\"door\",\"share_hashes\":[\"0x10efd56b580bc8e1b5f53b86f89c8e392613e3d0f3b61e94ba641667f689db7c\",\"0x2446d21a8823628167c3e2f2f2c5a722fe909182ebe8f148a516d449dec5528c\",\"0x2c9d8345986e55d88e7aad9393e03f846f5a88294ff1836a99018b317c0d9d8e\"]},{\"name\":\"door_randomness\",\"share_hashes\":[\"0x28340b28e83723c3d6b5e9b1b0cab370650ff7a34bfbc4950a872971c03b1f24\",\"0x18dd1509244c40bac78c6c351af35bd672a19b26ad5ad538611b1a75deacbac2\",\"0x1a2dcaf5852a7fad4c70026ad829d9b13c6a5c0a0e14602f99d0943d95805b14\"]}],\"state_keys\":{\"reads\":[\"0xb001\"],\"writes\":[\"0xb001\"]}}",
+      "domain": "cosnark-sidecar/v1/execute",
+      "message": "0x1221a371216c87858690a4c8de91150370b8ac46dc4d17a1e812e3e2381242a9",
+      "name": "execute",
+      "pubkey": {
+        "x": "0x1b0986d603033be6321c1804f6f8b4b14aef014e65a64d9544a6430582694387",
+        "y": "0x1abea81d71f73426f65a8c459264a01ac86750c6d8f6f4eae608fe0c8e2d982d"
+      },
+      "secret": "0x0000000000000000000000000000000000000000000000000000000000000005",
+      "signer": "requester"
+    }
+  ],
+  "rules": {
+    "canonical_execute": "execute: RFC 8785 JCS of the canonical body, the request without shares, c and signature (share_hashes and record_hashes stand in for them)",
+    "canonical_registry": "REGISTER and DISABLE: RFC 8785 JCS of the body without its top-level signature",
+    "message": "poseidon2_hash_bytes(domain || canonical), the aztec.js packing of the UTF-8 bytes",
+    "signature": "Schnorr over Grumpkin (testvectors/schnorr.json) by pubkey = secret·G over message; REGISTER and DISABLE by the namespace owner, execute by the requester",
+    "sources": "register is testvectors/registry.json's REGISTER body under another owner at seq 2; execute is testvectors/envelope.json's request with its signature"
+  }
+}

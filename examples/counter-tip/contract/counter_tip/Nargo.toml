@@ -1,0 +1,16 @@
+[package]
+name = "counter_tip"
+type = "contract"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0; deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+# the tip library: the queue, secret-shared receipt intake, the result
+# transaction under private outcomes, configure and the key epochs
+pss_public_contract = { path = "../../../../noir/pss_public_contract" }
+# the circuits' library: the outcome's ciphertext length, one definition for
+# circuits and contract. Its name sorts after `aztec` on purpose: nargo takes
+# dependencies in name order and the ABI names each protocol type by the
+# first dependency path reaching it.
+counter_circuit = { path = "../../circuits/counter_tip" }

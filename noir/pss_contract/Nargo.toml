@@ -1,0 +1,10 @@
+[package]
+name = "pss_contract"
+type = "lib"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0; deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+# PssEffects, the round circuits' return value (one definition).
+pss_core = { path = "../pss_core" }

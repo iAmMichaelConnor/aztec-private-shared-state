@@ -1,0 +1,341 @@
+# Continuous integration on GitHub-hosted ubuntu-24.04 runners (4 cores, 16 GB).
+#
+# Every job is sized to finish within 30 minutes on such a runner, and its
+# timeout-minutes is at most 30. Work that does not fit is split into matrix
+# shards; docs/TESTING.md ("Continuous integration") lists each job, its
+# shards and the measured cost they are sized from. The heavy suites (the TXE,
+# the co-noir witness extension, the full nextest run) are in nightly.yml,
+# sharded the same way. The e2e gate does not run on hosted runners
+# (docs/TESTING.md says why).
+#
+# Every action is pinned to a commit; the comment names its release.
+
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # A newer push cancels an older run of the same branch, except on main,
+  # where every commit is checked.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  # The scratch root (scratch_dir in scripts/toolchain.sh). The default, .runs/tmp
+  # in the checkout, is too deep on a hosted runner for the Unix sockets the TXE
+  # and the local network bind below it (107-byte path limit).
+  TXE_TMP_ROOT: /home/runner/pss
+
+jobs:
+  checks:
+    name: docs, manifests, design space, generated files, scripts, rustfmt
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@7dcc700092a1a8b9c17ba0e140b4e34e93000946 # 1.90.0
+        with:
+          toolchain: 1.90.0
+          components: rustfmt
+      - name: cargo fmt (machine)
+        working-directory: machine
+        run: cargo fmt --all -- --check
+      - name: manifests and generated intake and access (gen-intake.py --check, gen-access.py --check)
+        run: python3 -I scripts/check-manifests.py
+      - name: design space
+        run: python3 -I scripts/check-design-space.py
+      - name: docs links
+        run: python3 -I scripts/check-docs-links.py
+      - name: generated files are current
+        run: python3 -I scripts/gen-noir-vectors.py --check
+      - name: pins copied outside toolchain.json agree with it
+        run: python3 -I scripts/check-pins.py
+      - name: generated fixtures are current (every examples/*/circuits/gen-fixtures.py --check)
+        run: |
+          set -euo pipefail
+          for g in examples/*/circuits/gen-fixtures.py; do python3 -I "$g" --check; done
+      - name: shell syntax (bash -n, and shellcheck's errors; shellcheck is on the runner image)
+        run: |
+          set -euo pipefail
+          git ls-files -z -- '*.sh' | xargs -0 -n 1 bash -n
+          git ls-files -z -- '*.sh' | xargs -0 shellcheck -S error
+      - name: no machine-specific paths
+        run: |
+          set -euo pipefail
+          # Absolute paths under /mnt, /home, /Users or /root (at the start of a
+          # path, not inside one such as a/root/b), except the runner's own home.
+          hits="$(git grep -n -I -o -E -e '(^|[^[:alnum:]_.~/-])/(mnt|home|Users|root)/[[:alnum:]_.-]+' -- . | grep -v -E ':[^:]?/home/runner$' || true)"
+          if [[ -n $hits ]]; then
+            echo "$hits"
+            echo "::error::a tracked file names a path of one machine"
+            exit 1
+          fi
+
+  toolchain:
+    # Installs the pinned tools once per toolchain.json and shares them through the
+    # cache; the other jobs restore that exact key (pinned-setup).
+    name: pinned toolchain
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      key: ${{ steps.tools.outputs.key }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: tools
+        uses: ./.github/actions/install-toolchain
+
+  shards:
+    # The matrices below, read from the repository so that a new example is
+    # never left out: every directory with circuits/circuits.env (what
+    # check-noir.sh takes), and check-contracts.sh's packages grouped by
+    # example (examples/<name>) or top directory (noir, machine).
+    name: shards
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      circuits: ${{ steps.list.outputs.circuits }}
+      contracts: ${{ steps.list.outputs.contracts }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: list
+        run: |
+          set -euo pipefail
+          circuits="$(git ls-files -- 'examples/*/circuits/circuits.env' machine/circuits/circuits.env \
+            | sed 's|/circuits/circuits.env$||' | jq -R . | jq -cs .)"
+          contracts="$(scripts/check-contracts.sh --list | awk '{ print $2 }' \
+            | sed -E 's#^(examples/[^/]+|[^/]+)/.*#\1#' | sort -u | jq -R . | jq -cs .)"
+          echo "circuits=$circuits" >> "$GITHUB_OUTPUT"
+          echo "contracts=$contracts" >> "$GITHUB_OUTPUT"
+          echo "circuits: $circuits"
+          echo "contracts: $contracts"
+
+  noir-circuits:
+    name: round circuits, ${{ matrix.dir }} (nargo 1.0.0, total-lint, fixtures)
+    needs: [toolchain, shards]
+    runs-on: ubuntu-24.04
+    # check-noir.sh on one directory, then its compiled circuits uploaded for
+    # abi-fixtures.
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        dir: ${{ fromJSON(needs.shards.outputs.circuits) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/pinned-setup
+        with:
+          tools-key: ${{ needs.toolchain.outputs.key }}
+      - name: scripts/check-noir.sh ${{ matrix.dir }}
+        env:
+          DIR: ${{ matrix.dir }}
+        run: |
+          set -euo pipefail
+          outputs=()
+          [[ -f $DIR/circuits/outputs.txt ]] && outputs=(--outputs "$DIR/circuits/outputs.txt")
+          scripts/check-noir.sh "$DIR" "${outputs[@]}"
+      - name: the compiled circuits, for the ABI fixtures job
+        env:
+          DIR: ${{ matrix.dir }}
+        run: |
+          set -euo pipefail
+          find "$DIR/circuits" -path '*/target/*.json' -print0 | tar --null -czf "$RUNNER_TEMP/circuits.tgz" -T -
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: circuits-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/circuits.tgz
+          retention-days: 1
+
+  abi-fixtures:
+    name: ABI fixtures against the compiled circuits and the built contracts
+    needs: [toolchain, noir-circuits]
+    runs-on: ubuntu-24.04
+    # Three contract builds one after another, then fixtures.test.ts.
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - uses: ./.github/actions/pinned-setup
+        with:
+          tools-key: ${{ needs.toolchain.outputs.key }}
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: circuits-*
+          path: ${{ runner.temp }}/circuits
+      - name: unpack the compiled circuits (mtime now, so they are newer than this checkout)
+        run: |
+          set -euo pipefail
+          for t in "$RUNNER_TEMP"/circuits/*/circuits.tgz; do tar -xzmf "$t"; done
+      - run: npm ci --no-audit --no-fund
+      - name: the tracked ABI fixtures against the circuits compiled by noir-circuits and the contracts built here
+        env:
+          FIXTURES_REQUIRE_BUILT: "1"
+        run: |
+          set -euo pipefail
+          source scripts/toolchain.sh   # CONTRACT_NARGO_BIN and BB_BIN for the contract build
+          node --conditions=source ts/test-support/contract-fixture.ts build
+          cd ts/pss-client
+          node --conditions=source --test test/fixtures.test.ts
+
+  noir-vectors:
+    name: Noir vector programs and the Noir tests' vector values
+    needs: toolchain
+    runs-on: ubuntu-24.04
+    # scripts/check-vectors.sh.
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/pinned-setup
+        with:
+          tools-key: ${{ needs.toolchain.outputs.key }}
+      - run: scripts/check-vectors.sh
+
+  contracts:
+    name: Aztec contracts, ${{ matrix.dir }} (nargo 1.0.0-rc.3, compile and check)
+    needs: [toolchain, shards]
+    runs-on: ubuntu-24.04
+    # check-contracts.sh on one group of packages (the shards job's groups).
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        dir: ${{ fromJSON(needs.shards.outputs.contracts) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/pinned-setup
+        with:
+          tools-key: ${{ needs.toolchain.outputs.key }}
+      - name: scripts/check-contracts.sh ${{ matrix.dir }}
+        env:
+          CONTRACT_JOBS: "4"
+          DIR: ${{ matrix.dir }}
+        run: scripts/check-contracts.sh "$DIR"
+
+  rust-clippy:
+    name: machine, clippy
+    needs: toolchain
+    runs-on: ubuntu-24.04
+    # prepare-data.sh machine (the circuits sidecar-core's build embeds), then
+    # clippy over the release build of every target.
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/pinned-setup
+        with:
+          tools-key: ${{ needs.toolchain.outputs.key }}
+          rust-components: clippy
+          rust-cache: machine-clippy
+          crs: "true"
+      - name: the circuits sidecar-core's build embeds (machine/data)
+        run: scripts/prepare-data.sh machine
+      - name: cargo clippy
+        working-directory: machine
+        run: cargo clippy --release --workspace --all-targets --locked -- -D warnings
+
+  rust-test:
+    # The release build of the test binaries is the long pole, so the
+    # workspace is split in two groups, each building and running its own
+    # binaries under the quick profile.
+    name: machine, nextest --profile quick, ${{ matrix.group }}
+    needs: toolchain
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - group: orchestrator
+            packages: -p sidecar-orchestrator
+          - group: rest
+            packages: --workspace --exclude sidecar-orchestrator
+    services:
+      postgres:
+        image: postgres:16.14-alpine3.24@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      SIDECAR_TEST_POSTGRES_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
+      PSS_REQUIRE_POSTGRES: "1"
+      # scripts/prepare-data.sh runs below: a test that skips for missing
+      # prepared data fails here instead.
+      PSS_REQUIRE_DATA: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/pinned-setup
+        with:
+          tools-key: ${{ needs.toolchain.outputs.key }}
+          rust-cache: machine-${{ matrix.group }}
+          crs: "true"
+      - uses: taiki-e/install-action@cfdb7ed4ccc7c7dce37759eae89dc5674b469b39 # v2.90.3
+        with:
+          tool: cargo-nextest@0.9.103   # toolchain.json cargo_nextest
+      - name: circuits and CRS into machine/data, dev TLS material
+        run: |
+          set -euo pipefail
+          scripts/prepare-data.sh
+          scripts/gen-dev-certs.sh
+      - name: build the group's test binaries
+        working-directory: machine
+        env:
+          PACKAGES: ${{ matrix.packages }}
+        run: |
+          # shellcheck disable=SC2086 # PACKAGES is a list of cargo arguments
+          cargo nextest run --release --locked --no-run $PACKAGES
+      - name: the group's tests without the three-party proving binaries
+        env:
+          PACKAGES: ${{ matrix.packages }}
+        run: |
+          set -euo pipefail
+          source scripts/toolchain.sh   # NARGO_BIN and BB_BIN for the fresh-compile and vk cross-checks
+          cd machine
+          # shellcheck disable=SC2086 # PACKAGES is a list of cargo arguments
+          cargo nextest run --release --locked --profile quick $PACKAGES
+
+  typescript:
+    name: pss-client, pss-relayer, e2e harness (build, unit tests)
+    needs: toolchain
+    runs-on: ubuntu-24.04
+    # npm ci, tsc and the unit tests.
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .tools
+          key: ${{ needs.toolchain.outputs.key }}
+          fail-on-cache-miss: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: build (tsc of every workspace and of the chain suite's scripts)
+        run: npm run build
+      - name: unit tests (BB_BIN for the vk tests; the vectors test that needs machine/data skips)
+        run: |
+          set -euo pipefail
+          source scripts/toolchain.sh
+          npm test

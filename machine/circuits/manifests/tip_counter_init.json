@@ -1,0 +1,17 @@
+{
+  "manifest": 1,
+  "circuit": "tip_counter_init",
+  "namespace_param": "namespace",
+  "state_keys": { "reads": 0, "writes": 1 },
+  "intake": "onchain",
+  "outcome": "none",
+  "witness": [
+    { "param": "namespace", "from": { "PUBLIC": "$namespace" } },
+    { "param": "vk_hash",   "from": { "PUBLIC": "$vk_hash" } },
+    { "param": "out_slots", "from": { "PUBLIC": ["$state_keys.writes[0]"] } },
+    { "param": "start",     "from": { "PUBLIC": "start" } },
+    { "param": "r_new",     "from": { "SAMPLE": 1 } }
+  ],
+  "outputs": [ { "TACEO_store": "out0", "STORE": "$state_keys.writes[0]", "len": 2, "note_hash": "new_c" } ],
+  "state": { "$state_keys.writes[0]": "chain" }
+}

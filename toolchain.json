@@ -1,0 +1,131 @@
+{
+  "noir": {
+    "version": "1.0.0",
+    "scope": "round circuits (examples/*/circuits, noir/pss_core), read by the co-Noir nodes with the Noir 1.0.0 crates"
+  },
+  "contract_noir": {
+    "version": "1.0.0-rc.3",
+    "scope": "Aztec contracts and the TXE; aztec-nr v6.0.0 is released for this compiler"
+  },
+  "labs": {
+    "sdk_version": "6.0.0",
+    "scope": "@aztec-labs"
+  },
+  "rust": "1.90.0",
+  "node_major": 24,
+  "foundry": "1.8.5",
+  "cargo_nextest": "0.9.103",
+  "postgres": {
+    "image": "postgres:16.14-alpine3.24@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777",
+    "scope": "the nodes' Postgres in the e2e (e2e/run.sh reads it here), the CI service containers and the machine's Postgres test fixture (copies that scripts/check-pins.py compares with this one)"
+  },
+  "co_noir": {
+    "repository": "https://github.com/iAmMichaelConnor/co-snarks.git",
+    "git_commit": "8ec1568ebf16aaf8466ae789a9284acb19e514b9",
+    "barretenberg": {
+      "version": "6.0.0"
+    }
+  },
+  "total_noir": {
+    "repository": "https://github.com/iAmMichaelConnor/total-noir",
+    "tag": "v0.1.0",
+    "commit": "f93196faeb775e6a58bcd8ce6eed425051f36f4f",
+    "package": "noir/total",
+    "scope": "the total package (flagged primitives) the round circuits and the tip contract library import, as a Nargo git dependency at the tag (cached by nargo under ~/nargo/github.com/iAmMichaelConnor/total-noir/<tag>, which scripts/bootstrap.sh checks is at the commit; every Nargo.toml that takes total names this tag), and total-lint, which scripts/install-toolchain.sh installs from the same commit (cargo install --git) into TOOLS_DIR"
+  },
+  "schnorr": {
+    "repository": "https://github.com/noir-lang/schnorr",
+    "tag": "v0.4.0",
+    "commit": "9995bcc45e24c9eaccabe3bcf59c36f9aedaa00c",
+    "scope": "Schnorr over Grumpkin verified by the tip contracts (result signatures, receipts); a Nargo git dependency, cached by nargo under ~/nargo/github.com/noir-lang/schnorr/v0.4.0"
+  },
+  "sha256": {
+    "repository": "https://github.com/noir-lang/sha256",
+    "tag": "v0.3.0",
+    "commit": "9442e5b6856f98b2ec029882d7e90199ecff91ba",
+    "scope": "SHA-256 for total-noir's total package (a Nargo git dependency of it), cached by nargo under ~/nargo/github.com/noir-lang/sha256/v0.3.0"
+  },
+  "keccak256": {
+    "repository": "https://github.com/noir-lang/keccak256",
+    "tag": "v0.1.3",
+    "commit": "f64ab3af714aa1a1e2699243037e0f11fe5bf706",
+    "scope": "Keccak-256 for total-noir's total package (a Nargo git dependency of it), cached by nargo under ~/nargo/github.com/noir-lang/keccak256/v0.1.3"
+  },
+  "poseidon": {
+    "repository": "https://github.com/noir-lang/poseidon",
+    "tag": "v0.4.0",
+    "commit": "e105cdd5c79c222860d53c5dfdb8fa8012b291c0",
+    "scope": "Poseidon over BN254 in the machine's registration circuit (machine/circuits/sidecar_register); a Nargo git dependency, cached by nargo under ~/nargo/github.com/noir-lang/poseidon/v0.4.0"
+  },
+  "crs": {
+    "g1_points": 32768,
+    "g1_sha256": "50d2f4e9567be2b8e382cedfd078b96a3428a94597b7e88c4116e105d578ce77",
+    "g2_sha256": "01797bfc4de5a96f0e516a9ea4537d18786dc30cb991aca4274c95822b69c32f",
+    "scope": "the BN254 CRS of the Aztec ceremony that scripts/prepare-data.sh writes to machine/data: g1_sha256 is the sha256 of the first g1_points G1 points (64 bytes each, as crs.aztec-cdn.foundation/g1.dat serves them), g2_sha256 of the G2 point (g2.dat, 128 bytes)"
+  },
+  "tools": {
+    "NARGO_BIN": {
+      "version": "1.0.0",
+      "url": "https://github.com/noir-lang/noir/releases/download/v1.0.0/noir-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "a62f5b44a6db8ca8f0c20f841aa788ea56776e5aaf2ebd672c02dcf397901264",
+      "member": "nargo",
+      "member_sha256": "30707a7f7b372413a07c54a6376ac408418b4453901b3c479d3590eb1ec47842",
+      "path": "noir-1.0.0/nargo",
+      "used_for": "round circuits"
+    },
+    "CONTRACT_NARGO_BIN": {
+      "version": "1.0.0-rc.3",
+      "url": "https://github.com/noir-lang/noir/releases/download/v1.0.0-rc.3/noir-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "5792dd962afce1eed834570f95d9f72cc4a09d45cd846d3b80b7a57392732973",
+      "member": "nargo",
+      "member_sha256": "764b4fc1b27c8dad8a107043f915fe1b2cccc3184284ea00f31e9b390633d6f5",
+      "path": "noir-1.0.0-rc.3/nargo",
+      "used_for": "Aztec contracts and the TXE"
+    },
+    "BB_BIN": {
+      "version": "6.0.0",
+      "url": "https://registry.npmjs.org/@aztec-foundation/bb.js/-/bb.js-6.0.0.tgz",
+      "sha256": "ba502470a00a43b843328f9355e9402075ca5fb94a175799790e1326db4dd62f",
+      "member": "package/build/amd64-linux/bb",
+      "member_sha256": "5bbb64800d431c6760a70d8723be4eaf37ed10e8fbfe2842bb85b8436180c130",
+      "path": "bb-6.0.0/bb",
+      "used_for": "verification keys, CRS, contract-side proofs; the binary bb.js 6.0.0 bundles, which e2e/run.sh compares byte for byte"
+    },
+    "FOUNDRY_DIR": {
+      "version": "1.8.5",
+      "url": "https://github.com/foundry-rs/foundry/releases/download/v1.8.5/foundry_v1.8.5_linux_amd64.tar.gz",
+      "sha256": "6c66ffcc55fa4249197721baa3098bc208014ea1d8aa04b2ed50ac6bccffb226",
+      "members": [
+        "anvil",
+        "forge",
+        "cast"
+      ],
+      "path": "foundry-1.8.5",
+      "used_for": "the e2e only (the @aztec-labs CLI deploys the L1 contracts with it)"
+    }
+  },
+  "worlds": {
+    "AZTEC_WORLD_DIR": {
+      "repository": "https://github.com/aztec-labs-eng/aztec-node.git",
+      "commit": "d2e67c1d938f06a6476dd7d4bd01e73771923dd1",
+      "sparse": [
+        "noir-projects"
+      ],
+      "path": "worlds/aztec-world",
+      "patch": {
+        "file": "noir-projects/aztec-nr/aztec/Nargo.toml",
+        "replace": "^protocol_types = .*$",
+        "with": "protocol_types = { path = \"../../../../foundation-world/noir-projects/fnd/noir-protocol-circuits/crates/types\" }",
+        "why": "aztec-nr takes protocol_types from the foundation world beside it rather than a second git copy, so both sides share one type identity"
+      }
+    },
+    "FOUNDATION_WORLD_DIR": {
+      "repository": "https://github.com/AztecProtocol/aztec-packages.git",
+      "commit": "0219f11d8133970df3974fe5ae65e006bf8c193a",
+      "sparse": [
+        "noir-projects"
+      ],
+      "path": "worlds/foundation-world"
+    }
+  }
+}

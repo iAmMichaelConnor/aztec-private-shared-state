@@ -1,0 +1,12 @@
+[package]
+name = "sidecar_audit"
+type = "bin"
+# exact: the round circuits' Noir 1.0.0 (toolchain.json noir.version)
+compiler_version = "=1.0.0"
+
+# total-noir's variable-length Poseidon2 (the fixed-length digest of a public
+# prefix length, with no memory opcode), so a digest here equals the one
+# sidecar-core and pss_core compute for the same fields. Nothing
+# chain-specific: the machine's own circuit depends on no Aztec package.
+[dependencies]
+total = { git = "https://github.com/iAmMichaelConnor/total-noir", tag = "v0.1.0", directory = "noir/total" }

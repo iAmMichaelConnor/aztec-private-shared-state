@@ -1,0 +1,19 @@
+# Expected outputs of every amm_swap_total case, checked by
+# scripts/check-noir.sh examples/amm-swap-total --outputs examples/amm-swap-total/circuits/outputs.txt
+# (the format is in check-noir.sh's header).
+#
+# Each case's app_outputs [ok, code, amount_out] and new_note_hashes[0].
+# A rejected case outputs the note hash of the UNCHANGED reserves under
+# out0_randomness (0x2345f6...); drain and bad-reserve start from pools of
+# their own.
+
+# circuit       prover               from to  outputs
+amm_swap_total  Prover               -    -   app_outputs=[0x01,0x00,0x82aa] new_note_hashes=[0x012f6a245074c58899bed42c8360573013b7fbd4f37d4c0016053b9337aae7b1]
+amm_swap_total  Prover-zero          -    -   app_outputs=[0x00,0x01,0x00] new_note_hashes=[0x2345f6b90416a20d334bb72d614ad1637de6976c75d198d1591ccc6a82f7054d]
+amm_swap_total  Prover-oversize      -    -   app_outputs=[0x00,0x02,0x00] new_note_hashes=[0x2345f6b90416a20d334bb72d614ad1637de6976c75d198d1591ccc6a82f7054d]
+amm_swap_total  Prover-direction2    -    -   app_outputs=[0x00,0x03,0x00] new_note_hashes=[0x2345f6b90416a20d334bb72d614ad1637de6976c75d198d1591ccc6a82f7054d]
+amm_swap_total  Prover-direction-neg -    -   app_outputs=[0x00,0x03,0x00] new_note_hashes=[0x2345f6b90416a20d334bb72d614ad1637de6976c75d198d1591ccc6a82f7054d]
+amm_swap_total  Prover-overflow      -    -   app_outputs=[0x00,0x04,0x00] new_note_hashes=[0x2345f6b90416a20d334bb72d614ad1637de6976c75d198d1591ccc6a82f7054d]
+amm_swap_total  Prover-dust          -    -   app_outputs=[0x00,0x05,0x00] new_note_hashes=[0x2345f6b90416a20d334bb72d614ad1637de6976c75d198d1591ccc6a82f7054d]
+amm_swap_total  Prover-drain         -    -   app_outputs=[0x00,0x06,0x00] new_note_hashes=[0x24bf9f162760c023e71d940ce8e9b970fca02e4eab0d20f7178d74b8cdf3dc1a]
+amm_swap_total  Prover-bad-reserve   -    -   app_outputs=[0x00,0x07,0x00] new_note_hashes=[0x14a3af63900c84032b4293a15a4ce5bc3129cb17b376d7c5b67ecb354cd0d557]

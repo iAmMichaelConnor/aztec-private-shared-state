@@ -1,0 +1,403 @@
+{
+ "contract": "PssPublicTest",
+ "storageLayout": {
+  "config": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000001"
+  },
+  "vk_hash": {
+   "slot": "0x000000000000000000000000000000000000000000000000000000000000000b"
+  },
+  "held_vk_hash": {
+   "slot": "0x000000000000000000000000000000000000000000000000000000000000000d"
+  },
+  "queue": {
+   "slot": "0x000000000000000000000000000000000000000000000000000000000000000f"
+  },
+  "pool": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000015"
+  },
+  "book": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000016"
+  },
+  "fresh": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000017"
+  },
+  "oracle": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000018"
+  },
+  "outputs": {
+   "slot": "0x000000000000000000000000000000000000000000000000000000000000001c"
+  },
+  "price": {
+   "slot": "0x000000000000000000000000000000000000000000000000000000000000001d"
+  },
+  "reenter_target": {
+   "slot": "0x000000000000000000000000000000000000000000000000000000000000001e"
+  },
+  "reenter_mode": {
+   "slot": "0x000000000000000000000000000000000000000000000000000000000000001f"
+  },
+  "burn": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000020"
+  },
+  "held": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000021"
+  },
+  "init_vk_hash": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000022"
+  },
+  "outcome_vk_hash": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000024"
+  },
+  "partial_outcomes": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000026"
+  },
+  "epoch_value": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000027"
+  },
+  "epoch": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000028"
+  },
+  "epoch_previous": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000029"
+  },
+  "shared_onchain": {
+   "slot": "0x000000000000000000000000000000000000000000000000000000000000002a"
+  },
+  "hatch": {
+   "slot": "0x000000000000000000000000000000000000000000000000000000000000002c"
+  }
+ },
+ "functions": [
+  {
+   "name": "process_result",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "result",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "request_id",
+        "type": {
+         "kind": "field"
+        }
+       },
+       {
+        "name": "old_commitments",
+        "type": {
+         "kind": "array",
+         "length": 1,
+         "type": {
+          "kind": "field"
+         }
+        }
+       },
+       {
+        "name": "new_commitments",
+        "type": {
+         "kind": "array",
+         "length": 1,
+         "type": {
+          "kind": "field"
+         }
+        }
+       },
+       {
+        "name": "ok",
+        "type": {
+         "kind": "boolean"
+        }
+       },
+       {
+        "name": "values",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::result::TipResult"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "sealed",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "array",
+       "length": 1,
+       "type": {
+        "kind": "array",
+        "length": 5,
+        "type": {
+         "kind": "field"
+        }
+       }
+      }
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "signatures",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "array",
+       "length": 4,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "process_result_held",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "result",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "request_id",
+        "type": {
+         "kind": "field"
+        }
+       },
+       {
+        "name": "old_commitments",
+        "type": {
+         "kind": "array",
+         "length": 1,
+         "type": {
+          "kind": "field"
+         }
+        }
+       },
+       {
+        "name": "new_commitments",
+        "type": {
+         "kind": "array",
+         "length": 1,
+         "type": {
+          "kind": "field"
+         }
+        }
+       },
+       {
+        "name": "ok",
+        "type": {
+         "kind": "boolean"
+        }
+       },
+       {
+        "name": "values",
+        "type": {
+         "kind": "array",
+         "length": 2,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::result::TipResult"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "signatures",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "array",
+       "length": 4,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "skip",
+   "functionType": "public",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "apply",
+   "functionType": "public",
+   "isOnlySelf": true,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "result",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "request_id",
+        "type": {
+         "kind": "field"
+        }
+       },
+       {
+        "name": "old_commitments",
+        "type": {
+         "kind": "array",
+         "length": 1,
+         "type": {
+          "kind": "field"
+         }
+        }
+       },
+       {
+        "name": "new_commitments",
+        "type": {
+         "kind": "array",
+         "length": 1,
+         "type": {
+          "kind": "field"
+         }
+        }
+       },
+       {
+        "name": "ok",
+        "type": {
+         "kind": "boolean"
+        }
+       },
+       {
+        "name": "values",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::result::TipResult"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "sealed",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "array",
+       "length": 1,
+       "type": {
+        "kind": "array",
+        "length": 5,
+        "type": {
+         "kind": "field"
+        }
+       }
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "apply_held",
+   "functionType": "public",
+   "isOnlySelf": true,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "result",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "request_id",
+        "type": {
+         "kind": "field"
+        }
+       },
+       {
+        "name": "old_commitments",
+        "type": {
+         "kind": "array",
+         "length": 1,
+         "type": {
+          "kind": "field"
+         }
+        }
+       },
+       {
+        "name": "new_commitments",
+        "type": {
+         "kind": "array",
+         "length": 1,
+         "type": {
+          "kind": "field"
+         }
+        }
+       },
+       {
+        "name": "ok",
+        "type": {
+         "kind": "boolean"
+        }
+       },
+       {
+        "name": "values",
+        "type": {
+         "kind": "array",
+         "length": 2,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::result::TipResult"
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  }
+ ]
+}

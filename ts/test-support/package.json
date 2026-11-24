@@ -1,0 +1,26 @@
+{
+  "name": "@aztec-pss/test-support",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "description": "Test-only support shared by pss-client's and pss-relayer's tests: signed answer fixtures, the fixture files, the mock orchestrator, an in-memory queue, a recording result contract, the field helpers and the tip tree hashes.",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@aztec-labs/foundation": "6.0.0",
+    "@aztec-labs/stdlib": "6.0.0",
+    "@aztec-pss/pss-client": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

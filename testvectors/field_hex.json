@@ -1,0 +1,648 @@
+{
+  "documents": [
+    {
+      "accepted": true,
+      "json": {
+        "manifest_hash": "0x0989e76e314a901b423feb7dd8d7aa14de070c2440b21de9ac93ba41e68ee808",
+        "namespace": "0x1f2ea9c0",
+        "npk_app_hash": "0x1F21C078530872675C230B247BED26FFCE80C76AB6EEB360895CA8CBD8B92E16",
+        "owner_pubkey": {
+          "x": "0x0167fa7a43a272d0196084549d902cba8327d05c7949cf9bcbcdd1334e0b52a4",
+          "y": "0x095697a87a5c4661be2a446e45b68bf627aba31e0ce78ee0da14a21f30d1d310"
+        },
+        "seq": 2
+      },
+      "name": "namespace_ok",
+      "type": "NamespaceResponse"
+    },
+    {
+      "accepted": false,
+      "json": {
+        "manifest_hash": "0x0989e76e314a901b423feb7dd8d7aa14de070c2440b21de9ac93ba41e68ee808",
+        "namespace": "0x1f2ea9c0",
+        "note": "x",
+        "npk_app_hash": "0x1F21C078530872675C230B247BED26FFCE80C76AB6EEB360895CA8CBD8B92E16",
+        "owner_pubkey": {
+          "x": "0x0167fa7a43a272d0196084549d902cba8327d05c7949cf9bcbcdd1334e0b52a4",
+          "y": "0x095697a87a5c4661be2a446e45b68bf627aba31e0ce78ee0da14a21f30d1d310"
+        },
+        "seq": 2
+      },
+      "name": "namespace_unknown_field",
+      "type": "NamespaceResponse",
+      "why": "unknown field `note`"
+    },
+    {
+      "accepted": false,
+      "json": {
+        "manifest_hash": "0x0989e76e314a901b423feb7dd8d7aa14de070c2440b21de9ac93ba41e68ee808",
+        "namespace": "0x1f2ea9c0",
+        "npk_app_hash": "0x1F21C078530872675C230B247BED26FFCE80C76AB6EEB360895CA8CBD8B92E16",
+        "owner_pubkey": {
+          "x": "0x0167fa7a43a272d0196084549d902cba8327d05c7949cf9bcbcdd1334e0b52a4",
+          "y": "0x095697a87a5c4661be2a446e45b68bf627aba31e0ce78ee0da14a21f30d1d310",
+          "z": "0x1"
+        },
+        "seq": 2
+      },
+      "name": "namespace_unknown_nested_field",
+      "type": "NamespaceResponse",
+      "why": "unknown field `owner_pubkey.z`"
+    },
+    {
+      "accepted": false,
+      "json": {
+        "manifest_hash": "0x0989e76e314a901b423feb7dd8d7aa14de070c2440b21de9ac93ba41e68ee808",
+        "namespace": 7,
+        "npk_app_hash": "0x1F21C078530872675C230B247BED26FFCE80C76AB6EEB360895CA8CBD8B92E16",
+        "owner_pubkey": {
+          "x": "0x0167fa7a43a272d0196084549d902cba8327d05c7949cf9bcbcdd1334e0b52a4",
+          "y": "0x095697a87a5c4661be2a446e45b68bf627aba31e0ce78ee0da14a21f30d1d310"
+        },
+        "seq": 2
+      },
+      "name": "namespace_field_as_number",
+      "type": "NamespaceResponse",
+      "why": "a field element is a hex string"
+    },
+    {
+      "accepted": false,
+      "json": {
+        "manifest_hash": "0x0989e76e314a901b423feb7dd8d7aa14de070c2440b21de9ac93ba41e68ee808",
+        "namespace": "0x1f2ea9c0",
+        "npk_app_hash": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001",
+        "owner_pubkey": {
+          "x": "0x0167fa7a43a272d0196084549d902cba8327d05c7949cf9bcbcdd1334e0b52a4",
+          "y": "0x095697a87a5c4661be2a446e45b68bf627aba31e0ce78ee0da14a21f30d1d310"
+        },
+        "seq": 2
+      },
+      "name": "namespace_field_at_modulus",
+      "type": "NamespaceResponse",
+      "why": "at the modulus"
+    },
+    {
+      "accepted": false,
+      "json": {
+        "manifest_hash": "0x0989e76e314a901b423feb7dd8d7aa14de070c2440b21de9ac93ba41e68ee808",
+        "namespace": "0x1f2ea9c0",
+        "npk_app_hash": "0x01f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+        "owner_pubkey": {
+          "x": "0x0167fa7a43a272d0196084549d902cba8327d05c7949cf9bcbcdd1334e0b52a4",
+          "y": "0x095697a87a5c4661be2a446e45b68bf627aba31e0ce78ee0da14a21f30d1d310"
+        },
+        "seq": 2
+      },
+      "name": "namespace_field_65_digits",
+      "type": "NamespaceResponse",
+      "why": "65 digits"
+    },
+    {
+      "accepted": false,
+      "json": {
+        "manifest_hash": "0x0989e76e314a901b423feb7dd8d7aa14de070c2440b21de9ac93ba41e68ee808",
+        "namespace": "0x1f2ea9c0",
+        "npk_app_hash": "0x1F21C078530872675C230B247BED26FFCE80C76AB6EEB360895CA8CBD8B92E16",
+        "owner_pubkey": {
+          "x": "0x0167fa7a43a272d0196084549d902cba8327d05c7949cf9bcbcdd1334e0b52a4",
+          "y": "0x095697a87a5c4661be2a446e45b68bf627aba31e0ce78ee0da14a21f30d1d310"
+        },
+        "seq": -1
+      },
+      "name": "namespace_seq_negative",
+      "type": "NamespaceResponse",
+      "why": "seq is a non-negative integer"
+    },
+    {
+      "accepted": false,
+      "json": {
+        "manifest_hash": "0x0989e76e314a901b423feb7dd8d7aa14de070c2440b21de9ac93ba41e68ee808",
+        "namespace": "0x1f2ea9c0",
+        "npk_app_hash": "0x1F21C078530872675C230B247BED26FFCE80C76AB6EEB360895CA8CBD8B92E16",
+        "owner_pubkey": {
+          "x": "0x0167fa7a43a272d0196084549d902cba8327d05c7949cf9bcbcdd1334e0b52a4",
+          "y": "0x095697a87a5c4661be2a446e45b68bf627aba31e0ce78ee0da14a21f30d1d310"
+        },
+        "seq": 1.5
+      },
+      "name": "namespace_seq_fraction",
+      "type": "NamespaceResponse",
+      "why": "seq is an integer"
+    },
+    {
+      "accepted": true,
+      "json": {
+        "manifest_hash": "0x0989e76e314a901b423feb7dd8d7aa14de070c2440b21de9ac93ba41e68ee808",
+        "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+        "packages_hash": "0x0300b5b7fbd7a38c00bb9a2bf6926b994f4e187d05b7a9cfe8a31eec96e2739a",
+        "seq": 0,
+        "signatures": [
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          },
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          },
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          }
+        ]
+      },
+      "name": "register_ok",
+      "type": "ManifestResponse"
+    },
+    {
+      "accepted": false,
+      "json": {
+        "manifest_hash": "0x0989e76e314a901b423feb7dd8d7aa14de070c2440b21de9ac93ba41e68ee808",
+        "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+        "packages_hash": "0x0300b5b7fbd7a38c00bb9a2bf6926b994f4e187d05b7a9cfe8a31eec96e2739a",
+        "registration": {
+          "proof": "0x",
+          "public_inputs": []
+        },
+        "seq": 0,
+        "signatures": [
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          },
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          },
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          }
+        ]
+      },
+      "name": "register_unknown_field",
+      "type": "ManifestResponse",
+      "why": "unknown field `registration` (a node answer's, which the orchestrator does not forward)"
+    },
+    {
+      "accepted": false,
+      "json": {
+        "manifest_hash": "0x0989e76e314a901b423feb7dd8d7aa14de070c2440b21de9ac93ba41e68ee808",
+        "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+        "packages_hash": "0x0300b5b7fbd7a38c00bb9a2bf6926b994f4e187d05b7a9cfe8a31eec96e2739a",
+        "seq": 0,
+        "signatures": [
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          },
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "r": "0x1",
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          },
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          }
+        ]
+      },
+      "name": "register_unknown_signature_field",
+      "type": "ManifestResponse",
+      "why": "unknown field `signatures[1].r`"
+    },
+    {
+      "accepted": false,
+      "json": {
+        "manifest_hash": "0x0989e76e314a901b423feb7dd8d7aa14de070c2440b21de9ac93ba41e68ee808",
+        "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+        "packages": [],
+        "packages_hash": "0x0300b5b7fbd7a38c00bb9a2bf6926b994f4e187d05b7a9cfe8a31eec96e2739a",
+        "seq": 0,
+        "signatures": [
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          },
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          },
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          }
+        ]
+      },
+      "name": "register_packages_field",
+      "type": "ManifestResponse",
+      "why": "unknown field `packages`"
+    },
+    {
+      "accepted": true,
+      "json": {
+        "circuit": "pss_seed",
+        "disabled": true,
+        "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+        "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+        "seq": 1,
+        "signatures": [
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          },
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          },
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          }
+        ],
+        "vk_hash": "0xabcd"
+      },
+      "name": "disable_ok",
+      "type": "DisableResponse"
+    },
+    {
+      "accepted": false,
+      "json": {
+        "circuit": "pss_seed",
+        "disabled": true,
+        "name": "pss_seed",
+        "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+        "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+        "seq": 1,
+        "signatures": [
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          },
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          },
+          {
+            "e": [
+              "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+              "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+            ],
+            "s": [
+              "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+              "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+            ]
+          }
+        ],
+        "vk_hash": "0xabcd"
+      },
+      "name": "disable_unknown_field",
+      "type": "DisableResponse",
+      "why": "unknown field `name`"
+    },
+    {
+      "accepted": true,
+      "json": {
+        "nodes": [
+          {
+            "enc": {
+              "x": "0x17c83fd7a05ce31b24d720f2b7ce4f0d45ebefab49aacda9967b738e2701f849",
+              "y": "0x0c2b3a636c5d3ac174a99541f3833bc2b1d870f657a3eff8457de975d44efdf0"
+            },
+            "sig": {
+              "x": "0x2b681809013b22f0d2db3b443103b7fffdd7fa834a008595320ac526ab30de44",
+              "y": "0x28de1717d62f6f9ebd274bd7e1dd72ad225657277893e174d4f437a53aeab182"
+            }
+          },
+          {
+            "enc": {
+              "x": "0x19861a477442aba7dba3c41ee71b3b4623642d7cd20623099364f854045b893d",
+              "y": "0x02051254904e6c688365af6f61b181b05abddb224d53a8fc7a72a8074dc45d25"
+            },
+            "sig": {
+              "x": "0x0b53299786c80b86efd037531a7f8c8b21cac11146c56854f315d608030c730b",
+              "y": "0x28c8b5e2974e1676c8a8e182b2f4ed5ae003e2cd3fdbbb333e4cab004d1d2bb4"
+            }
+          },
+          {
+            "enc": {
+              "x": "0x27a1d29b0ce94c0576c0cf97988f8b5c2119c2c8142d795f8057e14fccfa4bc1",
+              "y": "0x07bfd7aad69d270d9a18790766df747e4bb3d5cf0bf084834cbe4183f47120ec"
+            },
+            "sig": {
+              "x": "0x0510626ed26672208a7c0a9354eb21632b15278602f6e99673bd247bac8e3726",
+              "y": "0x0a6177e34014e1610da411dec54a91340cfadfcb5eb054f9944e655f195935eb"
+            }
+          }
+        ]
+      },
+      "name": "nodes_ok",
+      "type": "NodesResponse"
+    },
+    {
+      "accepted": false,
+      "json": {
+        "nodes": [
+          {
+            "enc": {
+              "x": "0x17c83fd7a05ce31b24d720f2b7ce4f0d45ebefab49aacda9967b738e2701f849",
+              "y": "0x0c2b3a636c5d3ac174a99541f3833bc2b1d870f657a3eff8457de975d44efdf0"
+            },
+            "sig": {
+              "x": "0x2b681809013b22f0d2db3b443103b7fffdd7fa834a008595320ac526ab30de44",
+              "y": "0x28de1717d62f6f9ebd274bd7e1dd72ad225657277893e174d4f437a53aeab182"
+            }
+          },
+          {
+            "enc": {
+              "x": "0x19861a477442aba7dba3c41ee71b3b4623642d7cd20623099364f854045b893d",
+              "y": "0x02051254904e6c688365af6f61b181b05abddb224d53a8fc7a72a8074dc45d25"
+            },
+            "sig": {
+              "x": "0x0b53299786c80b86efd037531a7f8c8b21cac11146c56854f315d608030c730b",
+              "y": "0x28c8b5e2974e1676c8a8e182b2f4ed5ae003e2cd3fdbbb333e4cab004d1d2bb4"
+            }
+          },
+          {
+            "enc": {
+              "x": "0x27a1d29b0ce94c0576c0cf97988f8b5c2119c2c8142d795f8057e14fccfa4bc1",
+              "y": "0x07bfd7aad69d270d9a18790766df747e4bb3d5cf0bf084834cbe4183f47120ec"
+            },
+            "sig": {
+              "x": "0x0510626ed26672208a7c0a9354eb21632b15278602f6e99673bd247bac8e3726",
+              "y": "0x0a6177e34014e1610da411dec54a91340cfadfcb5eb054f9944e655f195935eb"
+            },
+            "tls": "0x00"
+          }
+        ]
+      },
+      "name": "nodes_unknown_field",
+      "type": "NodesResponse",
+      "why": "unknown field `nodes[2].tls`"
+    }
+  ],
+  "field_elements": {
+    "accepted": [
+      {
+        "text": "0x1",
+        "value": "0x0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      {
+        "text": "1",
+        "value": "0x0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      {
+        "text": "0x0",
+        "value": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "text": "0xA002",
+        "value": "0x000000000000000000000000000000000000000000000000000000000000a002"
+      },
+      {
+        "text": "a002",
+        "value": "0x000000000000000000000000000000000000000000000000000000000000a002"
+      },
+      {
+        "text": "0x41d3000000000000000000000000beef",
+        "value": "0x0000000000000000000000000000000041d3000000000000000000000000beef"
+      },
+      {
+        "text": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "value": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "text": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "value": "0x0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      {
+        "text": "0x1000000000000000000000000000000000000000000000000000000000000000",
+        "value": "0x1000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "text": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+        "value": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000"
+      },
+      {
+        "text": "30644E72E131A029B85045B68181585D2833E84879B9709143E1F593F0000000",
+        "value": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000"
+      }
+    ],
+    "refused": [
+      {
+        "text": "",
+        "why": "empty"
+      },
+      {
+        "text": "0x",
+        "why": "no digits"
+      },
+      {
+        "text": "0X1",
+        "why": "the prefix is 0x, lowercase"
+      },
+      {
+        "text": "0xzz",
+        "why": "not hex"
+      },
+      {
+        "text": "0x-1",
+        "why": "a sign"
+      },
+      {
+        "text": "-1",
+        "why": "a sign"
+      },
+      {
+        "text": "+1",
+        "why": "a sign"
+      },
+      {
+        "text": " 0x1",
+        "why": "whitespace"
+      },
+      {
+        "text": "0x1 ",
+        "why": "whitespace"
+      },
+      {
+        "text": "0x1_0",
+        "why": "a separator"
+      },
+      {
+        "text": "0x00000000000000000000000000000000000000000000000000000000000000000",
+        "why": "65 digits"
+      },
+      {
+        "text": "0x030644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+        "why": "65 digits"
+      },
+      {
+        "text": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001",
+        "why": "the modulus"
+      },
+      {
+        "text": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000002",
+        "why": "the modulus plus one"
+      },
+      {
+        "text": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "why": "2^256 - 1"
+      }
+    ]
+  },
+  "modulus": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001",
+  "request_ids": {
+    "accepted": [
+      {
+        "text": "0x41d3000000000000000000000000beef",
+        "value": "0x0000000000000000000000000000000041d3000000000000000000000000beef"
+      },
+      {
+        "text": "0x41D3000000000000000000000000BEEF",
+        "value": "0x0000000000000000000000000000000041d3000000000000000000000000beef"
+      },
+      {
+        "text": "0x1",
+        "value": "0x0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      {
+        "text": "0x000000000000000000000000000000005e1f0c2a9b7d4e3f8a6b1c0d2e4f6a8b",
+        "value": "0x000000000000000000000000000000005e1f0c2a9b7d4e3f8a6b1c0d2e4f6a8b"
+      },
+      {
+        "text": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+        "value": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000"
+      }
+    ],
+    "refused": [
+      {
+        "text": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001",
+        "why": "the modulus"
+      },
+      {
+        "text": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "why": "2^256 - 1"
+      },
+      {
+        "text": "0x",
+        "why": "no digits"
+      },
+      {
+        "text": "0x11111111111111111111111111111111111111111111111111111111111111111",
+        "why": "65 digits"
+      },
+      {
+        "text": "swap-41d3",
+        "why": "not hex"
+      }
+    ]
+  },
+  "rules": {
+    "documents": "response bodies both sides parse; accepted false means the parser refuses the whole body; unknown fields are refused at every level",
+    "field": "a field element in JSON is a string: an optional 0x (lowercase), then 1 to 64 hex digits of either case, big-endian; refused at or above the BN254 scalar modulus, never reduced; written 0x + 64 lowercase digits (value)",
+    "request_id": "the request id is one field element under the same rule"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "example": "lending-tip",
+  "descriptor": "lending-tip-plain",
+  "fee": "lending-tip",
+  "credit": {
+    "fund": "fund",
+    "balance": "credit_balance",
+    "assets": {
+      "collateral": 1,
+      "borrowed": 0
+    }
+  },
+  "contracts": {
+    "collateral": {
+      "example": "token",
+      "package": "token",
+      "args": [
+        "$operator",
+        "Lending collateral test token 1",
+        "LENDCOLLATERALTESTTOKENSYMBOL01",
+        18
+      ]
+    },
+    "borrowed": {
+      "example": "token",
+      "package": "token",
+      "args": [
+        "$operator",
+        "Lending borrowed asset token 01",
+        "LENDBORROWEDASSETTOKENSYMBOL001",
+        18
+      ]
+    },
+    "oracle": {
+      "package": "lending_oracle",
+      "args": [
+        "$operator",
+        250,
+        0,
+        50
+      ]
+    }
+  },
+  "fund": {
+    "collateral": {
+      "accounts": 100000
+    },
+    "borrowed": {
+      "accounts": 100000,
+      "app": 1000000
+    }
+  },
+  "config": {
+    "init_liquidity": 1000000,
+    "oracle": "$oracle",
+    "collateral": "$collateral",
+    "borrowed": "$borrowed",
+    "deposit": {
+      "token": "$borrowed",
+      "amount": 5,
+      "kept": true
+    },
+    "treasury": "0x0000000000000000000000000000000000000000000000000000000000007ea5",
+    "t_live": 60
+  },
+  "init": {
+    "method": "init_market"
+  }
+}

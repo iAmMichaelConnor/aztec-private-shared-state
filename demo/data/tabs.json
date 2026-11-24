@@ -1,0 +1,8 @@
+[
+  { "id": "counter-tip", "label": "counter-tip", "path": "tip", "example": "counter_tip", "scenario": "counter-tip" },
+  { "id": "amm-tip", "label": "amm-tip", "path": "tip", "example": "amm_tip", "next": "The AMM tip with every intake: a swap that spends and re-makes a note, upgradable circuits." },
+  { "id": "lending-tip", "label": "lending-tip", "path": "tip", "example": "lending_tip", "next": "Several contracts, a tree at the nodes, credit notes spent and re-made, refunds and the escape hatch." },
+  { "id": "credits-tip", "label": "credits-tip", "path": "tip", "example": "credits_tip", "next": "The oblivious keyed map and a fixed node key set." },
+  { "id": "monty-hall", "label": "monty-hall", "path": "sidecar", "example": "monty", "scenario": "monty-hall" },
+  { "id": "amm", "label": "amm", "path": "sidecar", "example": "amm", "next": "The sidecar path with node-held state: the pool sits at the nodes." }
+]

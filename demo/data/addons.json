@@ -1,0 +1,5 @@
+{
+  "label": "Add-ons",
+  "note": "Bricks an app adds beside the axes: design-space.json brick ids, shown with the brick's name and status (the list itself is the demo's own).",
+  "bricks": ["token-escrow", "note-ownership", "delivery-handle", "escape-hatch"]
+}

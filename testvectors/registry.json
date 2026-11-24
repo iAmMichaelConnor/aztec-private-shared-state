@@ -1,0 +1,457 @@
+{
+  "body_message_rule": "poseidon2_hash_bytes(domain || RFC 8785 JCS(body without signature)), domain cosnark-sidecar/v1/register or cosnark-sidecar/v1/disable, computed over the body as sent",
+  "disable": {
+    "body": {
+      "circuit": "pss_seed",
+      "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+      "owner_pubkey": {
+        "x": "0x0167fa7a43a272d0196084549d902cba8327d05c7949cf9bcbcdd1334e0b52a4",
+        "y": "0x095697a87a5c4661be2a446e45b68bf627aba31e0ce78ee0da14a21f30d1d310"
+      },
+      "seq": 1,
+      "signature": {
+        "e": [
+          "0x00000000000000000000000000000000c5866b4e6e46328283a8966317104d1c",
+          "0x000000000000000000000000000000002908d60c653588308e1e3500f6861bc5"
+        ],
+        "s": [
+          "0x00000000000000000000000000000000e68f867429a0c1d161a6d416594e6a7f",
+          "0x000000000000000000000000000000002de9c8f5cc7b881f87fde2e5f3e2c743"
+        ]
+      }
+    },
+    "message": "0x001312310113cccb7d4e8399638421f4cdfa74de01491d588c9501666f63b9fe"
+  },
+  "manifest": {
+    "manifest_domain": "0x00000000000000000000000000000000736964656361722e6d616e6966657374",
+    "manifest_hash": "0x0989e76e314a901b423feb7dd8d7aa14de070c2440b21de9ac93ba41e68ee808",
+    "manifest_message_rule": "poseidon2([MANIFEST_DOMAIN, namespace, manifest_hash, packages_hash, npk_app_hash, seq, 0, i]); MANIFEST_DOMAIN = ASCII \"sidecar.manifest\" as a big-endian integer; manifest_hash and packages_hash of the register body's contract manifest (testvectors/contract_manifest.json has the rules); npk_app_hash and the node keys those of `results`",
+    "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+    "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+    "packages_hash": "0x0300b5b7fbd7a38c00bb9a2bf6926b994f4e187d05b7a9cfe8a31eec96e2739a",
+    "results": [
+      {
+        "message": "0x0c01ef1673d155ef529c914bab8decee2fe46676e79a59256fa7a94315ebd137",
+        "node": 0,
+        "sig_pubkey": {
+          "x": "0x0f4c85396213d6133c1e636328d5e58c56d1a7d833ec673e56dae95b7ceda006",
+          "y": "0x23ece61f83ae1c9f10dbc8e23b44fc25cca667f26ba3ba219e23a121f881755a"
+        },
+        "signature": {
+          "e": [
+            "0x00000000000000000000000000000000579ea899da800f1b5283ac3b4bd5ae73",
+            "0x000000000000000000000000000000000a4d744feaaedd959df16e8661218e39"
+          ],
+          "s": [
+            "0x000000000000000000000000000000004d201902b01c7e34b11c1dbf10557e5a",
+            "0x0000000000000000000000000000000003f75380efb14157adc88743b7c4301b"
+          ]
+        }
+      },
+      {
+        "message": "0x048185ecf77bf589dc937bef48db5e5856939dc15d3db9c05eecde6b0f1dc8c7",
+        "node": 1,
+        "sig_pubkey": {
+          "x": "0x287140dfde14e2111974384a5588742f7d0f8dd841a1cfc9882b6726a0472a4f",
+          "y": "0x1b33dc1ba01c96a3b25779d16f9e12e8245f086d44c7f687b0dfd8761ac604d6"
+        },
+        "signature": {
+          "e": [
+            "0x000000000000000000000000000000008c7436b6eabdcdd8a522efd8d8ed9086",
+            "0x0000000000000000000000000000000008e1ba3211e73e986df02350459054d4"
+          ],
+          "s": [
+            "0x00000000000000000000000000000000d4fb781b51a04980c5c81b0dc5344c2b",
+            "0x0000000000000000000000000000000028ada8b60604cc95df2b2e344273b787"
+          ]
+        }
+      },
+      {
+        "message": "0x03a9e966beebb5f867d2c14268e93ccad2d5b1aa1eb8df020a26129c7ccca42d",
+        "node": 2,
+        "sig_pubkey": {
+          "x": "0x1ac7171c368cc663eb54f1d036ad787b5feead48e4af9c094752939c866b4083",
+          "y": "0x09f1a194c810e23d5939cfadf2c00c7ef6b30a3bea2c6a943e88db3d207c8675"
+        },
+        "signature": {
+          "e": [
+            "0x000000000000000000000000000000007e133b343010fc341a60e5d40b948a85",
+            "0x000000000000000000000000000000002238eaf73c22945736139f41023afff4"
+          ],
+          "s": [
+            "0x000000000000000000000000000000001d001ba570a164da54cd0cfd13e38147",
+            "0x0000000000000000000000000000000017cc6d86da796832db94274f6b48076a"
+          ]
+        }
+      }
+    ],
+    "seq": 0
+  },
+  "owner_pubkey": {
+    "x": "0x0167fa7a43a272d0196084549d902cba8327d05c7949cf9bcbcdd1334e0b52a4",
+    "y": "0x095697a87a5c4661be2a446e45b68bf627aba31e0ce78ee0da14a21f30d1d310"
+  },
+  "register": {
+    "body": {
+      "circuits": {
+        "pss_seed": {
+          "abi": {
+            "abi_version": 1,
+            "error_types": {
+              "12469291177396340830": {
+                "error_kind": "string",
+                "string": "call to assert_max_bit_size"
+              }
+            },
+            "parameters": [
+              {
+                "name": "namespace",
+                "type": {
+                  "kind": "field"
+                },
+                "visibility": "public"
+              },
+              {
+                "name": "owner",
+                "type": {
+                  "kind": "field"
+                },
+                "visibility": "public"
+              },
+              {
+                "name": "out_slots",
+                "type": {
+                  "kind": "array",
+                  "length": 1,
+                  "type": {
+                    "kind": "field"
+                  }
+                },
+                "visibility": "public"
+              },
+              {
+                "name": "out0_randomness",
+                "type": {
+                  "kind": "field"
+                },
+                "visibility": "private"
+              },
+              {
+                "name": "rand_seed",
+                "type": {
+                  "kind": "field"
+                },
+                "visibility": "private"
+              }
+            ],
+            "return_type": {
+              "abi_type": {
+                "fields": [
+                  {
+                    "name": "read_leaves",
+                    "type": {
+                      "kind": "array",
+                      "length": 0,
+                      "type": {
+                        "kind": "field"
+                      }
+                    }
+                  },
+                  {
+                    "name": "nullifiers",
+                    "type": {
+                      "kind": "array",
+                      "length": 0,
+                      "type": {
+                        "kind": "field"
+                      }
+                    }
+                  },
+                  {
+                    "name": "new_note_hashes",
+                    "type": {
+                      "kind": "array",
+                      "length": 1,
+                      "type": {
+                        "kind": "field"
+                      }
+                    }
+                  },
+                  {
+                    "name": "npk_app_hash",
+                    "type": {
+                      "kind": "field"
+                    }
+                  },
+                  {
+                    "name": "app_outputs",
+                    "type": {
+                      "kind": "array",
+                      "length": 0,
+                      "type": {
+                        "kind": "field"
+                      }
+                    }
+                  }
+                ],
+                "kind": "struct",
+                "path": "pss_core::effects::PssEffects"
+              },
+              "visibility": "public"
+            }
+          },
+          "bytecode": "H4sIAAAAAAAA/wMAAAAAAAAAAAA=",
+          "debug_symbols": "q1ZKSU0qTY/PzEvLL1ayio6tBQA=",
+          "file_map": {},
+          "hash": 1234,
+          "noir_version": "1.0.0"
+        }
+      },
+      "manifest": {
+        "circuits": {
+          "pss_seed": {
+            "vk_hash": "0x000000000000000000000000000000000000000000000000000000000000abcd"
+          }
+        },
+        "contract_manifest": 1,
+        "name": "pss_seed",
+        "node_keys": "fixed",
+        "packages": [
+          {
+            "circuit": "pss_seed",
+            "manifest": {
+              "circuit": "pss_seed",
+              "consume": [],
+              "manifest": 1,
+              "namespace_param": "namespace",
+              "outputs": [
+                {
+                  "STORE": "$state_keys.writes[0]",
+                  "TACEO_store": "out0",
+                  "len": 2,
+                  "note_hash": "new_note_hashes[0]"
+                }
+              ],
+              "state": {
+                "$state_keys.writes[0]": "node"
+              },
+              "state_keys": {
+                "reads": 0,
+                "writes": 1
+              },
+              "witness": [
+                {
+                  "from": {
+                    "PUBLIC": "$namespace"
+                  },
+                  "param": "namespace"
+                },
+                {
+                  "from": {
+                    "PUBLIC": {
+                      "const": "0xafafaf"
+                    }
+                  },
+                  "param": "owner"
+                },
+                {
+                  "from": {
+                    "PUBLIC": [
+                      "$state_keys.writes[0]"
+                    ]
+                  },
+                  "param": "out_slots"
+                },
+                {
+                  "from": {
+                    "SAMPLE": 1
+                  },
+                  "param": "out0_randomness"
+                },
+                {
+                  "from": {
+                    "SAMPLE": 1
+                  },
+                  "param": "rand_seed"
+                }
+              ]
+            },
+            "name": "pss_seed"
+          }
+        ],
+        "upgrades": "fixed"
+      },
+      "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+      "owner_pubkey": {
+        "x": "0x0167fa7a43a272d0196084549d902cba8327d05c7949cf9bcbcdd1334e0b52a4",
+        "y": "0x095697a87a5c4661be2a446e45b68bf627aba31e0ce78ee0da14a21f30d1d310"
+      },
+      "seq": 0,
+      "signature": {
+        "e": [
+          "0x00000000000000000000000000000000bc9214f81271cee531c71724732f0cac",
+          "0x000000000000000000000000000000001a79b3de4e698551bbd44fcc35c2845a"
+        ],
+        "s": [
+          "0x00000000000000000000000000000000ee281aa2589e245cc6e5ad51eadb3469",
+          "0x00000000000000000000000000000000105047bb8cacead7b1fa227c2485560d"
+        ]
+      }
+    },
+    "message": "0x0350aedc26322b13c77e6c102c049535c0f0e67a9bf0d740e3a2bda075a85341"
+  },
+  "registry_domain": "0x00000000000000000000000000000000736964656361722e7265676973747279",
+  "registry_message_rule": "poseidon2([REGISTRY_DOMAIN, namespace, poseidon2_hash_bytes(name), vk_hash, npk_app_hash, seq, disabled, i]); REGISTRY_DOMAIN = ASCII \"sidecar.registry\" as a big-endian integer; disabled 1 for a DISABLE answer, the only answer signed under this domain (the seq 0 entries with disabled 0 fix the message rule only); i the node index 0, 1, 2",
+  "results": [
+    {
+      "disabled": false,
+      "message": "0x18f2e013aca505f1e2a324b9d742bf3fdc1cc2fe42d80fbeb320f2aab22cdb23",
+      "name": "pss_seed",
+      "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+      "node": 0,
+      "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+      "seq": 0,
+      "sig_pubkey": {
+        "x": "0x0f4c85396213d6133c1e636328d5e58c56d1a7d833ec673e56dae95b7ceda006",
+        "y": "0x23ece61f83ae1c9f10dbc8e23b44fc25cca667f26ba3ba219e23a121f881755a"
+      },
+      "sig_secret": "0x0000000000000000000000000000000000000000000000000000000051600000",
+      "signature": {
+        "e": [
+          "0x00000000000000000000000000000000c4137bea4a2cb4f4783c8023f4bb5429",
+          "0x000000000000000000000000000000001386168b6726e7fb4e021c07e84ee0d4"
+        ],
+        "s": [
+          "0x00000000000000000000000000000000007a7e7bc2efbacf6cf64f237f648b98",
+          "0x0000000000000000000000000000000025fe973ffab8750f243dc0a50871c530"
+        ]
+      },
+      "vk_hash": "0x000000000000000000000000000000000000000000000000000000000000abcd"
+    },
+    {
+      "disabled": false,
+      "message": "0x2230915cc76db3180eae38fed337f5fe0854d586659e5e98bc11bc818f6ad07e",
+      "name": "pss_seed",
+      "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+      "node": 1,
+      "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+      "seq": 0,
+      "sig_pubkey": {
+        "x": "0x287140dfde14e2111974384a5588742f7d0f8dd841a1cfc9882b6726a0472a4f",
+        "y": "0x1b33dc1ba01c96a3b25779d16f9e12e8245f086d44c7f687b0dfd8761ac604d6"
+      },
+      "sig_secret": "0x0000000000000000000000000000000000000000000000000000000051600001",
+      "signature": {
+        "e": [
+          "0x00000000000000000000000000000000a73defae07d4595ce026c12b6beee889",
+          "0x0000000000000000000000000000000027ddc9493f07608985c94f3db05dc96a"
+        ],
+        "s": [
+          "0x00000000000000000000000000000000896a87047419baf5ca6846350e79991a",
+          "0x000000000000000000000000000000002e7d66cb347302dc63939ee3ac5db279"
+        ]
+      },
+      "vk_hash": "0x000000000000000000000000000000000000000000000000000000000000abcd"
+    },
+    {
+      "disabled": false,
+      "message": "0x03338f6732e2b582d8b7e0eff9bfa034842f9d2d52aec055d41ec17e54d22581",
+      "name": "pss_seed",
+      "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+      "node": 2,
+      "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+      "seq": 0,
+      "sig_pubkey": {
+        "x": "0x1ac7171c368cc663eb54f1d036ad787b5feead48e4af9c094752939c866b4083",
+        "y": "0x09f1a194c810e23d5939cfadf2c00c7ef6b30a3bea2c6a943e88db3d207c8675"
+      },
+      "sig_secret": "0x0000000000000000000000000000000000000000000000000000000051600002",
+      "signature": {
+        "e": [
+          "0x000000000000000000000000000000002722f59da5a954dc5e9cfe4ec7c7f442",
+          "0x00000000000000000000000000000000219cf7118b4e6944d9eadd8673b2b369"
+        ],
+        "s": [
+          "0x00000000000000000000000000000000e5b1bc8d0a2b0e704724f70a595354d4",
+          "0x0000000000000000000000000000000014ae9137974241a466248ca06f858623"
+        ]
+      },
+      "vk_hash": "0x000000000000000000000000000000000000000000000000000000000000abcd"
+    },
+    {
+      "disabled": true,
+      "message": "0x1a15fa93fa7e500e0d2a45faceafa17ab2ec021ae674d6d921b4c7db54f12f76",
+      "name": "pss_seed",
+      "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+      "node": 0,
+      "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+      "seq": 1,
+      "sig_pubkey": {
+        "x": "0x0f4c85396213d6133c1e636328d5e58c56d1a7d833ec673e56dae95b7ceda006",
+        "y": "0x23ece61f83ae1c9f10dbc8e23b44fc25cca667f26ba3ba219e23a121f881755a"
+      },
+      "sig_secret": "0x0000000000000000000000000000000000000000000000000000000051600000",
+      "signature": {
+        "e": [
+          "0x00000000000000000000000000000000411408b2448fa679b7f8a236cf00f373",
+          "0x00000000000000000000000000000000150a0d657169c144c92370c51372894e"
+        ],
+        "s": [
+          "0x0000000000000000000000000000000012f9ccc929daf25776b281158bb00781",
+          "0x0000000000000000000000000000000010dcf2a992af939fcf3f51073d086264"
+        ]
+      },
+      "vk_hash": "0x000000000000000000000000000000000000000000000000000000000000abcd"
+    },
+    {
+      "disabled": true,
+      "message": "0x0ff5782900703e793c8e7a0b7a92b8ddcbc72a8a171dd4b7ba9e72fb2827972f",
+      "name": "pss_seed",
+      "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+      "node": 1,
+      "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+      "seq": 1,
+      "sig_pubkey": {
+        "x": "0x287140dfde14e2111974384a5588742f7d0f8dd841a1cfc9882b6726a0472a4f",
+        "y": "0x1b33dc1ba01c96a3b25779d16f9e12e8245f086d44c7f687b0dfd8761ac604d6"
+      },
+      "sig_secret": "0x0000000000000000000000000000000000000000000000000000000051600001",
+      "signature": {
+        "e": [
+          "0x00000000000000000000000000000000e731c8949b02fc9797d9728269e55f2b",
+          "0x000000000000000000000000000000001f1fdcee7d4dfb1dd735490814eed8a3"
+        ],
+        "s": [
+          "0x00000000000000000000000000000000097d463fcb0edcdd3a382cc87ec42510",
+          "0x000000000000000000000000000000002210522bddbd85c5d1f11b9dffa9cb15"
+        ]
+      },
+      "vk_hash": "0x000000000000000000000000000000000000000000000000000000000000abcd"
+    },
+    {
+      "disabled": true,
+      "message": "0x01d76c0cbf1400410a42e294e2189be61c4a07ba41d65b6bc297943fb309c0b4",
+      "name": "pss_seed",
+      "namespace": "0x000000000000000000000000000000000000000000000000000000001f2ea9c0",
+      "node": 2,
+      "npk_app_hash": "0x1f21c078530872675c230b247bed26ffce80c76ab6eeb360895ca8cbd8b92e16",
+      "seq": 1,
+      "sig_pubkey": {
+        "x": "0x1ac7171c368cc663eb54f1d036ad787b5feead48e4af9c094752939c866b4083",
+        "y": "0x09f1a194c810e23d5939cfadf2c00c7ef6b30a3bea2c6a943e88db3d207c8675"
+      },
+      "sig_secret": "0x0000000000000000000000000000000000000000000000000000000051600002",
+      "signature": {
+        "e": [
+          "0x00000000000000000000000000000000c7ca99e4b07fb9f645aef0609758e7be",
+          "0x000000000000000000000000000000001111c33dc7a296e3707e5d148de56246"
+        ],
+        "s": [
+          "0x00000000000000000000000000000000d0bdbe22bcb0694a7047378d38c4c12e",
+          "0x0000000000000000000000000000000003c010ac453c1f90b0f252d74f80532b"
+        ]
+      },
+      "vk_hash": "0x000000000000000000000000000000000000000000000000000000000000abcd"
+    }
+  ]
+}

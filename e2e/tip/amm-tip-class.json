@@ -1,0 +1,15 @@
+{
+  "example": "amm-tip",
+  "descriptor": "amm-tip",
+  "fee": "amm-tip",
+  "classUpgrade": {
+    "file": "src/class.nr",
+    "replace": "CLASS_VERSION: Field = 1;",
+    "with": "CLASS_VERSION: Field = 2;"
+  },
+  "staleBlocks": 4,
+  "config": {},
+  "init": {
+    "method": "init_pool"
+  }
+}

@@ -1,0 +1,27 @@
+[package]
+name = "sidecar-oblivious"
+version = "0.1.0"
+description = "The oblivious tree brick: a tree-valued node-held key whose leaves and hashes live in a three-party distributed oblivious RAM (GigaDORAM, vendored under vendor/) and whose position index is a secret-shared input; the state holder behind sidecar-core's state seam (docs/ARCHITECTURE.md section 6, \"The oblivious tree\")"
+
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+sidecar-core = { path = "../sidecar-core" }
+doram = { path = "vendor/doram", package = "gigadoram-doram" }
+primitives = { path = "vendor/primitives", package = "gigadoram-primitives" }
+ark-ff.workspace = true
+mpc_core.workspace = true
+mpc_net.workspace = true
+eyre.workspace = true
+sha2.workspace = true
+
+[dev-dependencies]
+# The in-process three-party networks of the brick's own tests: the local
+# channels, and a TCP mesh on loopback with mpc-net's frame limit.
+mpc_net = { workspace = true, features = ["local", "tcp"] }
+primitives = { path = "vendor/primitives", package = "gigadoram-primitives", features = ["testing"] }
+sidecar-core = { path = "../sidecar-core", features = ["testing"] }
+# The layouts the tests build from JSON.
+serde_json.workspace = true

@@ -1,0 +1,11 @@
+[package]
+name = "sidecar_register"
+type = "bin"
+# exact: the round circuits' Noir 1.0.0 (toolchain.json noir.version)
+compiler_version = "=1.0.0"
+
+# The Poseidon2 sponge of the library Aztec's protocol_types hashes with, so
+# the derivation equals pss_core's by construction. Nothing chain-specific: the
+# machine's own circuit depends on no Aztec package.
+[dependencies]
+poseidon = { tag = "v0.4.0", git = "https://github.com/noir-lang/poseidon" }

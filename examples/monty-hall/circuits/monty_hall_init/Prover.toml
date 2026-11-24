@@ -1,0 +1,14 @@
+# Scenario: the player initialises the game from a seed note at key 0xff01
+# (seed 111 and blinding 222, as in pss_seed/Prover.toml) and writes the game
+# state to key 0xff02. Seed 111 gives winning door 1.
+namespace = "0xc0ffee"
+owner = "0xafafaf"
+in_slots = ["0xff01"]
+out_slots = ["0xff02"]
+# the seed note: [rand_seed]
+in0_fields = ["111"]
+in0_randomness = "222"
+# compute_note_hash_nonce(first_nullifier=7, index=0)
+in0_nonce = "0x26873b4daab0cd79798315a61559e32301deda2cbf0fb0eb1494a548981fa0ca"
+out0_randomness = "333"
+nsk_app = "777"

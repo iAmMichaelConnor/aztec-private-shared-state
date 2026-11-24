@@ -1,0 +1,52 @@
+# cargo-nextest for the machine's tests, from machine/:
+#
+#   cargo nextest run --release                  # every test, the full gate
+#   cargo nextest run --release -p sidecar-tip   # one crate
+#   cargo nextest run --release --profile quick  # without the three-party proving binaries
+#
+# nextest runs every test in its own process and every test binary at once,
+# where `cargo test --release` (the fallback; the tests pass under both) runs
+# the binaries one after another. A test binary's fixture (the CRS and the
+# verifiers, sidecar-core's `testing::fixture`) is then read once per test
+# instead of once per binary. No crate has doctests, so nextest runs
+# everything `cargo test` runs.
+
+# The binaries that run three-node networks with real MPC proofs: the
+# in-process harness (sidecar-core, sidecar-tip, sidecar-oblivious's
+# recovery), the nodes behind their APIs (sidecar-node's three_party) and the
+# orchestrator's suites. Each test
+# keeps several cores busy for seconds to minutes; `threads-required` counts
+# it as 8 of nextest's test threads (one per core by default), so at most
+# cores / 8 of them prove at once and the rest of the suite runs beside
+# them. The same filter is the quick profile's exclusion: keep the two in
+# step.
+[[profile.default.overrides]]
+filter = '''
+    binary_id(sidecar-core::lifecycle) | binary_id(sidecar-core::recovery)
+    | binary_id(sidecar-core::registry_resync) | binary_id(sidecar-core::executor)
+    | binary_id(sidecar-tip::lifecycle) | binary_id(sidecar-tip::receipt_round)
+    | binary_id(sidecar-node::three_party) | binary_id(sidecar-oblivious::recovery)
+    | (package(sidecar-orchestrator) & kind(test) & !binary(routes) & !binary(receipts))
+'''
+threads-required = 8
+# The longest test proves for a few minutes on an idle machine; one that
+# runs 15 minutes is hung (a mesh session waits at most 10).
+slow-timeout = { period = "180s", terminate-after = 5 }
+
+[profile.default]
+# A gate reports every failure, not the first.
+fail-fast = false
+
+# The quick profile also leaves out the depth-16 DORAM build over a TCP mesh
+# (a 2^20-leaf tree, most of sidecar-oblivious three_party's time); the
+# framing it exercises is unit-tested in the vendored primitives' `chunked`.
+[profile.quick]
+default-filter = '''
+    !(binary_id(sidecar-core::lifecycle) | binary_id(sidecar-core::recovery)
+    | binary_id(sidecar-core::registry_resync) | binary_id(sidecar-core::executor)
+    | binary_id(sidecar-tip::lifecycle) | binary_id(sidecar-tip::receipt_round)
+    | binary_id(sidecar-node::three_party) | binary_id(sidecar-oblivious::recovery)
+    | (package(sidecar-orchestrator) & kind(test) & !binary(routes) & !binary(receipts))
+    | (binary_id(sidecar-oblivious::three_party)
+       & test(=the_dense_doram_builds_at_depth_16_over_the_tcp_mesh)))
+'''

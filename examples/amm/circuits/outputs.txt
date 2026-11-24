@@ -1,0 +1,16 @@
+# Expected outputs of every examples/amm case, checked by
+# scripts/check-noir.sh examples/amm --outputs examples/amm/circuits/outputs.txt
+# (the format is in check-noir.sh's header).
+#
+# The Prover.toml fixtures are one scenario (README.md, "Checks"): seed 111
+# gives the pool [1359373, 1852331]; selling 25000 x for y pays out 33450
+# (0x82aa) and leaves [1384373, 1818881], whose note hash is the one
+# examples/amm-swap-total/circuits/outputs.txt pins for its own trade. Each row pins
+# new_note_hashes and app_outputs. amm_swap_total (linked from
+# examples/amm-swap-total) has no row here: that example's outputs.txt
+# checks its cases.
+
+# circuit  prover   from to  outputs
+pss_seed   Prover   -    -   new_note_hashes=[0x0d11883f2943661bc4ba4dbaabfdc0b2475f28a51d80920e241b6399af94ecee] app_outputs=[]
+amm_init   Prover   -    -   new_note_hashes=[0x304723534a91a15d7a2acb532dbdf953cb4538b068d80dd9f3790fae039f9fb5] app_outputs=[]
+amm_swap   Prover   -    -   new_note_hashes=[0x012f6a245074c58899bed42c8360573013b7fbd4f37d4c0016053b9337aae7b1] app_outputs=[0x82aa]

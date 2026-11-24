@@ -1,0 +1,5 @@
+namespace = "0xc0ffee"
+owner = "0x1234"
+out_slots = ["0xa001"]
+out0_randomness = "222"
+rand_seed = "111"

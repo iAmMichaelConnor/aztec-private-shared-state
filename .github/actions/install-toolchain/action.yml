@@ -1,0 +1,34 @@
+# The `toolchain` job of ci.yml and nightly.yml: installs the pinned tools
+# once per toolchain.json and shares them through the cache under `key`,
+# which every other job restores exactly (pinned-setup's `tools-key`).
+# Runs after the checkout.
+#
+# Every action is pinned to a commit; the comment names its release.
+
+name: install the pinned toolchain
+description: scripts/install-toolchain.sh into .tools, cached per toolchain.json; outputs the cache key.
+
+outputs:
+  key:
+    description: The cache key of .tools.
+    value: ${{ steps.key.outputs.key }}
+
+runs:
+  using: composite
+  steps:
+    - id: key
+      shell: bash
+      run: echo "key=tools-${{ runner.os }}-${{ hashFiles('toolchain.json', 'scripts/install-toolchain.sh') }}" >> "$GITHUB_OUTPUT"
+    - id: cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .tools
+        key: ${{ steps.key.outputs.key }}
+    - uses: dtolnay/rust-toolchain@7dcc700092a1a8b9c17ba0e140b4e34e93000946 # 1.90.0 (builds total-lint)
+      if: steps.cache.outputs.cache-hit != 'true'
+      with:
+        toolchain: 1.90.0
+    - name: scripts/install-toolchain.sh (nargo 1.0.0 and 1.0.0-rc.3, bb 6.0.0, total-lint, the two Aztec worlds)
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: scripts/install-toolchain.sh

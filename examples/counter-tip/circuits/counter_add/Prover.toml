@@ -1,0 +1,21 @@
+# adds 5 to the counter counter_init creates (0 under blinding 333): the
+# total 5 under r_new, the requester's note [0, 5, request_id]
+namespace = "0xc0ffee"
+# a stand-in for the circuit's vk hash, which process_result checks
+vk_hash = "0x5a5a"
+in_slots = ["0xa003"]
+out_slots = ["0xa003"]
+# C, the commitment the queued request carries (PUBLIC $inputs_hash):
+# poseidon2([amount, partial_note, outcome_key, outcome_tag, blinding])
+inputs_hash = "0x4f493d9b0c16ddbc8793300169f4b6ab5bb633e71368ceafc32111d90dadc92"
+# shared: the amount and the reserved values; partial_note is
+# partial_commitment(owner 0xa11ce, rho 0x5eed), the requester's partial note
+amount = "5"
+partial_note = "0x82534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a"
+outcome_key = "0x6b6b"
+outcome_tag = "0x7a7a"
+blinding = "0xb1b1"
+total = ["0"]
+r_old = "333"
+r_new = "444"
+nsk_app = "777"

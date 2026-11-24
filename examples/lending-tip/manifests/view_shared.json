@@ -1,0 +1,44 @@
+{
+  "manifest": 1,
+  "circuit": "view_shared",
+  "namespace_param": "namespace",
+  "state_keys": {"reads": 1, "writes": 1},
+  "intake": "shared_receipt",
+  "outcome": "partial",
+  "binding": "turn",
+  "witness": [
+    {"param": "namespace", "from": {"PUBLIC": "$namespace"}},
+    {"param": "vk_hash", "from": {"PUBLIC": "$vk_hash"}},
+    {"param": "in_slots", "from": {"PUBLIC": ["$state_keys.reads[0]"]}},
+    {"param": "out_slots", "from": {"PUBLIC": ["$state_keys.writes[0]"]}},
+    {"param": "price", "from": {"PUBLIC": "price"}},
+    {"param": "price_epoch", "from": {"PUBLIC": "price_epoch"}},
+    {"param": "clock", "from": {"PUBLIC": "clock"}},
+    {"param": "inputs_hash", "from": {"PUBLIC": "$inputs_hash"}},
+    {"param": "position", "from": {"PUBLIC": "position"}},
+    {"param": "handle_partial", "from": {"INPUT_SHARED": "handle_partial"}},
+    {"param": "handle_key", "from": {"INPUT_SHARED": "handle_key"}},
+    {"param": "partial_note", "from": {"INPUT_SHARED": "$partial_note"}},
+    {"param": "outcome_key", "from": {"INPUT_SHARED": "$outcome_key"}},
+    {"param": "outcome_tag", "from": {"INPUT_SHARED": "$outcome_tag"}},
+    {"param": "blinding", "from": {"INPUT_SHARED": "$blinding"}},
+    {"param": "leaves", "from": {"LOAD": "$state_keys.reads[0]", "slice": [0, 16], "len": 16}},
+    {"param": "old_hashes", "from": {"PUBLIC": "old_hashes"}},
+    {"param": "siblings", "from": {"PUBLIC": "siblings"}},
+    {"param": "indices", "from": {"PUBLIC": "indices"}},
+    {"param": "r_new", "from": {"SAMPLE": 2}},
+    {"param": "nsk_app", "from": {"LOAD": "nsk_app", "slice": [0, 1], "len": 1}}
+  ],
+  "outputs": [
+    {"TACEO_store": "out0", "STORE": "$state_keys.writes[0]", "len": 16, "note_hash": "new_commitments[0]"}
+  ],
+  "state": {"$state_keys.reads[0]": "node", "$state_keys.writes[0]": "node"},
+  "commitment_slot": {"$state_keys.reads[0]": {"old": "old_commitments[0]"}},
+  "tree": {
+    "$state_keys.reads[0]": {"depth": 16, "leaf_len": 8, "probe": 2, "header": true, "index": ["position"], "params": {"leaves": "leaves", "old_hashes": "old_hashes", "siblings": "siblings", "indices": "indices"}, "store": "$state_keys.writes[0]", "new_hashes": "new_hashes"}
+  },
+  "public_reads": [
+    {"contract": "0x0", "function": "get_price_epoch", "args": [], "param": "price", "freshness": "epoch", "epoch_param": "price_epoch"},
+    {"contract": "$self", "function": "clock", "args": [], "param": "clock", "freshness": "tolerance", "band": {"absolute": "128"}}
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "manifest": 1,
+  "circuit": "tip_tree",
+  "namespace_param": "namespace",
+  "state_keys": { "reads": 1, "writes": 1 },
+  "intake": "onchain",
+  "outcome": "none",
+  "binding": "turn",
+  "witness": [
+    { "param": "namespace",  "from": { "PUBLIC": "$namespace" } },
+    { "param": "vk_hash",    "from": { "PUBLIC": "$vk_hash" } },
+    { "param": "in_slots",   "from": { "PUBLIC": ["$state_keys.reads[0]"] } },
+    { "param": "out_slots",  "from": { "PUBLIC": ["$state_keys.writes[0]"] } },
+    { "param": "amount",     "from": { "PUBLIC": "amount" } },
+    { "param": "p1",         "from": { "PUBLIC": "p1" } },
+    { "param": "p2",         "from": { "PUBLIC": "p2" } },
+    { "param": "count",      "from": { "PUBLIC": "count" } },
+    { "param": "user_nonce", "from": { "PUBLIC": "$user_nonce" } },
+    { "param": "leaves",     "from": { "LOAD": "$state_keys.reads[0]", "slice": [0, 9], "len": 9 } },
+    { "param": "old_hashes", "from": { "PUBLIC": "old_hashes" } },
+    { "param": "siblings",   "from": { "PUBLIC": "siblings" } },
+    { "param": "indices",    "from": { "PUBLIC": "indices" } },
+    { "param": "new_leaf",   "from": { "PUBLIC": "$new_leaf" } },
+    { "param": "r_new",      "from": { "SAMPLE": 3 } }
+  ],
+  "outputs": [ { "TACEO_store": "out0", "STORE": "$state_keys.writes[0]", "len": 9, "note_hash": "new_c" } ],
+  "state": { "$state_keys.reads[0]": "node", "$state_keys.writes[0]": "node" },
+  "commitment_slot": { "$state_keys.reads[0]": { "old": "old_c" } },
+  "tree": {
+    "$state_keys.reads[0]": {
+      "depth": 16, "leaf_len": 3, "probe": 3, "header": true,
+      "index": ["p1", "p2"], "count": "count", "open": "p1",
+      "params": { "leaves": "leaves", "old_hashes": "old_hashes", "siblings": "siblings", "indices": "indices" },
+      "store": "$state_keys.writes[0]", "new_hashes": "new_hashes"
+    }
+  }
+}

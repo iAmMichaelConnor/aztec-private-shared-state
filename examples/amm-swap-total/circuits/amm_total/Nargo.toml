@@ -1,0 +1,19 @@
+[package]
+name = "amm_total"
+type = "lib"
+# a range: a library, built by the packages that depend on it under either
+# compiler (the round circuits' 1.0.0, the contracts' 1.0.0-rc.3)
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# total-noir's `total` library, a Nargo git dependency at the ref
+# toolchain.json pins (total_noir.tag, total_noir.commit; scripts/bootstrap.sh
+# checks that every Nargo.toml names it). Moving the pin moves this library
+# and the lint together (scripts/install-toolchain.sh installs total-lint
+# from the same commit).
+total = { git = "https://github.com/iAmMichaelConnor/total-noir", tag = "v0.1.0", directory = "noir/total" }
+# pss_core's Prng, for the tests only (random trade sizes).
+pss_core = { path = "../../../../noir/pss_core" }
+# examples/amm's asserting Pool, for the tests only: the baseline the total
+# swap's numbers are checked against.
+amm = { path = "../../../amm/circuits/amm" }

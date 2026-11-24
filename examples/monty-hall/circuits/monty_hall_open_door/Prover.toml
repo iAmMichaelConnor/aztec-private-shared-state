@@ -1,0 +1,28 @@
+# Scenario: the player, holding the record of the state monty_hall_init
+# wrote (winning door 1), plays door 2. The host must open door 0.
+namespace = "0xc0ffee"
+owner = "0xafafaf"
+in_slots = ["0xff02"]
+out_slots = ["0xff02"]
+# INPUT_SHARED: the door committed in choose_door and its blinding
+door = "2"
+door_randomness = "4242"
+# GameState::init(111).as_field_array(): [phase, prng state (4), prng
+# position, winning_door, chosen_door, open_door]
+in0_fields = [
+    "0x00",
+    "0x297a808dfa9041b94e1bf9cfdd8eeec509a6b148849d80bac98954fb090eb94d",
+    "0x1b34c5971e2da4a85c04e942f2927b4bc46ab38168332bd4397f91743f44ca2b",
+    "0x1479883f0e6e5653107156935bf50d161dcc31102542ca693684d45bb4d9cd66",
+    "0x1d576ad62d23d287fc91539fe1d2f8d49ddb079d071d698391772d2d3ef2198b",
+    "0x01",
+    "0x01",
+    "0x00",
+    "0x00",
+]
+# monty_hall_init's out0_randomness
+in0_randomness = "333"
+# compute_note_hash_nonce(first_nullifier=8, index=0)
+in0_nonce = "0x17bad57eb7869a9ec5c83647e40b5332e91091d9c5622c32286b2170177bffae"
+out0_randomness = "555"
+nsk_app = "777"

@@ -1,0 +1,164 @@
+# Expected outputs of every lending-tip case, checked by
+# scripts/check-noir.sh examples/lending-tip --outputs examples/lending-tip/circuits/outputs.txt
+# (the format is in check-noir.sh's header).
+#
+# The non-secret-shared deposit's chain of books (circuits/gen-fixtures.py): lending_init's
+# Prover.toml makes book S0 and deposit's Prover S1; every case on S1 has its
+# commitment, as the deposit left it, as its old_c. gen-fixtures.py places
+# each case's slots from its own tree, so this also checks the circuits' tree
+# update against it. Prover-second opens Bob's position on S2 (S1 after
+# Alice's borrow, which only the secret-shared entries run), so its row checks an
+# applied new_c, not its old_c, and Prover-accrued deposits into the interest
+# book KK at block 100 (the header and the position accrued); a case with from `-` and to `=` starts from a
+# book of its own. Each case outputs [ok, partial_note, code, position, new_hashes]
+# (the rows check ok, code and position); a rejected case has new_c = old_c, an
+# applied one a new_c that differs.
+state old_c new_c
+
+# circuit     prover                    from  to  outputs
+lending_init  Prover                    0x00  S0
+deposit       Prover                    S0    S1  ok=0x01 code=0x00 position=0x01
+deposit       Prover-oversize           S1    =   ok=0x00 code=0x01 position=0x00
+deposit       Prover-zero               S1    =   ok=0x00 code=0x02 position=0x00
+deposit       Prover-position           S1    =   ok=0x00 code=0x03 position=0x00
+deposit       Prover-full               S1    =   ok=0x00 code=0x10 position=0x00
+deposit       Prover-gap                S1    =   ok=0x00 code=0x11 position=0x00
+deposit       Prover-bad-state          -     =   ok=0x00 code=0x04 position=0x00
+deposit       Prover-not-open           S1    =   ok=0x00 code=0x05 position=0x00
+deposit       Prover-overflow           S1    =   ok=0x00 code=0x07 position=0x00
+deposit       Prover-lender             -     =   ok=0x00 code=0x05 position=0x00
+deposit       Prover-second             -     S3  ok=0x01 code=0x00 position=0x02
+deposit       Prover-accrued            -     KK1 ok=0x01 code=0x00 position=0x01
+
+# The secret-shared entries (the *_shared circuits): each case's outcome [code, position,
+# mask, x, y, payout, leaf_hash] is inside its ciphertext and the completed note's hash,
+# which its fixture's comment states and lending_tip's tests check; a row checks that the
+# case solves under its outcome tag, with its app values: the exit value first (the one exit
+# tag the landing emits as a nullifier, a spent tag or a filler: EXIT_TAGS = 1), then for a
+# round over two slots the position slot's written index (0 where the round did not write
+# it: a failed opening, a probe the liquidation left, an empty leaf, any position of a round
+# whose shares do not open C; the leaf-hash log's pair), then the inputs-opened bit (0 only
+# where the shares do not open C). The commitments are the outputs' arrays, which the state
+# line does not name.
+deposit_shared         Prover                -     -   outcome_tag=0x1a3fe7f24bb59d12e6fb8b5dedf4fc077df4d771d419abdadbb184057767a2b4 app_values=[0x17bc657342a928b924dfa98c9e025c0fddd7549f420f2edcffb64cead6932621,0x00,0x01]
+deposit_shared         Prover-full           -     -   outcome_tag=0x7a04 app_values=[0x0d28540b26f66940c7743e4f30866b44ad00b415509f6a5461963fb39b3513f3,0x00,0x01]
+deposit_shared         Prover-gap            -     -   outcome_tag=0x7a06 app_values=[0x2e18e08dfe06af517724730b6317bcc00fe8dee91e98539b6d0158f0d765078f,0x00,0x01]
+deposit_shared         Prover-mismatch       -     -   outcome_tag=0x7a05 app_values=[0x0f3de73d6467a8045bbf3bc2eabc9fd7a3153f5bc55173cb46c2e1b71d652af4,0x00,0x00]
+deposit_shared         Prover-not-open       -     -   outcome_tag=0x7a03 app_values=[0x0cbe694ac7f74ac6bd6123d9fcf0ca641af483354b82e1ed2d3b931406bef555,0x00,0x01]
+deposit_shared         Prover-owned          -     -   outcome_tag=0x7a02 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+borrow_shared          Prover                -     -   outcome_tag=0x7a07 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+borrow_shared          Prover-at-limit       -     -   outcome_tag=0x7a0a app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+borrow_shared          Prover-lender         -     -   outcome_tag=0x7a0b app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+borrow_shared          Prover-limit          -     -   outcome_tag=0x7a09 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+borrow_shared          Prover-mismatch       -     -   outcome_tag=0x7a0c app_values=[0x14d8eba79cc8971d2d01a7ea9788edba45716cea6b206a1b1f52eaa40c896873,0x00,0x00]
+borrow_shared          Prover-not-open       -     -   outcome_tag=0x7a08 app_values=[0x181b78e5df51aefb032a7d18e48978e933a641baf443f05dcef518432a923353,0x00,0x01]
+withdraw_shared        Prover                -     -   outcome_tag=0x7a0d app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+withdraw_shared        Prover-limit          -     -   outcome_tag=0x7a0e app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+withdraw_shared        Prover-mismatch       -     -   outcome_tag=0x7a10 app_values=[0x271afd6b0a500a99c6407c10b6de97aa2f755bfbd810274a9213615af6ef44d7,0x00,0x00]
+withdraw_shared        Prover-over           -     -   outcome_tag=0x7a0f app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+repay_shared           Prover                -     -   outcome_tag=0x7a11 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+repay_shared           Prover-excess         -     -   outcome_tag=0x7a12 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+repay_shared           Prover-mismatch       -     -   outcome_tag=0x7a13 app_values=[0x07584401a9b7f4142c5c7b8eef5c01a450ae55b9e6631322391301530de3581a,0x00,0x00]
+repay_shared           Prover-accrued        -     -   outcome_tag=0x7a32 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+supply_shared          Prover                -     -   outcome_tag=0x7a14 app_values=[0x28f96fe8ef7a8aed6d5414020df71c31ef99cf97a2fd0061f51c914b3e2ac91f,0x00,0x01]
+supply_shared          Prover-borrower       -     -   outcome_tag=0x7a17 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+supply_shared          Prover-mismatch       -     -   outcome_tag=0x7a18 app_values=[0x0769bf7065a379312b2b308a5b623f322d96e7e58994da8a3c5a2e2b9121510e,0x00,0x00]
+supply_shared          Prover-moved          -     -   outcome_tag=0x7a15 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+supply_shared          Prover-zero           -     -   outcome_tag=0x7a16 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+withdraw_supply_shared Prover                -     -   outcome_tag=0x7a19 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+withdraw_supply_shared Prover-accrued        -     -   outcome_tag=0x7a34 app_values=[0x146710d5e9d164f2312671e3656bbbc0fbcd51c752878fd30032a3db183ba63d,0x00,0x01]
+withdraw_supply_shared Prover-liquidity      -     -   outcome_tag=0x7a1b app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+withdraw_supply_shared Prover-mismatch       -     -   outcome_tag=0x7a1c app_values=[0x070f53c672685d288d95f4c92323e49e77320b05b017d45f3b3ac7ada3f91437,0x00,0x00]
+withdraw_supply_shared Prover-shares         -     -   outcome_tag=0x7a1a app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+view_shared            Prover                -     -   outcome_tag=0x7a1d app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+view_shared            Prover-accrued        -     -   outcome_tag=0x7a31 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+view_shared            Prover-lender         -     -   outcome_tag=0x7a20 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+view_shared            Prover-not-open       -     -   outcome_tag=0x7a1e app_values=[0x2b39a1b92d6b44eed380237c543bf59701f4a9948f2707bf8e7fbcc562bcadac,0x00,0x01]
+view_shared            Prover-position       -     -   outcome_tag=0x7a1f app_values=[0x0105200930f0303c4e83f7825b34d8a7a574afc2fe32afa4694c9ec8a6cbfa73,0x00,0x01]
+quote_shared           Prover                -     -   outcome_tag=0x7a21 app_values=[0x14a51b57745b79617667f30a85d3ddb80fe174d0c0895db4853618428ac087bd,0x01]
+quote_shared           Prover-accrued        -     -   outcome_tag=0x7a33 app_values=[0x05dd1c36eb055a4b244d302ee7533c8c2f9fd191e6b8580ca86c60cb18ee4174,0x01]
+quote_shared           Prover-mismatch       -     -   outcome_tag=0x7a22 app_values=[0x2cf766a159b3952645b805a3f8d8cc4c90b0bea41ddd059389a41193a1dd6c94,0x00]
+liquidate_shared       Prover                -     -   outcome_tag=0x7a23 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+liquidate_shared       Prover-accrued        -     -   outcome_tag=0x7a37 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+liquidate_shared       Prover-budget         -     -   outcome_tag=0x7a27 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x00,0x01]
+liquidate_shared       Prover-count          -     -   outcome_tag=0x7a25 app_values=[0x07c07aa2d7c2351f50b0f69bdadaf1d4a5627a2524ec748f194ccfb267d57e1b,0x00,0x01]
+liquidate_shared       Prover-healthy        -     -   outcome_tag=0x7a24 app_values=[0x2eb2709efbddbc51e072961feba86b4311d6718d056589eb3496187b755e70c5,0x00,0x01]
+liquidate_shared       Prover-mismatch       -     -   outcome_tag=0x7a26 app_values=[0x10ce45e40c812964fbea605f33185466cddc93bacb70c3e7f457bb8c9f1c7323,0x00,0x00]
+scan_shared            Prover                -     -   outcome_tag=0x7a28 app_values=[0x0ac2e11bf69716eeda7fea7f5eacd0b8b16f43d71e167c3def70dcaedf5cd969,0x01]
+scan_shared            Prover-accrued        -     -   outcome_tag=0x7a35 app_values=[0x2939d158436339cf944acf771bfad947f1c8e9f3047698f14c931e742a3ccbe6,0x01]
+scan_shared            Prover-bad-state      -     -   outcome_tag=0x7a2f app_values=[0x027e64bc083a1ddb352ccb90614852e397046a16919f85d489ea0f9e99d0e407,0x01]
+scan_shared            Prover-empty          -     -   outcome_tag=0x7a2b app_values=[0x2173b3830b727717a36692c8ac1dfe3db35b1d8950f441b8242590d2bfdd2a5c,0x01]
+scan_shared            Prover-mismatch       -     -   outcome_tag=0x7a30 app_values=[0x01fd42e26d80e1e9dc8771473eee3c4636abf09f06dca539b77d94758a9b3eab,0x00]
+scan_shared            Prover-not-yet        -     -   outcome_tag=0x7a36 app_values=[0x130fb4829aa98b92e0d8402e13f9844be5db963310c6bc4f3784f71dc0f9999a,0x01]
+scan_shared            Prover-out-of-range   -     -   outcome_tag=0x7a2d app_values=[0x2b85a0388f24ba2de04ea2be1250fe75059839d0dec3b556074b99ca4d02ee7f,0x01]
+scan_shared            Prover-past-end       -     -   outcome_tag=0x7a2a app_values=[0x2db43a0b2c2987a576124fc6e9f7513d7329e53064f0deceeaea8044cffb37b4,0x01]
+scan_shared            Prover-position       -     -   outcome_tag=0x7a2c app_values=[0x1aab14a9930cb381cea38df5a1f9b6f3385c281db5237754b8792004704b42a1,0x01]
+scan_shared            Prover-price-zero     -     -   outcome_tag=0x7a2e app_values=[0x088ec2e6145c1b9f0e52e718e66aaa0041dcecba2038fd305548b6c85ff5e775,0x01]
+scan_shared            Prover-second-window  -     -   outcome_tag=0x7a29 app_values=[0x1b3a6d6ee81c11ccd697e12115a7a88a40661a0ccef7591390464ce0583daa17,0x01]
+
+# The oblivious deployment (the *_oblivious circuits, README "The oblivious deployment"):
+# every secret-shared case again on the same book, with the same outcome tag, plus its own
+# cases (Prover-opens: an opening flag the committed position contradicts, code 4;
+# Prover-position: a position past the tree, read at its low bits, code 3). Its init makes
+# the clear deployment's S0 with no leaf hash output. Each round outputs the exit value
+# first; a round over two slots then the header's append index after the round (from which
+# the nodes keep theirs: it moves only when an opening applied); then the inputs-opened bit.
+lending_init_oblivious Prover              0x00  -   new_c=0x2ba353a44036794e32c1964cd8782e99847c1bc7435b8fa042887ba99da701a4 new_hashes=[0x00]
+deposit_oblivious          Prover                -     -   outcome_tag=0x1a3fe7f24bb59d12e6fb8b5dedf4fc077df4d771d419abdadbb184057767a2b4 app_values=[0x13acc8a5cd674c680a8a33f37cfc29b9cf9970fe09e332981798732ba5bc3b2a,0x02,0x01]
+deposit_oblivious          Prover-full           -     -   outcome_tag=0x7a04 app_values=[0x162a7862884c09479e38a4db7d1f081afc6476022f038eeaee4c9726a799e816,0x02,0x01]
+deposit_oblivious          Prover-gap            -     -   outcome_tag=0x7a06 app_values=[0x28fb8880bca1d88f78dca52474a2b82e3fe6b2c5fb826fc088a145c2383048ff,0x02,0x01]
+deposit_oblivious          Prover-mismatch       -     -   outcome_tag=0x7a05 app_values=[0x0437f969c280504526234d55a5457caa173a577576cca4d50a7af6884cd88aac,0x02,0x00]
+deposit_oblivious          Prover-not-open       -     -   outcome_tag=0x7a03 app_values=[0x10c66a0726b2a1394d35cd0b5626d8683ac088c2291b653a34d8999031080e43,0x02,0x01]
+deposit_oblivious          Prover-owned          -     -   outcome_tag=0x7a02 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+deposit_oblivious          Prover-opens          -     -   outcome_tag=0x7a38 app_values=[0x0aca4275b1f3ddd104064e37515d146f060c35180e12fef9ddef16b4b8da27f5,0x02,0x01]
+deposit_oblivious          Prover-position       -     -   outcome_tag=0x7a39 app_values=[0x1278bd14ae820aaabaadec4865a80d8149f0b3f06009a0ae09371845c81cd028,0x02,0x01]
+borrow_oblivious           Prover                -     -   outcome_tag=0x7a07 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+borrow_oblivious           Prover-at-limit       -     -   outcome_tag=0x7a0a app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+borrow_oblivious           Prover-lender         -     -   outcome_tag=0x7a0b app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+borrow_oblivious           Prover-limit          -     -   outcome_tag=0x7a09 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+borrow_oblivious           Prover-mismatch       -     -   outcome_tag=0x7a0c app_values=[0x14d8eba79cc8971d2d01a7ea9788edba45716cea6b206a1b1f52eaa40c896873,0x02,0x00]
+borrow_oblivious           Prover-not-open       -     -   outcome_tag=0x7a08 app_values=[0x181b78e5df51aefb032a7d18e48978e933a641baf443f05dcef518432a923353,0x02,0x01]
+borrow_oblivious           Prover-position       -     -   outcome_tag=0x7a3a app_values=[0x067f4093b52e77f0e04cada7ab7bce5ac59e6e71e51f86a94a51caad5b6220d0,0x02,0x01]
+withdraw_oblivious         Prover                -     -   outcome_tag=0x7a0d app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+withdraw_oblivious         Prover-limit          -     -   outcome_tag=0x7a0e app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+withdraw_oblivious         Prover-mismatch       -     -   outcome_tag=0x7a10 app_values=[0x271afd6b0a500a99c6407c10b6de97aa2f755bfbd810274a9213615af6ef44d7,0x02,0x00]
+withdraw_oblivious         Prover-over           -     -   outcome_tag=0x7a0f app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+repay_oblivious            Prover                -     -   outcome_tag=0x7a11 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x03,0x01]
+repay_oblivious            Prover-excess         -     -   outcome_tag=0x7a12 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x03,0x01]
+repay_oblivious            Prover-mismatch       -     -   outcome_tag=0x7a13 app_values=[0x07584401a9b7f4142c5c7b8eef5c01a450ae55b9e6631322391301530de3581a,0x03,0x00]
+repay_oblivious            Prover-accrued        -     -   outcome_tag=0x7a32 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x03,0x01]
+supply_oblivious           Prover                -     -   outcome_tag=0x7a14 app_values=[0x0f30a42f4c22977a05352569d46405cb49543a0be85ed8ebc1cf0d13afe18a88,0x02,0x01]
+supply_oblivious           Prover-borrower       -     -   outcome_tag=0x7a17 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+supply_oblivious           Prover-mismatch       -     -   outcome_tag=0x7a18 app_values=[0x117ef9534652136cec3b0068c032352ced33dbf873c7a618b19d41e78a48040e,0x02,0x00]
+supply_oblivious           Prover-moved          -     -   outcome_tag=0x7a15 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+supply_oblivious           Prover-zero           -     -   outcome_tag=0x7a16 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+withdraw_supply_oblivious  Prover                -     -   outcome_tag=0x7a19 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+withdraw_supply_oblivious  Prover-accrued        -     -   outcome_tag=0x7a34 app_values=[0x146710d5e9d164f2312671e3656bbbc0fbcd51c752878fd30032a3db183ba63d,0x03,0x01]
+withdraw_supply_oblivious  Prover-liquidity      -     -   outcome_tag=0x7a1b app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+withdraw_supply_oblivious  Prover-mismatch       -     -   outcome_tag=0x7a1c app_values=[0x070f53c672685d288d95f4c92323e49e77320b05b017d45f3b3ac7ada3f91437,0x02,0x00]
+withdraw_supply_oblivious  Prover-shares         -     -   outcome_tag=0x7a1a app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+view_oblivious             Prover                -     -   outcome_tag=0x7a1d app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+view_oblivious             Prover-accrued        -     -   outcome_tag=0x7a31 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x03,0x01]
+view_oblivious             Prover-lender         -     -   outcome_tag=0x7a20 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x02,0x01]
+view_oblivious             Prover-not-open       -     -   outcome_tag=0x7a1e app_values=[0x2b39a1b92d6b44eed380237c543bf59701f4a9948f2707bf8e7fbcc562bcadac,0x02,0x01]
+view_oblivious             Prover-position       -     -   outcome_tag=0x7a1f app_values=[0x0105200930f0303c4e83f7825b34d8a7a574afc2fe32afa4694c9ec8a6cbfa73,0x02,0x01]
+quote_oblivious            Prover                -     -   outcome_tag=0x7a21 app_values=[0x14a51b57745b79617667f30a85d3ddb80fe174d0c0895db4853618428ac087bd,0x01]
+quote_oblivious            Prover-accrued        -     -   outcome_tag=0x7a33 app_values=[0x05dd1c36eb055a4b244d302ee7533c8c2f9fd191e6b8580ca86c60cb18ee4174,0x01]
+quote_oblivious            Prover-mismatch       -     -   outcome_tag=0x7a22 app_values=[0x2cf766a159b3952645b805a3f8d8cc4c90b0bea41ddd059389a41193a1dd6c94,0x00]
+liquidate_oblivious        Prover                -     -   outcome_tag=0x7a23 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x03,0x01]
+liquidate_oblivious        Prover-accrued        -     -   outcome_tag=0x7a37 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x03,0x01]
+liquidate_oblivious        Prover-budget         -     -   outcome_tag=0x7a27 app_values=[0x081952d0d11556f9b5b21a5b40da3099d8ffd0f1322aa575e5acf0b32282a74c,0x03,0x01]
+liquidate_oblivious        Prover-count          -     -   outcome_tag=0x7a25 app_values=[0x07c07aa2d7c2351f50b0f69bdadaf1d4a5627a2524ec748f194ccfb267d57e1b,0x03,0x01]
+liquidate_oblivious        Prover-healthy        -     -   outcome_tag=0x7a24 app_values=[0x2eb2709efbddbc51e072961feba86b4311d6718d056589eb3496187b755e70c5,0x03,0x01]
+liquidate_oblivious        Prover-mismatch       -     -   outcome_tag=0x7a26 app_values=[0x10ce45e40c812964fbea605f33185466cddc93bacb70c3e7f457bb8c9f1c7323,0x03,0x00]
+scan_oblivious             Prover                -     -   outcome_tag=0x7a28 app_values=[0x0ac2e11bf69716eeda7fea7f5eacd0b8b16f43d71e167c3def70dcaedf5cd969,0x01]
+scan_oblivious             Prover-accrued        -     -   outcome_tag=0x7a35 app_values=[0x2939d158436339cf944acf771bfad947f1c8e9f3047698f14c931e742a3ccbe6,0x01]
+scan_oblivious             Prover-bad-state      -     -   outcome_tag=0x7a2f app_values=[0x027e64bc083a1ddb352ccb90614852e397046a16919f85d489ea0f9e99d0e407,0x01]
+scan_oblivious             Prover-empty          -     -   outcome_tag=0x7a2b app_values=[0x2173b3830b727717a36692c8ac1dfe3db35b1d8950f441b8242590d2bfdd2a5c,0x01]
+scan_oblivious             Prover-mismatch       -     -   outcome_tag=0x7a30 app_values=[0x01fd42e26d80e1e9dc8771473eee3c4636abf09f06dca539b77d94758a9b3eab,0x00]
+scan_oblivious             Prover-not-yet        -     -   outcome_tag=0x7a36 app_values=[0x130fb4829aa98b92e0d8402e13f9844be5db963310c6bc4f3784f71dc0f9999a,0x01]
+scan_oblivious             Prover-out-of-range   -     -   outcome_tag=0x7a2d app_values=[0x2b85a0388f24ba2de04ea2be1250fe75059839d0dec3b556074b99ca4d02ee7f,0x01]
+scan_oblivious             Prover-past-end       -     -   outcome_tag=0x7a2a app_values=[0x2db43a0b2c2987a576124fc6e9f7513d7329e53064f0deceeaea8044cffb37b4,0x01]
+scan_oblivious             Prover-position       -     -   outcome_tag=0x7a2c app_values=[0x1aab14a9930cb381cea38df5a1f9b6f3385c281db5237754b8792004704b42a1,0x01]
+scan_oblivious             Prover-price-zero     -     -   outcome_tag=0x7a2e app_values=[0x088ec2e6145c1b9f0e52e718e66aaa0041dcecba2038fd305548b6c85ff5e775,0x01]
+scan_oblivious             Prover-second-window  -     -   outcome_tag=0x7a29 app_values=[0x1b3a6d6ee81c11ccd697e12115a7a88a40661a0ccef7591390464ce0583daa17,0x01]

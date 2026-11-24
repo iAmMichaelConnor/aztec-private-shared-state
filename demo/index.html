@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PSS step by step</title>
+<link rel="icon" href="data:,">
+<meta name="description" content="The private shared state examples, step by step: who holds what, what each function and co-SNARK checks, what moves between them, and which bricks are at work.">
+<script>
+/* a forced theme (?theme=dark or ?theme=light) is set before the first paint */
+(function () {
+  var m = /[?&]theme=(dark|light)\b/.exec(location.search);
+  if (m) document.documentElement.setAttribute('data-theme', m[1]);
+})();
+</script>
+<link rel="stylesheet" href="src/demo.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <symbol id="m-pub" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.6" fill="currentColor"/></symbol>
+  <symbol id="m-pub-s" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+  <symbol id="m-usr" viewBox="0 0 12 12"><path d="M6 .6 11.4 6 6 11.4.6 6z" fill="currentColor"/></symbol>
+  <symbol id="m-usr-s" viewBox="0 0 12 12"><path d="M6 1.7 10.3 6 6 10.3 1.7 6z" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+  <symbol id="m-shr" viewBox="0 0 12 12"><path d="M6 1.4V10.6H1.1z" fill="currentColor"/><path d="M6 1.8 10.6 10.4H1.4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="m-shr-s" viewBox="0 0 12 12"><path d="M6 1.8 10.6 10.4H1.4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="m-opr" viewBox="0 0 12 12"><rect x="1.6" y="1.6" width="8.8" height="8.8" fill="currentColor"/></symbol>
+  <symbol id="m-opr-s" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+</defs></svg>
+
+<div class="wrap" id="app">
+  <div class="top">
+    <h1>Private shared state, step by step</h1>
+    <span class="note" id="topnote">Loading…</span>
+    <nav class="tabs" id="tabs" aria-label="Example"></nav>
+  </div>
+  <noscript><p class="pan">This page draws each step with JavaScript; turn scripts on to see it.</p></noscript>
+  <div id="main"></div>
+</div>
+
+<!-- DATA -->
+<script src="src/model.js"></script>
+<script src="src/view.js"></script>
+<script src="src/arrows.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>

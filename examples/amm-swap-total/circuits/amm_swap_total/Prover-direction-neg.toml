@@ -1,0 +1,14 @@
+# direction = p - 1 (the Field -1): rejected with code 3
+namespace = "0xc0ffee"
+owner = "0x1234"
+in_slots = ["0xa002"]
+out_slots = ["0xa002"]
+amount_in = "25000"
+direction = "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000"
+# the pool examples/amm/circuits/amm_init/Prover.toml creates: Pool::from_seed(111)
+in0_fields = ["1359373", "1852331"]
+in0_randomness = "333"
+# compute_note_hash_nonce(first_nullifier=8, index=0)
+in0_nonce = "0x17bad57eb7869a9ec5c83647e40b5332e91091d9c5622c32286b2170177bffae"
+out0_randomness = "444"
+nsk_app = "777"

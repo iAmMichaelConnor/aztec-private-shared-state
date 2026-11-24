@@ -1,0 +1,25 @@
+# Scenario: the player switches from door 2 to door 1 and wins (win = 1).
+# With switch = false the player sticks with door 2 and the round returns
+# win = 0.
+namespace = "0xc0ffee"
+owner = "0xafafaf"
+in_slots = ["0xff02"]
+switch = true
+# the state monty_hall_open_door wrote: phase STATE_OPENED_DOOR, prng
+# position 2, winning_door 1, chosen_door 2, open_door 0
+in0_fields = [
+    "0x01",
+    "0x297a808dfa9041b94e1bf9cfdd8eeec509a6b148849d80bac98954fb090eb94d",
+    "0x1b34c5971e2da4a85c04e942f2927b4bc46ab38168332bd4397f91743f44ca2b",
+    "0x1479883f0e6e5653107156935bf50d161dcc31102542ca693684d45bb4d9cd66",
+    "0x1d576ad62d23d287fc91539fe1d2f8d49ddb079d071d698391772d2d3ef2198b",
+    "0x02",
+    "0x01",
+    "0x02",
+    "0x00",
+]
+# monty_hall_open_door's out0_randomness
+in0_randomness = "555"
+# compute_note_hash_nonce(first_nullifier=9, index=0)
+in0_nonce = "0x2c431c3fb881c4c47fa96eb7bd0a39edd17e4e4d7b9485ee4029ed41684024be"
+nsk_app = "777"

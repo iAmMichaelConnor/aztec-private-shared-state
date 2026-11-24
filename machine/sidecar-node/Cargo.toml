@@ -1,0 +1,69 @@
+[package]
+name = "sidecar-node"
+version = "0.1.0"
+description = "The node process of the co-SNARK sidecar: configuration, the pinned-TLS Rep3 mesh and its session handshake, the HTTPS API, the admin socket, the Postgres store, key rotation, recovery, node replacement, backups and the receipt signer"
+
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "sidecar-node"
+path = "src/main.rs"
+
+[dependencies]
+zeroize.workspace = true
+sidecar-core = { path = "../sidecar-core" }
+# The API's TLS set-up, listener, answers and client, shared with the
+# orchestrator.
+sidecar-http = { path = "../sidecar-http" }
+# The tip's receipt message, signer and checks (the receipt route).
+sidecar-tip = { path = "../sidecar-tip" }
+# The mesh: its configuration types, and its network over TLS streams the
+# node opens itself (src/mesh.rs, with a deadline on every step).
+mpc_net = { workspace = true, features = ["tls-session-blocking"] }
+rustls.workspace = true
+rcgen.workspace = true
+toml.workspace = true
+bytes.workspace = true
+axum.workspace = true
+tokio-rustls.workspace = true
+rand.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+eyre.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+tokio.workspace = true
+# The Postgres store (src/postgres.rs), through sqlx on the store's own
+# runtime; its rows' encodings are sidecar-core's codec. TLS to the server
+# over rustls with aws-lc, the provider the rest of the workspace's rustls uses.
+sqlx = { version = "0.8.6", default-features = false, features = ["postgres", "runtime-tokio", "migrate", "macros", "tls-rustls-aws-lc-rs"] }
+# Random field elements in key setup (src/setup.rs).
+ark-ff.workspace = true
+ring.workspace = true
+# The mesh listener's options (src/mesh.rs) and `testing::reserve_ports`
+# (feature `test-util`): a bound socket that never listens.
+socket2 = "0.6"
+
+[features]
+# `testing`: loopback ports reserved for test meshes, for this crate's and the
+# orchestrator's tests.
+test-util = []
+
+[dev-dependencies]
+# The node's own `testing` module in its integration tests.
+sidecar-node = { path = ".", features = ["test-util"] }
+# The store test suite (`sidecar_core::store::testing`), run on both backends.
+sidecar-core = { path = "../sidecar-core", features = ["test-util"] }
+# The in-memory Aztec node (`sidecar_tip::testing::MemoryChain`) for the receipt pruning tests.
+sidecar-tip = { path = "../sidecar-tip", features = ["test-util"] }
+sidecar-test-fixtures = { path = "../sidecar-test-fixtures", features = ["postgres"] }
+# Rep3 arithmetic over an opened session in the mesh tests.
+mpc_core.workspace = true
+# tests/three_party.rs compares local-store logs by their SHA-256.
+sha2.workspace = true

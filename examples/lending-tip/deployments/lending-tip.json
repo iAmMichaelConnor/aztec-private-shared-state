@@ -1,0 +1,21 @@
+{
+  "descriptor": 1,
+  "name": "lending-tip",
+  "contract": "lending_tip",
+  "stale_blocks": 50,
+  "packages": [
+    {"name": "lending_init", "circuit": "lending_init", "state_keys": {"reads": [], "writes": ["market"]}},
+    {"name": "deposit_shared", "circuit": "deposit_shared", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "borrow_shared", "circuit": "borrow_shared", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "repay_shared", "circuit": "repay_shared", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "view_shared", "circuit": "view_shared", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "liquidate_shared", "circuit": "liquidate_shared", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "scan_shared", "circuit": "scan_shared", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "withdraw_shared", "circuit": "withdraw_shared", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "supply_shared", "circuit": "supply_shared", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "withdraw_supply_shared", "circuit": "withdraw_supply_shared", "state_keys": {"reads": ["market"], "writes": ["market"]}},
+    {"name": "quote_shared", "circuit": "quote_shared", "state_keys": {"reads": ["market"], "writes": ["market"]}}
+  ],
+  "init": {"package": "lending_init", "inputs": ["init_liquidity"]},
+  "read_contracts": {"get_price_epoch": "oracle"}
+}

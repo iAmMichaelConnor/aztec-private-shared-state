@@ -1,0 +1,9 @@
+[package]
+name = "liquidate_shared"
+type = "bin"
+# a round main compiles with the round circuits' Noir (toolchain.json noir.version)
+compiler_version = "=1.0.0"
+
+[dependencies]
+# the round's entry, the market layout and the families
+lending_tip = { path = "../lending_tip" }

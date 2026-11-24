@@ -1,0 +1,38 @@
+{
+  "name": "@aztec-pss/e2e",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "description": "Explicit local-network end-to-end harness: a local Aztec 6.0.0 network with node-side proof verification, three sidecar-node processes on Postgres and the sidecar-orchestrator, a ready pss-client configuration, and the scenario driver. Started by run.sh; never part of default CI.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@alejoamiras/private-fee-juice": "6.0.0",
+    "@aztec-foundation/bb.js": "6.0.0",
+    "@aztec-foundation/l1-artifacts": "6.0.0",
+    "@aztec-labs/accounts": "6.0.0",
+    "@aztec-labs/aztec": "6.0.0",
+    "@aztec-labs/aztec-node": "6.0.0",
+    "@aztec-labs/aztec.js": "6.0.0",
+    "@aztec-labs/constants": "6.0.0",
+    "@aztec-labs/ethereum": "6.0.0",
+    "@aztec-labs/foundation": "6.0.0",
+    "@aztec-labs/noir-protocol-circuits-types": "6.0.0",
+    "@aztec-labs/noir-test-contracts.js": "6.0.0",
+    "@aztec-labs/protocol-contracts": "6.0.0",
+    "@aztec-labs/pxe": "6.0.0",
+    "@aztec-labs/stdlib": "6.0.0",
+    "@aztec-labs/wallet-sdk": "6.0.0",
+    "@aztec-labs/wallets": "6.0.0",
+    "@aztec-pss/pss-client": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

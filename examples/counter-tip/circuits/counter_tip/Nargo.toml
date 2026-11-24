@@ -1,0 +1,13 @@
+[package]
+name = "counter_tip"
+type = "lib"
+# a range: a library, built by the packages that depend on it under either
+# compiler (the round circuits' 1.0.0, the contract's 1.0.0-rc.3)
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# total-noir's Outcome and the u64 addition with an overflow flag
+total = { git = "https://github.com/iAmMichaelConnor/total-noir", tag = "v0.1.0", directory = "noir/total" }
+# the tip round helpers: the flat key, the secret-shared intake, the private
+# outcome
+pss_core = { path = "../../../../noir/pss_core" }

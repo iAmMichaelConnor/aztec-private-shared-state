@@ -1,0 +1,102 @@
+[workspace]
+members = [
+    "sidecar-core",
+    "sidecar-http",
+    "sidecar-node",
+    "sidecar-oblivious",
+    "sidecar-oblivious/vendor/primitives",
+    "sidecar-oblivious/vendor/circuits",
+    "sidecar-oblivious/vendor/data-structures",
+    "sidecar-oblivious/vendor/doram",
+    "sidecar-orchestrator",
+    "sidecar-test-fixtures",
+    "sidecar-tip",
+]
+# Every member but the test fixtures, so a plain `cargo build --release`
+# does not unify sidecar-test-fixtures' `testing` feature of sidecar-core
+# (and mpc_net's `local` network) into sidecar-node and
+# sidecar-orchestrator. The fixtures crate has no tests of its own; the
+# crates that use it build it as a dev-dependency, and `--workspace` still
+# selects it.
+default-members = [
+    "sidecar-core",
+    "sidecar-http",
+    "sidecar-node",
+    "sidecar-oblivious",
+    "sidecar-oblivious/vendor/primitives",
+    "sidecar-oblivious/vendor/circuits",
+    "sidecar-oblivious/vendor/data-structures",
+    "sidecar-oblivious/vendor/doram",
+    "sidecar-orchestrator",
+    "sidecar-tip",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.90"
+license = "Apache-2.0"
+
+[workspace.dependencies]
+ark-bn254 = "0.6"
+ark-ff = "0.6"
+ark-ec = "0.6"
+# Grumpkin, the curve over the BN254 scalar field: owner keys, node keys,
+# Schnorr signatures and the nullifier identity.
+ark-grumpkin = { version = "0.6", features = ["std"] }
+ark-std = "0.6"
+ark-serialize = { version = "0.6", features = ["derive", "std"] }
+# The local store's record checksum (sidecar-core/src/local.rs: the first 8
+# bytes of a SHA-256 of each log record) and the oblivious holder's state
+# digest, which the nodes compare before a DORAM session
+# (sidecar-oblivious/src/holder.rs `state_digest`). No proven value uses it:
+# every hash of the protocol is Poseidon2 (docs/ARCHITECTURE.md section 1).
+sha2 = "0.11"
+clap = { version = "4.5", features = ["derive", "env"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# Names the JSON path of a refused field ("public.amount_in", "records[0].c[1]").
+serde_path_to_error = "0.1"
+eyre = { version = "0.6.12" }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tokio = { version = "1.44.1", features = ["full"] }
+# The node's transport: the pinned-TLS Rep3 mesh (mpc_net's TLS streams are
+# rustls), its party-config files, and the development certificate generator.
+rustls = "0.23"
+rcgen = "0.14"
+toml = "0.8"
+bytes = "1"
+# The HTTPS API of both binaries (sidecar-http): axum routes served by hyper
+# over tokio-rustls, mutual TLS under the deployment CA at the node; the same
+# stack is the node leg's client.
+axum = { version = "0.8", default-features = false, features = ["http1", "json", "tokio", "matched-path"] }
+hyper = { version = "1", features = ["http1", "server", "client"] }
+hyper-util = { version = "0.1", features = ["tokio", "service"] }
+http-body-util = "0.1"
+tokio-rustls = "0.26"
+# The node backups' authenticated encryption (sidecar-node/src/backup.rs:
+# ChaCha20-Poly1305 of the store and key directory files under the
+# operator's offline backup key) and its nonce source; rcgen already builds
+# on it. No protocol value uses it: everything sealed between parties is the
+# Poseidon2 AEAD (sidecar-core's `ae`).
+ring = "0.17"
+# The OS CSPRNG for node setup (enc and sig scalars) and registry signatures;
+# rand 0.8 is the rand behind ark-std's re-export.
+rand = "0.8"
+# Overwrites key material before it is freed: the node's backup key, the
+# admin socket's command lines, the enc scalars (already in the build through
+# ark-ff and rustls).
+zeroize = "1"
+
+# The pinned co-snarks fork (docs/DECISIONS.md, toolchain pins); every co-snarks
+# crate below names the same rev.
+co_noir = { git = "https://github.com/iAmMichaelConnor/co-snarks.git", rev = "8ec1568ebf16aaf8466ae789a9284acb19e514b9", package = "co-noir" }
+co_noir_common = { git = "https://github.com/iAmMichaelConnor/co-snarks.git", rev = "8ec1568ebf16aaf8466ae789a9284acb19e514b9", package = "co-noir-common" }
+co_noir_types = { git = "https://github.com/iAmMichaelConnor/co-snarks.git", rev = "8ec1568ebf16aaf8466ae789a9284acb19e514b9", package = "co-noir-types" }
+co_builder = { git = "https://github.com/iAmMichaelConnor/co-snarks.git", rev = "8ec1568ebf16aaf8466ae789a9284acb19e514b9", package = "co-builder" }
+mpc_net = { git = "https://github.com/iAmMichaelConnor/co-snarks.git", rev = "8ec1568ebf16aaf8466ae789a9284acb19e514b9", package = "mpc-net" }
+mpc_core = { git = "https://github.com/iAmMichaelConnor/co-snarks.git", rev = "8ec1568ebf16aaf8466ae789a9284acb19e514b9", package = "mpc-core" }
+# The ABI types of compiled circuits. The co-snarks rev depends on the Noir
+# 1.0.0 crates, so this must be tag v1.0.0 too or the types do not match.
+noirc_abi = { version = "1.0.0", git = "https://github.com/noir-lang/noir/", tag = "v1.0.0", package = "noirc_abi" }

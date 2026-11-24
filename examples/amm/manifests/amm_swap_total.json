@@ -1,0 +1,23 @@
+{
+  "manifest": 1,
+  "circuit": "amm_swap_total",
+  "namespace_param": "namespace",
+  "state_keys": { "reads": 1, "writes": 1 },
+  "witness": [
+    { "param": "namespace", "from": { "PUBLIC": "$namespace" } },
+    { "param": "owner",            "from": { "PUBLIC": { "const": "0xafafaf" } } },
+    { "param": "in_slots",         "from": { "PUBLIC": ["$state_keys.reads[0]"] } },
+    { "param": "out_slots",        "from": { "PUBLIC": ["$state_keys.writes[0]"] } },
+    { "param": "amount_in",        "from": { "PUBLIC": "amount_in" } },
+    { "param": "direction",        "from": { "PUBLIC": "direction" } },
+    { "param": "in0_fields",       "from": { "LOAD": "$state_keys.reads[0]", "slice": [0, 2], "len": 3 } },
+    { "param": "in0_randomness",   "from": { "LOAD": "$state_keys.reads[0]", "slice": [2, 3], "len": 3 } },
+    { "param": "in0_nonce",        "from": { "PUBLIC": "in0_nonce" } },
+    { "param": "out0_randomness",  "from": { "SAMPLE": 1 } },
+    { "param": "nsk_app",          "from": { "LOAD": "nsk_app", "slice": [0, 1], "len": 1 } }
+  ],
+  "outputs": [ { "TACEO_store": "out0", "STORE": "$state_keys.writes[0]", "len": 3,
+                 "note_hash": "new_note_hashes[0]" } ],
+  "state": { "$state_keys.reads[0]": "node", "$state_keys.writes[0]": "node" },
+  "consume": [ { "key": "$state_keys.reads[0]", "policy": "once" } ]
+}

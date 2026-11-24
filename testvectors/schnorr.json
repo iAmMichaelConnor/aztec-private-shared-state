@@ -1,0 +1,345 @@
+{
+  "encoding": "s and e as [lo, hi]: the low and high 128 bits of each scalar. The 64-byte SchnorrSignature of aztec.js/barretenberg is s || e, each 32 bytes big-endian: s.hi = bytes 0..16, s.lo = 16..32, e.hi = 32..48, e.lo = 48..64 (toLimbFields() = [s.lo, s.hi, e.lo, e.hi]).",
+  "message_rule": "message = poseidon2_hash_bytes(domain || RFC 8785 JCS(body without its top-level signature field)); domain cosnark-sidecar/v1/register (REGISTER, owner), cosnark-sidecar/v1/disable (DISABLE, owner) or cosnark-sidecar/v1/execute (execute body supplying client-held records, requester); poseidon2_hash_bytes uses the aztec.js/protocol_types packing: 31-byte chunks, each read little-endian, then the Poseidon2 sponge over the chunks",
+  "scheme": "Schnorr over Grumpkin, noir-lang/schnorr v0.4.0: R = s*G + e*pk; accept iff pk on curve, s != 0, e != 0, R != infinity and poseidon2([DST, R.x, pk.x, pk.y, message]) == e.lo + e.hi*2^128; DST = poseidon2_hash_bytes(\"schnorr_grumpkin_poseidon2\") = 0x024c76938ed06b8ec1d9094b1013d190baa4011372f0604643bda812a63b832e",
+  "signed_messages": [
+    {
+      "body_without_signature": {
+        "a": 1,
+        "b": "x",
+        "c": [
+          true,
+          false,
+          null,
+          -7
+        ]
+      },
+      "canonical": "{\"a\":1,\"b\":\"x\",\"c\":[true,false,null,-7]}",
+      "domain": "cosnark-sidecar/v1/register",
+      "message": "0x160f3f51dd9740241a118eaa76c560c0c121a0a70ce9ddf986cbaa3dfd347514",
+      "name": "register_small"
+    },
+    {
+      "body_without_signature": {
+        "a": {
+          "B": 3,
+          "z": 0,
+          "￿": 2,
+          "😀": 1
+        },
+        "€": "é\n\t\"\\\u0001\u001f "
+      },
+      "canonical": "{\"a\":{\"B\":3,\"z\":0,\"😀\":1,\"￿\":2},\"€\":\"é\\n\\t\\\"\\\\\\u0001\\u001f \"}",
+      "domain": "cosnark-sidecar/v1/register",
+      "message": "0x02ad3fb2a4d4c2e875c0cccee094752baddf39f92a44167d55a4587177d2a570",
+      "name": "register_unicode"
+    },
+    {
+      "body_without_signature": {
+        "circuit": {
+          "abi": {
+            "abi_version": 1,
+            "error_types": {},
+            "parameters": [
+              {
+                "name": "namespace",
+                "type": {
+                  "kind": "field"
+                },
+                "visibility": "public"
+              }
+            ],
+            "return_type": null
+          },
+          "bytecode": "H4sIAAAAAAAA/wMAAAAAAAAAAAA=",
+          "hash": "8492969876084869796",
+          "noir_version": "1.0.0+275d3ab1a5c916c6ea73e8d6b943f685f574500c"
+        },
+        "manifest": {
+          "circuit": "pss_seed",
+          "manifest": 1
+        },
+        "name": "pss_seed",
+        "namespace": "0x1f2ea9c0",
+        "owner_pubkey": {
+          "x": "0x09f0c96b72c2688fc47281a522d22a50c4eda0af8bc5856d50389d6a70c5d960",
+          "y": "0x1c457e7c50df9b99ea44ad877a1e2e4d685b058d34bb27adf7ebf37228126cd1"
+        }
+      },
+      "canonical": "{\"circuit\":{\"abi\":{\"abi_version\":1,\"error_types\":{},\"parameters\":[{\"name\":\"namespace\",\"type\":{\"kind\":\"field\"},\"visibility\":\"public\"}],\"return_type\":null},\"bytecode\":\"H4sIAAAAAAAA/wMAAAAAAAAAAAA=\",\"hash\":\"8492969876084869796\",\"noir_version\":\"1.0.0+275d3ab1a5c916c6ea73e8d6b943f685f574500c\"},\"manifest\":{\"circuit\":\"pss_seed\",\"manifest\":1},\"name\":\"pss_seed\",\"namespace\":\"0x1f2ea9c0\",\"owner_pubkey\":{\"x\":\"0x09f0c96b72c2688fc47281a522d22a50c4eda0af8bc5856d50389d6a70c5d960\",\"y\":\"0x1c457e7c50df9b99ea44ad877a1e2e4d685b058d34bb27adf7ebf37228126cd1\"}}",
+      "domain": "cosnark-sidecar/v1/register",
+      "message": "0x290141241db41b278a7280d7ab482978ed0dc528a25c4b49fe95d42ba1b766e0",
+      "name": "register_like"
+    },
+    {
+      "body_without_signature": {
+        "circuit": "amm_swap",
+        "namespace": "0x1f2ea9c0"
+      },
+      "canonical": "{\"circuit\":\"amm_swap\",\"namespace\":\"0x1f2ea9c0\"}",
+      "domain": "cosnark-sidecar/v1/disable",
+      "message": "0x1d11df88671db4dd6a10540576fb8dbeedae8403b0a4fb7d1b7be2611dd96784",
+      "name": "disable"
+    },
+    {
+      "body_without_signature": {
+        "a": 1,
+        "b": "x",
+        "c": [
+          true,
+          false,
+          null,
+          -7
+        ]
+      },
+      "canonical": "{\"a\":1,\"b\":\"x\",\"c\":[true,false,null,-7]}",
+      "domain": "cosnark-sidecar/v1/execute",
+      "message": "0x260beda661080ba3ca5c452a2f1665891ec720a0b941de0464cd97fc8cdb3202",
+      "name": "execute_small"
+    }
+  ],
+  "ts_signer_compatible": true,
+  "ts_signer_compatible_note": "@aztec-labs/foundation 6.0.0 Schnorr.constructSignature (barretenberg 6.0.0 schnorrConstructSignature) produces signatures that this verifier and noir-lang/schnorr v0.4.0 accept (vector typescript_signer), and barretenberg 6.0.0 schnorrVerifySignature gives the expected answer on every vector here. Map its 64 bytes to limbs as in `encoding`.",
+  "vectors": [
+    {
+      "expected": true,
+      "message": "0x00000000000000000000000000000000000000000000000000000000000002bc",
+      "name": "library_pinned_small",
+      "pubkey": {
+        "x": "0x2c39bbbde2d0ffcb5c4317dcbfa1771cf554a2f33c647446632fa707a5bf5f3f",
+        "y": "0x2b9c81935298af5ebe22f1a7279bb76781e6cadba3fb6c5c41ed942392dc687c"
+      },
+      "signature": {
+        "e": [
+          "0x000000000000000000000000000000006c368959f958e525d761d06c47fd2ad6",
+          "0x00000000000000000000000000000000013f6a902c6c0efafdadbd4de409690d"
+        ],
+        "s": [
+          "0x000000000000000000000000000000005fd1ac0ad411110674830c54cb506212",
+          "0x00000000000000000000000000000000281906862cdb4e0efec7226d757fe803"
+        ]
+      },
+      "source": "noir-lang/schnorr v0.4.0 test pinned_vector_small"
+    },
+    {
+      "expected": true,
+      "message": "0x0123456789abcdef0fedcba9876543210123456789abcdef0fedcba987654321",
+      "name": "library_pinned_large",
+      "pubkey": {
+        "x": "0x065812e335a97c2108ea8cf4ccfe2f9dd6b117a0714f5e18461575be93f61da6",
+        "y": "0x1a915003e8ec534f9a15d926a7ded478e178468ccc4f28e236e67450a55ac622"
+      },
+      "signature": {
+        "e": [
+          "0x0000000000000000000000000000000097065383ebbbd76620398792bd259bc2",
+          "0x000000000000000000000000000000002ceaee87f45b7a417f0ffb05451a8c92"
+        ],
+        "s": [
+          "0x00000000000000000000000000000000f3bc3b7147acb9c621fd9f72dbf15ffa",
+          "0x0000000000000000000000000000000008599f379f0301dfefdbd0272554454d"
+        ]
+      },
+      "source": "noir-lang/schnorr v0.4.0 test pinned_vector_large"
+    },
+    {
+      "expected": true,
+      "message": "0x00000000000000000000000000000000000000000000000000000000000002bc",
+      "name": "rust_small_secret",
+      "pubkey": {
+        "x": "0x01751feac926a27a5ea5c3f72a111a0c6530592c891e17e9b2f8afb240160ccc",
+        "y": "0x1edd8f317bdce2c7000fc1069290122504c67a9a483cfb3226bf141e4c193d91"
+      },
+      "signature": {
+        "e": [
+          "0x000000000000000000000000000000001291d7a6b4fa0b2fa6fe2c25eac408ee",
+          "0x000000000000000000000000000000000803df3eb67d94025eb7a3ae05532d8d"
+        ],
+        "s": [
+          "0x00000000000000000000000000000000e921768888c3c44c53887d1a3109cbad",
+          "0x0000000000000000000000000000000003d2fd4d80b915e46547297ecbcb9042"
+        ]
+      },
+      "source": "sidecar-core schnorr::sign"
+    },
+    {
+      "expected": true,
+      "message": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+      "name": "rust_large_secret_max_message",
+      "pubkey": {
+        "x": "0x1cb497e86a8c85198729e1c1764115cdbcbb3cf0fa96d344ccbee476b775d940",
+        "y": "0x146efacfe63112ff3e450332b1c64ddbdb5c62b61906b9d9d8f3f969c091452e"
+      },
+      "signature": {
+        "e": [
+          "0x0000000000000000000000000000000014a1328ceb7a9f563d83293eac094d9e",
+          "0x000000000000000000000000000000002c64181d419fa5f19b9b2c516c95bed0"
+        ],
+        "s": [
+          "0x00000000000000000000000000000000dc48e5f998dbda7b30d13adde1f1d9c1",
+          "0x0000000000000000000000000000000018cb40ba8881af76b23106e0c0fdec6a"
+        ]
+      },
+      "source": "sidecar-core schnorr::sign"
+    },
+    {
+      "expected": true,
+      "message": "0x290141241db41b278a7280d7ab482978ed0dc528a25c4b49fe95d42ba1b766e0",
+      "name": "rust_register_body",
+      "pubkey": {
+        "x": "0x09f0c96b72c2688fc47281a522d22a50c4eda0af8bc5856d50389d6a70c5d960",
+        "y": "0x1c457e7c50df9b99ea44ad877a1e2e4d685b058d34bb27adf7ebf37228126cd1"
+      },
+      "signature": {
+        "e": [
+          "0x00000000000000000000000000000000248117e5366de4afd5d49263c578ef42",
+          "0x0000000000000000000000000000000007a8b28b90f275d7f9eef12c794d9167"
+        ],
+        "s": [
+          "0x000000000000000000000000000000009795054d54caa284b0ea32952a62b3cd",
+          "0x000000000000000000000000000000002ced0e8f34148e66c2c8cc6d1460d290"
+        ]
+      },
+      "source": "sidecar-core schnorr::sign"
+    },
+    {
+      "expected": true,
+      "message": "0x160f3f51dd9740241a118eaa76c560c0c121a0a70ce9ddf986cbaa3dfd347514",
+      "name": "typescript_signer",
+      "pubkey": {
+        "x": "0x1e80aee3834e1297b47c859a4a26339b5c7c4c4096342b360e2b7ba402d1873e",
+        "y": "0x0e3faf018f2e20f0811785d35bd8491f32e42833ede83ca1a5f3e1975ce7e25e"
+      },
+      "signature": {
+        "e": [
+          "0x00000000000000000000000000000000a62153463a6cb796d88e45b8092d29f0",
+          "0x0000000000000000000000000000000015bb6481d37caa2c2cc38b092009ce8f"
+        ],
+        "s": [
+          "0x000000000000000000000000000000007ba4c6f530a1f8c829c613261349f146",
+          "0x00000000000000000000000000000000297cda4c102742d5d8e78340925d705e"
+        ]
+      },
+      "source": "@aztec-labs/foundation 6.0.0 Schnorr.constructSignature (barretenberg 6.0.0)"
+    },
+    {
+      "expected": false,
+      "message": "0x0000000000000000000000000000000000000000000000000000000000001234",
+      "name": "zero_signature",
+      "pubkey": {
+        "x": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "y": "0x0000000000000002cf135e7506a45d632d270d45f1181294833fc48d823f272c"
+      },
+      "signature": {
+        "e": [
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "0x0000000000000000000000000000000000000000000000000000000000000000"
+        ],
+        "s": [
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "0x0000000000000000000000000000000000000000000000000000000000000000"
+        ]
+      },
+      "source": "noir-lang/schnorr v0.4.0 test zero_signature"
+    },
+    {
+      "expected": false,
+      "message": "0x290141241db41b278a7280d7ab482978ed0dc528a25c4b49fe95d42ba1b766e1",
+      "name": "tampered_message",
+      "pubkey": {
+        "x": "0x09f0c96b72c2688fc47281a522d22a50c4eda0af8bc5856d50389d6a70c5d960",
+        "y": "0x1c457e7c50df9b99ea44ad877a1e2e4d685b058d34bb27adf7ebf37228126cd1"
+      },
+      "signature": {
+        "e": [
+          "0x00000000000000000000000000000000248117e5366de4afd5d49263c578ef42",
+          "0x0000000000000000000000000000000007a8b28b90f275d7f9eef12c794d9167"
+        ],
+        "s": [
+          "0x000000000000000000000000000000009795054d54caa284b0ea32952a62b3cd",
+          "0x000000000000000000000000000000002ced0e8f34148e66c2c8cc6d1460d290"
+        ]
+      },
+      "source": "rust_register_body with one value changed"
+    },
+    {
+      "expected": false,
+      "message": "0x290141241db41b278a7280d7ab482978ed0dc528a25c4b49fe95d42ba1b766e0",
+      "name": "tampered_key",
+      "pubkey": {
+        "x": "0x210f9f2058aa9409897d66ce9402f2b9cdec5bb61aa2a20e4924455127b41759",
+        "y": "0x263b5f2ffb2085339c1d5aacf6ecc1216f90bc8fe6c158a07eacfcaa2199f886"
+      },
+      "signature": {
+        "e": [
+          "0x00000000000000000000000000000000248117e5366de4afd5d49263c578ef42",
+          "0x0000000000000000000000000000000007a8b28b90f275d7f9eef12c794d9167"
+        ],
+        "s": [
+          "0x000000000000000000000000000000009795054d54caa284b0ea32952a62b3cd",
+          "0x000000000000000000000000000000002ced0e8f34148e66c2c8cc6d1460d290"
+        ]
+      },
+      "source": "rust_register_body with one value changed"
+    },
+    {
+      "expected": false,
+      "message": "0x290141241db41b278a7280d7ab482978ed0dc528a25c4b49fe95d42ba1b766e0",
+      "name": "tampered_s_lo",
+      "pubkey": {
+        "x": "0x09f0c96b72c2688fc47281a522d22a50c4eda0af8bc5856d50389d6a70c5d960",
+        "y": "0x1c457e7c50df9b99ea44ad877a1e2e4d685b058d34bb27adf7ebf37228126cd1"
+      },
+      "signature": {
+        "e": [
+          "0x00000000000000000000000000000000248117e5366de4afd5d49263c578ef42",
+          "0x0000000000000000000000000000000007a8b28b90f275d7f9eef12c794d9167"
+        ],
+        "s": [
+          "0x000000000000000000000000000000009795054d54caa284b0ea32952a62b3ce",
+          "0x000000000000000000000000000000002ced0e8f34148e66c2c8cc6d1460d290"
+        ]
+      },
+      "source": "rust_register_body with one value changed"
+    },
+    {
+      "expected": false,
+      "message": "0x290141241db41b278a7280d7ab482978ed0dc528a25c4b49fe95d42ba1b766e0",
+      "name": "tampered_e_lo",
+      "pubkey": {
+        "x": "0x09f0c96b72c2688fc47281a522d22a50c4eda0af8bc5856d50389d6a70c5d960",
+        "y": "0x1c457e7c50df9b99ea44ad877a1e2e4d685b058d34bb27adf7ebf37228126cd1"
+      },
+      "signature": {
+        "e": [
+          "0x00000000000000000000000000000000248117e5366de4afd5d49263c578ef43",
+          "0x0000000000000000000000000000000007a8b28b90f275d7f9eef12c794d9167"
+        ],
+        "s": [
+          "0x000000000000000000000000000000009795054d54caa284b0ea32952a62b3cd",
+          "0x000000000000000000000000000000002ced0e8f34148e66c2c8cc6d1460d290"
+        ]
+      },
+      "source": "rust_register_body with one value changed"
+    },
+    {
+      "expected": false,
+      "message": "0x290141241db41b278a7280d7ab482978ed0dc528a25c4b49fe95d42ba1b766e0",
+      "name": "tampered_s_e_swapped",
+      "pubkey": {
+        "x": "0x09f0c96b72c2688fc47281a522d22a50c4eda0af8bc5856d50389d6a70c5d960",
+        "y": "0x1c457e7c50df9b99ea44ad877a1e2e4d685b058d34bb27adf7ebf37228126cd1"
+      },
+      "signature": {
+        "e": [
+          "0x000000000000000000000000000000009795054d54caa284b0ea32952a62b3cd",
+          "0x000000000000000000000000000000002ced0e8f34148e66c2c8cc6d1460d290"
+        ],
+        "s": [
+          "0x00000000000000000000000000000000248117e5366de4afd5d49263c578ef42",
+          "0x0000000000000000000000000000000007a8b28b90f275d7f9eef12c794d9167"
+        ]
+      },
+      "source": "rust_register_body with one value changed"
+    }
+  ]
+}

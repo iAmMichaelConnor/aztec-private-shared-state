@@ -1,0 +1,2298 @@
+{
+ "contract": "LendingTip",
+ "storageLayout": {
+  "outcome_notes": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000001"
+  },
+  "config": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000002"
+  },
+  "configured": {
+   "slot": "0x000000000000000000000000000000000000000000000000000000000000002b"
+  },
+  "queue": {
+   "slot": "0x000000000000000000000000000000000000000000000000000000000000004d"
+  },
+  "market": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000053"
+  },
+  "shared_onchain": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000054"
+  },
+  "refunds": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000056"
+  },
+  "kept_deposits": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000057"
+  },
+  "credits": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000058"
+  },
+  "hatch": {
+   "slot": "0x0000000000000000000000000000000000000000000000000000000000000059"
+  }
+ },
+ "functions": [
+  {
+   "name": "constructor",
+   "functionType": "public",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": true,
+   "parameters": [
+    {
+     "name": "config",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "init_liquidity",
+        "type": {
+         "kind": "field"
+        }
+       },
+       {
+        "name": "oracle",
+        "type": {
+         "kind": "struct",
+         "fields": [
+          {
+           "name": "inner",
+           "type": {
+            "kind": "field"
+           }
+          }
+         ],
+         "path": "aztec::protocol_types::address::aztec_address::AztecAddress"
+        }
+       },
+       {
+        "name": "collateral",
+        "type": {
+         "kind": "struct",
+         "fields": [
+          {
+           "name": "inner",
+           "type": {
+            "kind": "field"
+           }
+          }
+         ],
+         "path": "aztec::protocol_types::address::aztec_address::AztecAddress"
+        }
+       },
+       {
+        "name": "borrowed",
+        "type": {
+         "kind": "struct",
+         "fields": [
+          {
+           "name": "inner",
+           "type": {
+            "kind": "field"
+           }
+          }
+         ],
+         "path": "aztec::protocol_types::address::aztec_address::AztecAddress"
+        }
+       },
+       {
+        "name": "deposit",
+        "type": {
+         "kind": "struct",
+         "fields": [
+          {
+           "name": "token",
+           "type": {
+            "kind": "struct",
+            "fields": [
+             {
+              "name": "inner",
+              "type": {
+               "kind": "field"
+              }
+             }
+            ],
+            "path": "aztec::protocol_types::address::aztec_address::AztecAddress"
+           }
+          },
+          {
+           "name": "amount",
+           "type": {
+            "kind": "integer",
+            "sign": "unsigned",
+            "width": 128
+           }
+          },
+          {
+           "name": "kept",
+           "type": {
+            "kind": "boolean"
+           }
+          }
+         ],
+         "path": "pss_public_contract::token::UsageDeposit"
+        }
+       },
+       {
+        "name": "treasury",
+        "type": {
+         "kind": "struct",
+         "fields": [
+          {
+           "name": "inner",
+           "type": {
+            "kind": "field"
+           }
+          }
+         ],
+         "path": "aztec::protocol_types::address::aztec_address::AztecAddress"
+        }
+       },
+       {
+        "name": "t_live",
+        "type": {
+         "kind": "integer",
+         "sign": "unsigned",
+         "width": 32
+        }
+       },
+       {
+        "name": "tip",
+        "type": {
+         "kind": "struct",
+         "fields": [
+          {
+           "name": "stale_blocks",
+           "type": {
+            "kind": "struct",
+            "fields": [
+             {
+              "name": "enabled",
+              "type": {
+               "kind": "boolean"
+              }
+             },
+             {
+              "name": "blocks",
+              "type": {
+               "kind": "integer",
+               "sign": "unsigned",
+               "width": 32
+              }
+             }
+            ],
+            "path": "pss_public_contract::config::StaleBlocks"
+           }
+          },
+          {
+           "name": "node_sig_keys",
+           "type": {
+            "kind": "array",
+            "length": 3,
+            "type": {
+             "kind": "struct",
+             "fields": [
+              {
+               "name": "x",
+               "type": {
+                "kind": "field"
+               }
+              },
+              {
+               "name": "y",
+               "type": {
+                "kind": "field"
+               }
+              }
+             ],
+             "path": "std::embedded_curve_ops::EmbeddedCurvePoint"
+            }
+           }
+          },
+          {
+           "name": "circuits",
+           "type": {
+            "kind": "struct",
+            "fields": [
+             {
+              "name": "manifest_hash",
+              "type": {
+               "kind": "field"
+              }
+             },
+             {
+              "name": "packages",
+              "type": {
+               "kind": "array",
+               "length": 11,
+               "type": {
+                "kind": "field"
+               }
+              }
+             },
+             {
+              "name": "vk_hashes",
+              "type": {
+               "kind": "array",
+               "length": 11,
+               "type": {
+                "kind": "field"
+               }
+              }
+             }
+            ],
+            "path": "pss_public_contract::configure::CircuitPins"
+           }
+          }
+         ],
+         "path": "pss_public_contract::configure::TipPins"
+        }
+       }
+      ],
+      "path": "lending_market::app::Config"
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "configure",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "npk_app_hash",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "answer",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "seq",
+        "type": {
+         "kind": "field"
+        }
+       },
+       {
+        "name": "signatures",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "array",
+          "length": 4,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::configure::RegistryAnswer"
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "init_market",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "new_c",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "new_hashes",
+     "type": {
+      "kind": "array",
+      "length": 1,
+      "type": {
+       "kind": "field"
+      }
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "signatures",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "array",
+       "length": 4,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "deposit",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "position",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "amount",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "user_nonce",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "deposit_with_receipts",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "position",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "amount",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "user_nonce",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "expiry_block",
+     "type": {
+      "kind": "integer",
+      "sign": "unsigned",
+      "width": 32
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "receipts",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "struct",
+       "fields": [
+        {
+         "name": "s",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        },
+        {
+         "name": "e",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       ],
+       "path": "pss_public_contract::receipt::Receipt"
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "deposit_shared",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "position",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "amount",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "handle_rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "handle_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_tag",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "sharing",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "summands",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "array",
+          "length": 7,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       },
+       {
+        "name": "salts",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::shared_intake::Sharing"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "expiry_block",
+     "type": {
+      "kind": "integer",
+      "sign": "unsigned",
+      "width": 32
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "receipts",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "struct",
+       "fields": [
+        {
+         "name": "s",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        },
+        {
+         "name": "e",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       ],
+       "path": "pss_public_contract::receipt::Receipt"
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "borrow_shared",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "position",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "amount",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "handle_rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "handle_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_tag",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "sharing",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "summands",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "array",
+          "length": 7,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       },
+       {
+        "name": "salts",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::shared_intake::Sharing"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "expiry_block",
+     "type": {
+      "kind": "integer",
+      "sign": "unsigned",
+      "width": 32
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "receipts",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "struct",
+       "fields": [
+        {
+         "name": "s",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        },
+        {
+         "name": "e",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       ],
+       "path": "pss_public_contract::receipt::Receipt"
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "repay_shared",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "position",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "amount",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "handle_rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "handle_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_tag",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "sharing",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "summands",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "array",
+          "length": 7,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       },
+       {
+        "name": "salts",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::shared_intake::Sharing"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "expiry_block",
+     "type": {
+      "kind": "integer",
+      "sign": "unsigned",
+      "width": 32
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "receipts",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "struct",
+       "fields": [
+        {
+         "name": "s",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        },
+        {
+         "name": "e",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       ],
+       "path": "pss_public_contract::receipt::Receipt"
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "view_shared",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "position",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "handle_rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "handle_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_tag",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "sharing",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "summands",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "array",
+          "length": 6,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       },
+       {
+        "name": "salts",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::shared_intake::Sharing"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "expiry_block",
+     "type": {
+      "kind": "integer",
+      "sign": "unsigned",
+      "width": 32
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "receipts",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "struct",
+       "fields": [
+        {
+         "name": "s",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        },
+        {
+         "name": "e",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       ],
+       "path": "pss_public_contract::receipt::Receipt"
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "liquidate_shared",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "positions",
+     "type": {
+      "kind": "array",
+      "length": 1,
+      "type": {
+       "kind": "field"
+      }
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "count",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "budget",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_tag",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "sharing",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "summands",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "array",
+          "length": 5,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       },
+       {
+        "name": "salts",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::shared_intake::Sharing"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "expiry_block",
+     "type": {
+      "kind": "integer",
+      "sign": "unsigned",
+      "width": 32
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "receipts",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "struct",
+       "fields": [
+        {
+         "name": "s",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        },
+        {
+         "name": "e",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       ],
+       "path": "pss_public_contract::receipt::Receipt"
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "withdraw_shared",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "position",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "amount",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "handle_rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "handle_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_tag",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "sharing",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "summands",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "array",
+          "length": 7,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       },
+       {
+        "name": "salts",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::shared_intake::Sharing"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "expiry_block",
+     "type": {
+      "kind": "integer",
+      "sign": "unsigned",
+      "width": 32
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "receipts",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "struct",
+       "fields": [
+        {
+         "name": "s",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        },
+        {
+         "name": "e",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       ],
+       "path": "pss_public_contract::receipt::Receipt"
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "supply_shared",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "position",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "amount",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_tag",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "sharing",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "summands",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "array",
+          "length": 5,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       },
+       {
+        "name": "salts",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::shared_intake::Sharing"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "expiry_block",
+     "type": {
+      "kind": "integer",
+      "sign": "unsigned",
+      "width": 32
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "receipts",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "struct",
+       "fields": [
+        {
+         "name": "s",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        },
+        {
+         "name": "e",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       ],
+       "path": "pss_public_contract::receipt::Receipt"
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "withdraw_supply_shared",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "position",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "shares",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_tag",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "sharing",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "summands",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "array",
+          "length": 5,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       },
+       {
+        "name": "salts",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::shared_intake::Sharing"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "expiry_block",
+     "type": {
+      "kind": "integer",
+      "sign": "unsigned",
+      "width": 32
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "receipts",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "struct",
+       "fields": [
+        {
+         "name": "s",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        },
+        {
+         "name": "e",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       ],
+       "path": "pss_public_contract::receipt::Receipt"
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "quote_shared",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_key",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "outcome_tag",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "sharing",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "summands",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "array",
+          "length": 4,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       },
+       {
+        "name": "salts",
+        "type": {
+         "kind": "array",
+         "length": 3,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::shared_intake::Sharing"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "expiry_block",
+     "type": {
+      "kind": "integer",
+      "sign": "unsigned",
+      "width": 32
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "receipts",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "struct",
+       "fields": [
+        {
+         "name": "s",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        },
+        {
+         "name": "e",
+         "type": {
+          "kind": "array",
+          "length": 2,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       ],
+       "path": "pss_public_contract::receipt::Receipt"
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "process_result",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "round",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "partial_note",
+        "type": {
+         "kind": "field"
+        }
+       },
+       {
+        "name": "result",
+        "type": {
+         "kind": "struct",
+         "fields": [
+          {
+           "name": "request_id",
+           "type": {
+            "kind": "field"
+           }
+          },
+          {
+           "name": "old_commitments",
+           "type": {
+            "kind": "array",
+            "length": 1,
+            "type": {
+             "kind": "field"
+            }
+           }
+          },
+          {
+           "name": "new_commitments",
+           "type": {
+            "kind": "array",
+            "length": 1,
+            "type": {
+             "kind": "field"
+            }
+           }
+          },
+          {
+           "name": "ok",
+           "type": {
+            "kind": "boolean"
+           }
+          },
+          {
+           "name": "values",
+           "type": {
+            "kind": "array",
+            "length": 9,
+            "type": {
+             "kind": "field"
+            }
+           }
+          }
+         ],
+         "path": "pss_public_contract::result::TipResult"
+        }
+       }
+      ],
+      "path": "pss_public_contract::result::PartialResult"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "signatures",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "array",
+       "length": 4,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "process_shared",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "round",
+     "type": {
+      "kind": "integer",
+      "sign": "unsigned",
+      "width": 32
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "result",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "apply",
+        "type": {
+         "kind": "struct",
+         "fields": [
+          {
+           "name": "request_id",
+           "type": {
+            "kind": "field"
+           }
+          },
+          {
+           "name": "old_commitments",
+           "type": {
+            "kind": "array",
+            "length": 1,
+            "type": {
+             "kind": "field"
+            }
+           }
+          },
+          {
+           "name": "values",
+           "type": {
+            "kind": "array",
+            "length": 4,
+            "type": {
+             "kind": "field"
+            }
+           }
+          }
+         ],
+         "path": "pss_public_contract::outcome::OutcomeApply"
+        }
+       },
+       {
+        "name": "outcome_tag",
+        "type": {
+         "kind": "field"
+        }
+       },
+       {
+        "name": "note_hashes",
+        "type": {
+         "kind": "array",
+         "length": 1,
+         "type": {
+          "kind": "field"
+         }
+        }
+       },
+       {
+        "name": "ciphertext",
+        "type": {
+         "kind": "array",
+         "length": 8,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::outcome::OutcomeResult"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "new_hashes",
+     "type": {
+      "kind": "array",
+      "length": 2,
+      "type": {
+       "kind": "field"
+      }
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "values",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "field"
+      }
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "deliveries",
+     "type": {
+      "kind": "array",
+      "length": 1,
+      "type": {
+       "kind": "struct",
+       "fields": [
+        {
+         "name": "tag",
+         "type": {
+          "kind": "field"
+         }
+        },
+        {
+         "name": "note_hash",
+         "type": {
+          "kind": "field"
+         }
+        },
+        {
+         "name": "ciphertext",
+         "type": {
+          "kind": "array",
+          "length": 9,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       ],
+       "path": "pss_public_contract::handle::Delivery"
+      }
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "signatures",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "array",
+       "length": 4,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "process_header_shared",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "round",
+     "type": {
+      "kind": "integer",
+      "sign": "unsigned",
+      "width": 32
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "result",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "apply",
+        "type": {
+         "kind": "struct",
+         "fields": [
+          {
+           "name": "request_id",
+           "type": {
+            "kind": "field"
+           }
+          },
+          {
+           "name": "old_commitments",
+           "type": {
+            "kind": "array",
+            "length": 1,
+            "type": {
+             "kind": "field"
+            }
+           }
+          },
+          {
+           "name": "values",
+           "type": {
+            "kind": "array",
+            "length": 4,
+            "type": {
+             "kind": "field"
+            }
+           }
+          }
+         ],
+         "path": "pss_public_contract::outcome::OutcomeApply"
+        }
+       },
+       {
+        "name": "outcome_tag",
+        "type": {
+         "kind": "field"
+        }
+       },
+       {
+        "name": "note_hashes",
+        "type": {
+         "kind": "array",
+         "length": 1,
+         "type": {
+          "kind": "field"
+         }
+        }
+       },
+       {
+        "name": "ciphertext",
+        "type": {
+         "kind": "array",
+         "length": 8,
+         "type": {
+          "kind": "field"
+         }
+        }
+       }
+      ],
+      "path": "pss_public_contract::outcome::OutcomeResult"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "new_hashes",
+     "type": {
+      "kind": "array",
+      "length": 1,
+      "type": {
+       "kind": "field"
+      }
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "values",
+     "type": {
+      "kind": "array",
+      "length": 2,
+      "type": {
+       "kind": "field"
+      }
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "deliveries",
+     "type": {
+      "kind": "array",
+      "length": 1,
+      "type": {
+       "kind": "struct",
+       "fields": [
+        {
+         "name": "tag",
+         "type": {
+          "kind": "field"
+         }
+        },
+        {
+         "name": "note_hash",
+         "type": {
+          "kind": "field"
+         }
+        },
+        {
+         "name": "ciphertext",
+         "type": {
+          "kind": "array",
+          "length": 9,
+          "type": {
+           "kind": "field"
+          }
+         }
+        }
+       ],
+       "path": "pss_public_contract::handle::Delivery"
+      }
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "signatures",
+     "type": {
+      "kind": "array",
+      "length": 3,
+      "type": {
+       "kind": "array",
+       "length": 4,
+       "type": {
+        "kind": "field"
+       }
+      }
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "deliver_outcome",
+   "functionType": "utility",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "owner",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "inner",
+        "type": {
+         "kind": "field"
+        }
+       }
+      ],
+      "path": "aztec::protocol_types::address::aztec_address::AztecAddress"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "rho",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "packed",
+     "type": {
+      "kind": "array",
+      "length": 8,
+      "type": {
+       "kind": "field"
+      }
+     },
+     "visibility": "private"
+    },
+    {
+     "name": "tx",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "tx_hash",
+        "type": {
+         "kind": "field"
+        }
+       },
+       {
+        "name": "unique_note_hashes",
+        "type": {
+         "kind": "struct",
+         "fields": [
+          {
+           "name": "storage",
+           "type": {
+            "kind": "array",
+            "length": 64,
+            "type": {
+             "kind": "field"
+            }
+           }
+          },
+          {
+           "name": "len",
+           "type": {
+            "kind": "integer",
+            "sign": "unsigned",
+            "width": 32
+           }
+          }
+         ],
+         "path": "std::collections::bounded_vec::BoundedVec"
+        }
+       },
+       {
+        "name": "first_nullifier",
+        "type": {
+         "kind": "field"
+        }
+       }
+      ],
+      "path": "pss_public_contract::outcome::OutcomeTx"
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "offchain_receive",
+   "functionType": "utility",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "messages",
+     "type": {
+      "kind": "struct",
+      "fields": [
+       {
+        "name": "storage",
+        "type": {
+         "kind": "array",
+         "length": 16,
+         "type": {
+          "kind": "struct",
+          "fields": [
+           {
+            "name": "ciphertext",
+            "type": {
+             "kind": "struct",
+             "fields": [
+              {
+               "name": "storage",
+               "type": {
+                "kind": "array",
+                "length": 15,
+                "type": {
+                 "kind": "field"
+                }
+               }
+              },
+              {
+               "name": "len",
+               "type": {
+                "kind": "integer",
+                "sign": "unsigned",
+                "width": 32
+               }
+              }
+             ],
+             "path": "std::collections::bounded_vec::BoundedVec"
+            }
+           },
+           {
+            "name": "recipient",
+            "type": {
+             "kind": "struct",
+             "fields": [
+              {
+               "name": "inner",
+               "type": {
+                "kind": "field"
+               }
+              }
+             ],
+             "path": "aztec::protocol_types::address::aztec_address::AztecAddress"
+            }
+           },
+           {
+            "name": "tx_hash",
+            "type": {
+             "kind": "struct",
+             "fields": [
+              {
+               "name": "_is_some",
+               "type": {
+                "kind": "boolean"
+               }
+              },
+              {
+               "name": "_value",
+               "type": {
+                "kind": "field"
+               }
+              }
+             ],
+             "path": "std::option::Option"
+            }
+           },
+           {
+            "name": "anchor_block_timestamp",
+            "type": {
+             "kind": "integer",
+             "sign": "unsigned",
+             "width": 64
+            }
+           }
+          ],
+          "path": "aztec::messages::processing::offchain::OffchainMessage"
+         }
+        }
+       },
+       {
+        "name": "len",
+        "type": {
+         "kind": "integer",
+         "sign": "unsigned",
+         "width": 32
+        }
+       }
+      ],
+      "path": "std::collections::bounded_vec::BoundedVec"
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "redeem",
+   "functionType": "private",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [
+    {
+     "name": "request_id",
+     "type": {
+      "kind": "field"
+     },
+     "visibility": "private"
+    }
+   ],
+   "returnTypes": [],
+   "errorTypes": {}
+  },
+  {
+   "name": "sweep_deposits",
+   "functionType": "public",
+   "isOnlySelf": false,
+   "isStatic": false,
+   "isInitializer": false,
+   "parameters": [],
+   "returnTypes": [],
+   "errorTypes": {}
+  }
+ ]
+}

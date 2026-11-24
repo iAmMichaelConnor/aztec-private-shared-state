@@ -1,0 +1,25 @@
+[package]
+name = "amm_tip_test"
+type = "lib"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0; deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+amm_tip = { path = "../amm_tip" }
+pss_public_contract = { path = "../../../../noir/pss_public_contract" }
+# the round circuits' own swap (swap_tip), pss_core's slot commitment and
+# round key, and amm_total's
+# codes: the suite's rounds are computed by the function the circuits prove,
+# so the commitments and outputs it lands are the ones a real round makes
+amm_tip_circuit = { path = "../../circuits/amm_tip" }
+amm_total = { path = "../../../amm-swap-total/circuits/amm_total" }
+pss_core = { path = "../../../../noir/pss_core" }
+# the tip suites' probe, deployed beside the app: it calls the app's open
+# skip() as a nested call and reports a revert instead of rethrowing it, and
+# reads a settled transaction (try_skip, tx_summary, tx_names_no_requester)
+pss_probe = { path = "../../../../noir/pss_probe" }
+# the test network (node keys, signer) and the helpers every tip suite shares
+pss_tip_test = { path = "../../../../noir/pss_tip_test" }
+# the outcome's AEAD, to open a secret-shared swap's outcome log as its trader does
+pss_utils = { path = "../../../../noir/pss_utils" }

@@ -1,0 +1,9 @@
+[package]
+name = "envelope_vectors"
+type = "bin"
+# exact: the round circuits' Noir 1.0.0 (toolchain.json noir.version)
+compiler_version = "=1.0.0"
+
+[dependencies]
+pss_utils = { path = "../../../noir/pss_utils" }
+protocol_types = { path = "../../../deps/foundation-world/noir-projects/fnd/noir-protocol-circuits/crates/types" }

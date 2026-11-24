@@ -1,0 +1,23 @@
+{
+  "name": "@aztec-pss/counter-tip-client",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "description": "The counter tip example's client: deploy, request an add, wait for its result and read its private outcome, with pss-client's brick calls. Type-checked by the root build; not run by any suite.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@aztec-labs/aztec.js": "6.0.0",
+    "@aztec-labs/stdlib": "6.0.0",
+    "@aztec-pss/pss-client": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

@@ -1,0 +1,15 @@
+# Expected outputs of every examples/monty-hall case, checked by
+# scripts/check-noir.sh examples/monty-hall --outputs examples/monty-hall/circuits/outputs.txt
+# (the format is in check-noir.sh's header).
+#
+# The Prover.toml fixtures are one scenario (README.md, "Checks"): seed 111
+# (winning door 1), the player plays door 2, the host opens door 0, and the
+# player switches and wins. open_door outputs [opened door,
+# door_commitment(door, door_randomness)]; finish outputs [win] and stores no
+# new note. Each row pins new_note_hashes and app_outputs. pss_seed (linked
+# from examples/amm) has no row here: that example's outputs.txt checks its case.
+
+# circuit            prover   from to  outputs
+monty_hall_init      Prover   -    -   new_note_hashes=[0x08db3500c10f59d11a18d40570257faa759106300d7785ce74fefa9ccc2b78f9] app_outputs=[]
+monty_hall_open_door Prover   -    -   new_note_hashes=[0x0c9e9b35e0fbbf55829ab7ea172ad67160299c56dfbff94d414b3c3879289a3f] app_outputs=[0x00,0x28f2b0da64b65e700359c3ee7d09b014b2e1aaf3538996fe6773638baba8b607]
+monty_hall_finish    Prover   -    -   new_note_hashes=[] app_outputs=[0x01]

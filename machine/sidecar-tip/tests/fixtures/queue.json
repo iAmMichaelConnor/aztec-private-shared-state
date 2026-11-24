@@ -1,0 +1,176 @@
+{
+ "recorded": "Recorded by hand (no script rewrites it) from a local Aztec 6.0.0 network (aztec start --local-network). PssPublicTest (noir/pss_public_contract_test) at the storage slots of its compiled storage layout (`slots`): queue 15 (requests map 15, tail 16, head index 17, head since 18, seen map 19, done map 20), pool 21; seven requests appended by machine/sidecar-tip/tests/chain/setup.ts (three through the on-chain intake request_onchain, with the `onchain` inputs and nonces, then 0xd4, 0xe5, 0xf6, 0x107 through request); the last call asks for a block that does not exist.",
+ "contract": "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+ "slots": {
+  "queue": "0xf",
+  "pool": "0x15"
+ },
+ "vk_hash": "0x5eed",
+ "onchain": [
+  {
+   "inputs": [
+    "0x3e8",
+    "0x0"
+   ],
+   "user_nonce": "0x77"
+  },
+  {
+   "inputs": [
+    "0x9c4",
+    "0x1"
+   ],
+   "user_nonce": "0x78"
+  },
+  {
+   "inputs": [
+    "0x2a",
+    "0x0"
+   ],
+   "user_nonce": "0x79"
+  }
+ ],
+ "request_ids": [
+  "0x45119abc27f302f7576b1f68cef6a1dada05c878f3d9d311eb543e852e2febc",
+  "0x111a449ccadf82aa23f37c25363dc6d73efb5bd2a06d14d17f6e579e11ff8d8d",
+  "0x17d237fff43157d310bdaac4ed3e1472b899ae9e0ebdee1538d578e70033b023",
+  "0xd4",
+  "0xe5",
+  "0xf6",
+  "0x107"
+ ],
+ "calls": [
+  {
+   "method": "node_getPublicStorageAt",
+   "params": [
+    {
+     "number": 12
+    },
+    "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+    "0x0000000000000000000000000000000000000000000000000000000000000010"
+   ],
+   "response": {
+    "result": "0x0000000000000000000000000000000000000000000000000000000000000007"
+   }
+  },
+  {
+   "method": "node_getPublicStorageAt",
+   "params": [
+    {
+     "number": 12
+    },
+    "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+    "0x0000000000000000000000000000000000000000000000000000000000000011"
+   ],
+   "response": {
+    "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+   }
+  },
+  {
+   "method": "node_getPublicStorageAt",
+   "params": [
+    {
+     "number": 12
+    },
+    "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+    "0x0000000000000000000000000000000000000000000000000000000000000012"
+   ],
+   "response": {
+    "result": "0x0000000000000000000000000000000000000000000000000000000000000006"
+   }
+  },
+  {
+   "method": "node_getPublicStorageAt",
+   "params": [
+    {
+     "number": 12
+    },
+    "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+    "0x2b53c30fc2f7134ae3ce27a25bbe9c630f19fdd69de91463baf10cdbda97ee19"
+   ],
+   "response": {
+    "result": "0x045119abc27f302f7576b1f68cef6a1dada05c878f3d9d311eb543e852e2febc"
+   }
+  },
+  {
+   "method": "node_getPublicStorageAt",
+   "params": [
+    {
+     "number": 12
+    },
+    "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+    "0x1a1b696e0bee39da8dac5f43ea0af379d9825d8131fcfe530f79cd29a795f5fd"
+   ],
+   "response": {
+    "result": "0x111a449ccadf82aa23f37c25363dc6d73efb5bd2a06d14d17f6e579e11ff8d8d"
+   }
+  },
+  {
+   "method": "node_getPublicStorageAt",
+   "params": [
+    {
+     "number": 12
+    },
+    "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+    "0x29dd978dc8a1beac3ed29e5bae264bf837aede75c1ca1357474aa92be818fa6c"
+   ],
+   "response": {
+    "result": "0x17d237fff43157d310bdaac4ed3e1472b899ae9e0ebdee1538d578e70033b023"
+   }
+  },
+  {
+   "method": "node_getPublicStorageAt",
+   "params": [
+    {
+     "number": 12
+    },
+    "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+    "0x2403a7add78c639009581e8a0774808a21e10394d1c23a13f69c8ed5a9d46344"
+   ],
+   "response": {
+    "result": "0x00000000000000000000000000000000000000000000000000000000000000d4"
+   }
+  },
+  {
+   "method": "node_getPublicStorageAt",
+   "params": [
+    {
+     "number": 12
+    },
+    "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+    "0x1d062ec9cf07234575e18aaccdbf8ec5ba721e9f215f2214ca694f829fc3d8af"
+   ],
+   "response": {
+    "result": "0x00000000000000000000000000000000000000000000000000000000000000e5"
+   }
+  },
+  {
+   "method": "node_getPublicStorageAt",
+   "params": [
+    {
+     "number": 12
+    },
+    "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+    "0x0000000000000000000000000000000000000000000000000000000000000015"
+   ],
+   "response": {
+    "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+   }
+  },
+  {
+   "method": "node_getPublicStorageAt",
+   "params": [
+    {
+     "number": 1012
+    },
+    "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+    "0x0000000000000000000000000000000000000000000000000000000000000010"
+   ],
+   "response": {
+    "error": {
+     "code": -32702,
+     "message": "Block not found for number=1012 when resolving query."
+    }
+   }
+  }
+ ]
+}

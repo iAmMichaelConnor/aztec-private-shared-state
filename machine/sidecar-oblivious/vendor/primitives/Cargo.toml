@@ -1,0 +1,33 @@
+[package]
+name = "gigadoram-primitives"
+description = "GigaDoram share types and helpers (vendored from TaceoLabs/gigadoram-rs; see PROVENANCE.md)"
+version = "0.1.0"
+edition = "2024"
+rust-version.workspace = true
+license = "MIT OR Apache-2.0"
+publish = false
+
+[lib]
+name = "primitives"
+
+[dependencies]
+ark-bn254.workspace = true
+ark-ff.workspace = true
+ark-serialize.workspace = true
+bytes.workspace = true
+eyre.workspace = true
+mpc_core.workspace = true
+mpc_net.workspace = true
+num-traits = "0.2"
+rand.workspace = true
+rand_chacha = "0.3"
+
+[dev-dependencies]
+# The framing adapter's test (src/chunked.rs) on the in-process network.
+mpc_net = { workspace = true, features = ["local"] }
+
+[features]
+# `testing`: `run_parties` and `run_parties_may_panic`, three parties on
+# mpc_net's in-process network, for the vendored crates' tests and
+# sidecar-oblivious's.
+testing = ["mpc_net/local"]

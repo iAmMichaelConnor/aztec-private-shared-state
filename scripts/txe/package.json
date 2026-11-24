@@ -1,0 +1,14 @@
+{
+  "name": "@aztec-pss/txe-tools",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@aztec-labs/foundation": "6.0.0",
+    "@aztec-labs/txe": "6.0.0"
+  }
+}

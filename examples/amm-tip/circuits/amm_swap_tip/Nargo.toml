@@ -1,0 +1,11 @@
+[package]
+name = "amm_swap_tip"
+type = "bin"
+# exact: the round circuits' Noir 1.0.0 (toolchain.json noir.version)
+compiler_version = "=1.0.0"
+
+[dependencies]
+# the round's logic (amm_tip, which calls amm_total's swap_total by path)
+amm_tip = { path = "../amm_tip" }
+# npk_app_hash and the tip round helpers (the request id, the store)
+pss_core = { path = "../../../../noir/pss_core" }

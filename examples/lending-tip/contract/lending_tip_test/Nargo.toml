@@ -1,0 +1,27 @@
+[package]
+name = "lending_tip_test"
+type = "lib"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0; deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+# the market's two contracts, the clear tree's and the oblivious tree's,
+# and the library they share (its types, pins and layouts)
+lending_tip = { path = "../lending_tip" }
+lending_tip_oblivious = { path = "../lending_tip_oblivious" }
+lending_market = { path = "../lending_market" }
+lending_oracle = { path = "../lending_oracle" }
+pss_public_contract = { path = "../../../../noir/pss_public_contract" }
+# the test network (node keys, signer) and the helpers every tip suite shares
+pss_tip_test = { path = "../../../../noir/pss_tip_test" }
+# the tip suites' probe: the requester audit's and the public-log count's
+# transaction-effect utilities, on a deployed instance
+pss_probe = { path = "../../../../noir/pss_probe" }
+# the rounds' own outcome functions (the suite's stand-in shared results)
+# and the AEAD the client opens the outcome log with
+pss_core = { path = "../../../../noir/pss_core" }
+pss_utils = { path = "../../../../noir/pss_utils" }
+# the token the suite deploys twice, the collateral asset and the borrowed
+# asset (aztec-nr v6.0.0's reference token, vendored)
+token = { path = "../../../token/contract/token" }

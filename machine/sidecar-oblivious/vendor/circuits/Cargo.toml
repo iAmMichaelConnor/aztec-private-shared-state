@@ -1,0 +1,21 @@
+[package]
+name = "gigadoram-circuits"
+description = "GigaDoram MPC circuits: LowMC, oblivious sort, CHT lookup, selects (vendored from TaceoLabs/gigadoram-rs; see PROVENANCE.md)"
+version = "0.1.0"
+edition = "2024"
+rust-version.workspace = true
+license = "MIT OR Apache-2.0"
+publish = false
+
+[lib]
+name = "circuits"
+
+[dependencies]
+eyre.workspace = true
+mpc_core.workspace = true
+mpc_net.workspace = true
+primitives = { path = "../primitives", package = "gigadoram-primitives" }
+
+[dev-dependencies]
+primitives = { path = "../primitives", package = "gigadoram-primitives", features = ["testing"] }
+rand.workspace = true

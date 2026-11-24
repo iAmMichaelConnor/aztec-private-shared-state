@@ -1,0 +1,10 @@
+{
+  "example": "amm-tip",
+  "descriptor": "amm-tip-onchain",
+  "fee": "amm-tip",
+  "staleBlocks": 4,
+  "config": {},
+  "init": {
+    "method": "init_pool"
+  }
+}

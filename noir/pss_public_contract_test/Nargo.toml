@@ -1,0 +1,19 @@
+[package]
+name = "pss_public_contract_test"
+type = "contract"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0; deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+pss_public_contract = { path = "../pss_public_contract" }
+# the test network (node keys, signer) and the helpers every tip suite shares
+pss_tip_test = { path = "../pss_tip_test" }
+# the round's own outcome functions (pss_core tip::outcome), with which the
+# private-outcome suite seals outcomes as the MPC does, and the key exchange
+# (pss_utils dh.nr) the secret-shared on-chain suite derives its shares with
+pss_core = { path = "../pss_core" }
+pss_utils = { path = "../pss_utils" }
+# aztec-nr's UintNote, against which the partial-note suite pins the
+# library's two-step note hash
+uint_note = { path = "../../deps/aztec-world/noir-projects/aztec-nr/uint-note" }

@@ -1,0 +1,57 @@
+[package]
+name = "sidecar-tip"
+version = "0.1.0"
+description = "The tip-of-chain additions of the co-SNARK sidecar shared by node and orchestrator: the queued-manifest view, the chain request ids, the chain reader with its log discovery (the tip follower and the tag queries), the request synthesiser and the receipt and result-signature messages, and the tip namespace and Aztec node config entries"
+
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+# Built on sidecar-core's types and pipeline; it adds no store and no
+# pipeline of its own.
+[dependencies]
+sidecar-core = { path = "../sidecar-core" }
+# The oblivious tree brick's holder, which the node-held row pairs with its
+# tip state (`tip_oblivious`).
+sidecar-oblivious = { path = "../sidecar-oblivious" }
+# The receipt's derived Schnorr nonce (StdRng, as the result signature's) and
+# the receipt routes' wire types.
+ark-std.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+# The `[[tip.namespaces]]` config entry's checks.
+eyre.workspace = true
+# The TLS client configuration of an `https://` Aztec node (`AztecNode`),
+# and the HTTP exchange of the chain reader's JSON-RPC client (`rpc`).
+sidecar-http = { path = "../sidecar-http" }
+# The chain verifier logs what it accepts and refuses under the request span.
+tracing.workspace = true
+
+# The chain reader's JSON-RPC client of an Aztec node: the node URL and
+# method (hyper's types), the connection (tokio, tokio-rustls for https).
+tokio.workspace = true
+hyper.workspace = true
+rustls.workspace = true
+tokio-rustls.workspace = true
+
+[dev-dependencies]
+# The three-node lifecycle harness (`sidecar_core::testing`) for the queued
+# rounds of tests/lifecycle.rs.
+sidecar-core = { path = "../sidecar-core", features = ["testing"] }
+# Field arithmetic in tests/vectors.rs.
+ark-ff.workspace = true
+# tests/receipt_round.rs runs a round circuit on three in-process parties
+# (sidecar-core's executor over mpc_net's local network).
+co_noir_types.workspace = true
+mpc_core.workspace = true
+mpc_net = { workspace = true, features = ["local"] }
+# The crate's own requester audit (`audit`, feature test-util) in its
+# integration tests.
+sidecar-tip = { path = ".", features = ["test-util"] }
+sidecar-test-fixtures = { path = "../sidecar-test-fixtures" }
+
+[features]
+# `test-util`: the recorded-fixture transport and the in-memory Aztec node
+# (`testing`), for the scheduler's and the chain verifier's tests, and the
+# requester audit of the in-process suites (`audit`).
+test-util = []

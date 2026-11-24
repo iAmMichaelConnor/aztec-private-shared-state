@@ -1,0 +1,16 @@
+[package]
+name = "tip_onchain_vectors"
+type = "bin"
+# exact: nargo 1.0.0 (toolchain.json); nargo reads no prerelease, so the contract
+# compiler 1.0.0-rc.3 this program builds with passes too
+compiler_version = "=1.0.0"
+
+[dependencies]
+# The tip contract library whose request function computes the encoding on
+# chain, pss_core's encoding it calls, pss_utils' key exchange, and aztec-nr
+# for AztecAddress and the private log's siloing; built with the contract
+# compiler (CONTRACT_NARGO_BIN, nargo 1.0.0-rc.3).
+pss_public_contract = { path = "../../../noir/pss_public_contract" }
+pss_core = { path = "../../../noir/pss_core" }
+pss_utils = { path = "../../../noir/pss_utils" }
+aztec = { path = "../../../deps/aztec-world/noir-projects/aztec-nr/aztec" }

@@ -1,0 +1,27 @@
+{
+  "manifest": 1,
+  "circuit": "amm_swap_tip",
+  "namespace_param": "namespace",
+  "state_keys": { "reads": 1, "writes": 1 },
+  "intake": "onchain",
+  "binding": "turn",
+  "witness": [
+    { "param": "namespace",  "from": { "PUBLIC": "$namespace" } },
+    { "param": "vk_hash",    "from": { "PUBLIC": "$vk_hash" } },
+    { "param": "in_slots",   "from": { "PUBLIC": ["$state_keys.reads[0]"] } },
+    { "param": "out_slots",  "from": { "PUBLIC": ["$state_keys.writes[0]"] } },
+    { "param": "amount_in",  "from": { "PUBLIC": "amount_in" } },
+    { "param": "direction",  "from": { "PUBLIC": "direction" } },
+    { "param": "min_out",    "from": { "PUBLIC": "min_out" } },
+    { "param": "partial_note", "from": { "PUBLIC": "$partial_note" } },
+    { "param": "user_nonce", "from": { "PUBLIC": "$user_nonce" } },
+    { "param": "pool",       "from": { "LOAD": "$state_keys.reads[0]", "slice": [0, 2], "len": 3 } },
+    { "param": "r_old",      "from": { "LOAD": "$state_keys.reads[0]", "slice": [2, 3], "len": 3 } },
+    { "param": "r_new",      "from": { "SAMPLE": 1 } },
+    { "param": "nsk_app",    "from": { "LOAD": "nsk_app", "slice": [0, 1], "len": 1 } }
+  ],
+  "outputs": [ { "TACEO_store": "out0", "STORE": "$state_keys.writes[0]", "len": 3, "note_hash": "new_c" } ],
+  "state": { "$state_keys.reads[0]": "chain", "$state_keys.writes[0]": "chain" },
+  "commitment_slot": { "$state_keys.reads[0]": { "old": "old_c" } },
+  "public_reads": []
+}

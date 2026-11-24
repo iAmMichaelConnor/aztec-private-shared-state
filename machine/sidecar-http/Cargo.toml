@@ -1,0 +1,25 @@
+[package]
+name = "sidecar-http"
+version = "0.1.0"
+description = "The HTTPS plumbing the sidecar node and orchestrator share: the TLS set-up, the bounded listener, the JSON answers in the one error shape, and the mutual-TLS JSON client of the node API"
+
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+# The error shape (`Refusal`) and the field encoding of path parameters.
+sidecar-core = { path = "../sidecar-core" }
+rustls.workspace = true
+tokio-rustls.workspace = true
+axum.workspace = true
+hyper.workspace = true
+hyper-util.workspace = true
+http-body-util.workspace = true
+bytes.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+eyre.workspace = true
+tracing.workspace = true
+zeroize.workspace = true

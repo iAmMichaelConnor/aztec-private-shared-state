@@ -1,0 +1,68 @@
+{
+  "nodes": [
+    {
+      "enc": "0x025cd753ec1910b44aacc9d764a429f522135bb725ccd91a2d2b3c40dc6d3394",
+      "enc_limbs": {
+        "hi": "0x00000000000000000000000000000000025cd753ec1910b44aacc9d764a429f5",
+        "lo": "0x0000000000000000000000000000000022135bb725ccd91a2d2b3c40dc6d3394"
+      },
+      "enc_pk": {
+        "x": "0x17c83fd7a05ce31b24d720f2b7ce4f0d45ebefab49aacda9967b738e2701f849",
+        "y": "0x0c2b3a636c5d3ac174a99541f3833bc2b1d870f657a3eff8457de975d44efdf0"
+      },
+      "key_id": "0x0f404a022508c8ac",
+      "node": 0,
+      "record_key": "0x29748a219541e382113ee7af58c7c0091c1e65b5d8567c1e6e8cdc8e48573078",
+      "sig": "0x13fe9f9afe81c099297a6efb7719c0150db4951a0d2326504ff01db08bfd0ea3",
+      "sig_pk": {
+        "x": "0x2b681809013b22f0d2db3b443103b7fffdd7fa834a008595320ac526ab30de44",
+        "y": "0x28de1717d62f6f9ebd274bd7e1dd72ad225657277893e174d4f437a53aeab182"
+      }
+    },
+    {
+      "enc": "0x05f227df741f1b66fbb7cb9e4e27a1f9bf20baf72533d0a123ca8306e6c467f7",
+      "enc_limbs": {
+        "hi": "0x0000000000000000000000000000000005f227df741f1b66fbb7cb9e4e27a1f9",
+        "lo": "0x00000000000000000000000000000000bf20baf72533d0a123ca8306e6c467f7"
+      },
+      "enc_pk": {
+        "x": "0x19861a477442aba7dba3c41ee71b3b4623642d7cd20623099364f854045b893d",
+        "y": "0x02051254904e6c688365af6f61b181b05abddb224d53a8fc7a72a8074dc45d25"
+      },
+      "key_id": "0x2441273ce6502775",
+      "node": 1,
+      "record_key": "0x0b0701820f4e153c10f3384e656c4084600e7d70172b8c0f25ed370e139ae6aa",
+      "sig": "0x13a755b3c79842700b40de3b648a3fb55ed0c8fa19cdf390f26ea9e9255ec15e",
+      "sig_pk": {
+        "x": "0x0b53299786c80b86efd037531a7f8c8b21cac11146c56854f315d608030c730b",
+        "y": "0x28c8b5e2974e1676c8a8e182b2f4ed5ae003e2cd3fdbbb333e4cab004d1d2bb4"
+      }
+    },
+    {
+      "enc": "0x208a2afb52a942f4a7b73b668c045a1b185d4b738224cd3d5ab0774468fe06a4",
+      "enc_limbs": {
+        "hi": "0x00000000000000000000000000000000208a2afb52a942f4a7b73b668c045a1b",
+        "lo": "0x00000000000000000000000000000000185d4b738224cd3d5ab0774468fe06a4"
+      },
+      "enc_pk": {
+        "x": "0x27a1d29b0ce94c0576c0cf97988f8b5c2119c2c8142d795f8057e14fccfa4bc1",
+        "y": "0x07bfd7aad69d270d9a18790766df747e4bb3d5cf0bf084834cbe4183f47120ec"
+      },
+      "key_id": "0x11669f16214b996c",
+      "node": 2,
+      "record_key": "0x07dabd6bd4a126b08341163d0038a2869573ed158fe49c3af2f6d87f79d8a36a",
+      "sig": "0x1b1c5bc22e0b4c4ac876402115b29dca3fae102c3709ea2869004403bedec7b6",
+      "sig_pk": {
+        "x": "0x0510626ed26672208a7c0a9354eb21632b15278602f6e99673bd247bac8e3726",
+        "y": "0x0a6177e34014e1610da411dec54a91340cfadfcb5eb054f9944e655f195935eb"
+      }
+    }
+  ],
+  "rules": {
+    "key_id": "the first 8 bytes of poseidon2([enc_pk.x, enc_pk.y]) written as 32 bytes big-endian",
+    "public_keys": "enc_pk = enc·G, sig_pk = sig·G on Grumpkin",
+    "record_key": "poseidon2([enc.lo, enc.hi, SIDECAR_SEAL_KEY]), enc.lo and enc.hi the low and high 128 bits, SIDECAR_SEAL_KEY = ASCII \"sidecar.seal_key\" as a big-endian integer",
+    "scalars": "enc and sig are independent uniform Grumpkin scalars, written 0x + 64 hex digits big-endian (the key files' form)"
+  },
+  "sidecar_seal_key": "0x00000000000000000000000000000000736964656361722e7365616c5f6b6579"
+}

@@ -1,0 +1,19 @@
+[package]
+name = "amm_tip"
+type = "contract"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0; deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+# the tip library: queue, on-chain intake and receipt intake, process_result and apply
+pss_public_contract = { path = "../../../../noir/pss_public_contract" }
+# secret-shared on-chain intake's encoding layout type and kinds (pss_core tip::derived
+# Layout, CLEAR, CHOSEN), which the request function takes
+pss_core = { path = "../../../../noir/pss_core" }
+# the circuits' library: the secret-shared swap's outcome ciphertext length, one
+# definition for circuits and contract. Its name sorts after `aztec` on
+# purpose: nargo takes dependencies in name order and the ABI names each
+# protocol type (AztecAddress, ...) by the first dependency path reaching
+# it, so a name before `aztec` renames those types in the contract's ABI.
+swap_circuit = { path = "../../circuits/amm_tip" }

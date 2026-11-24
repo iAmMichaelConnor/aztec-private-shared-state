@@ -1,0 +1,14 @@
+[package]
+name = "amm_init_tip"
+type = "bin"
+# exact: the round circuits' Noir 1.0.0 (toolchain.json noir.version)
+compiler_version = "=1.0.0"
+
+[dependencies]
+# The seeded reserves come from examples/amm's
+# Pool::from_seed by path (each reserve in [1e6, 2e6), a price nobody
+# chose), the same derivation examples/amm's amm_init applies, never a
+# copy.
+amm = { path = "../../../amm/circuits/amm" }
+# npk_app_hash, the TACEO_store hand-off and the slot commitment
+pss_core = { path = "../../../../noir/pss_core" }

@@ -1,0 +1,35 @@
+{
+  "manifest": 1,
+  "circuit": "view",
+  "namespace_param": "namespace",
+  "state_keys": {"reads": 1, "writes": 1},
+  "intake": "shared_receipt",
+  "outcome": "partial",
+  "binding": "turn",
+  "witness": [
+    {"param": "namespace", "from": {"PUBLIC": "$namespace"}},
+    {"param": "vk_hash", "from": {"PUBLIC": "$vk_hash"}},
+    {"param": "in_slots", "from": {"PUBLIC": ["$state_keys.reads[0]"]}},
+    {"param": "out_slots", "from": {"PUBLIC": ["$state_keys.writes[0]"]}},
+    {"param": "inputs_hash", "from": {"PUBLIC": "$inputs_hash"}},
+    {"param": "key", "from": {"INPUT_SHARED": "key"}},
+    {"param": "partial_note", "from": {"INPUT_SHARED": "$partial_note"}},
+    {"param": "outcome_key", "from": {"INPUT_SHARED": "$outcome_key"}},
+    {"param": "outcome_tag", "from": {"INPUT_SHARED": "$outcome_tag"}},
+    {"param": "blinding", "from": {"INPUT_SHARED": "$blinding"}},
+    {"param": "leaves", "from": {"LOAD": "$state_keys.reads[0]", "slice": [0, 3], "len": 68}},
+    {"param": "old_hashes", "from": {"LOAD": "$state_keys.reads[0]", "slice": [3, 4], "len": 68}},
+    {"param": "siblings", "from": {"LOAD": "$state_keys.reads[0]", "slice": [4, 68], "len": 68}},
+    {"param": "r_new", "from": {"SAMPLE": 1}},
+    {"param": "nsk_app", "from": {"LOAD": "nsk_app", "slice": [0, 1], "len": 1}}
+  ],
+  "outputs": [
+    {"TACEO_store": "out0", "STORE": "$state_keys.writes[0]", "len": 68, "note_hash": "new_commitments[0]"}
+  ],
+  "state": {"$state_keys.reads[0]": "node", "$state_keys.writes[0]": "node"},
+  "commitment_slot": {"$state_keys.reads[0]": {"old": "old_commitments[0]"}},
+  "tree": {
+    "$state_keys.reads[0]": {"depth": 64, "leaf_len": 3, "probe": 1, "access": "oblivious", "keyed": true, "index": ["key"], "params": {"leaves": "leaves", "old_hashes": "old_hashes", "siblings": "siblings"}, "store": "$state_keys.writes[0]"}
+  },
+  "public_reads": []
+}

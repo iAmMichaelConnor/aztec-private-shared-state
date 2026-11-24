@@ -1,0 +1,11 @@
+// The type check of the live-network chain suite's scripts, which the root
+// `npm run build` runs (they run from source, as tests/chain.rs starts them).
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "customConditions": ["source"]
+  },
+  "include": ["*.ts"]
+}

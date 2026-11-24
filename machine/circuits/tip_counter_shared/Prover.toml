@@ -1,0 +1,19 @@
+# Development values for scripts/check-noir.sh machine: the state
+# tip_counter_init/Prover.toml stores ([5, 9]), plus 3, under blinding 10,
+# with C = commit([3, 14, 11, 12], 13) over the shared values (the amount,
+# the partial note, the outcome key and tag, the blinding last). The nodes fill
+# these from the manifest (PUBLIC $namespace, $vk_hash, $state_keys and
+# $inputs_hash, INPUT_SHARED, LOAD $state_keys.reads[0], SAMPLE 1).
+namespace = "0xc0ffee"
+vk_hash = "0x7e57"
+in_slots = ["0x7c01"]
+out_slots = ["0x7c01"]
+inputs_hash = "0x040744bf03f917941b938b588dd02d62b481e84326d6f909d5a2d2dc2a69781c"
+amount = "3"
+partial_note = "14"
+outcome_key = "11"
+blinding = "13"
+outcome_tag = "12"
+value = ["5"]
+r_old = "9"
+r_new = "10"

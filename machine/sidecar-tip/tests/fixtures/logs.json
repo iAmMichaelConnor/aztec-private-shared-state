@@ -1,0 +1,617 @@
+{
+ "recorded": "Recorded from a fresh local Aztec 6.0.0 network (aztec start --local-network) by tests/chain/run.sh --record. C is PssPublicTest, deployed with vk_hash 0x5eed, whose on-chain intake emitted the request log of chain request R0 (inputs 1000, 0; user_nonce 0x77) in block 6. B, a LogEmitter (tests/chain/log_emitter), later emitted a log of other inputs (999999, 1; user_nonce 0xbad) under the same tag, compute_log_tag(R0, REQUEST_DOMAIN), in block 10. A and B (two instances of LogEmitter) each emitted a six-field sealed-shaped log under compute_log_tag(R0, PSS_STATE), B first (blocks 11 and 12); every tag was computed in Noir by aztec-nr. The chosen id 0xd4, appended without intake, has no log. Then A emitted 21 one-field logs (0 to 20) under the tag 0x9a9e in block 13, and a private log (21, 22, 23) under 0x9217, siloed with A's address (private_tag), in block 14; the second node_getChainTips answer (block 14) is the follower's next poll, with the node_getBlockData answers it compares, the paged query (a page of 20, then afterLog), the private query, a query whose reference block (gone) no network has, and the block past the tip follow. A node_getBlockData answer is kept to blockHash and the block number. A log's blockHash, blockTimestamp and txHash, and every block hash (the tips', each query's referenceBlock), differ on every network; the rest is reproduced.",
+ "c": "0x154aa0a3989664b1b4df5010bfa7162626b0be0c7afd6c0a4773fdbb53b0e888",
+ "a": "0x2aa5b503e756edafe87d34a0bd2a75c0439b4f578506bea17b3a40600b3ffe60",
+ "b": "0x03c7fdeb99927f8149e38d2dfa0d27d4512772c33864a49243592dd678072316",
+ "r0": "0x21a02c47941c55c5f6035441918c93fadc8ea02b28d20218266b51cbd02836e2",
+ "vk_hash": "0x0000000000000000000000000000000000000000000000000000000000005eed",
+ "paged_tag": "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+ "private_tag": "0x28735d458f9920b3ed8d2d6344688f082254c11111bb16d30a15788135e235a0",
+ "gone": "0x0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d",
+ "calls": [
+  {
+   "method": "node_getChainTips",
+   "params": [],
+   "response": {
+    "result": {
+     "proposed": {
+      "number": 12,
+      "hash": "0x126798871dea3c54b5ec34d43e155bb397908d40b223c79c18bfe87460d9ccd1"
+     },
+     "checkpointed": {
+      "block": {
+       "number": 12,
+       "hash": "0x126798871dea3c54b5ec34d43e155bb397908d40b223c79c18bfe87460d9ccd1"
+      },
+      "checkpoint": {
+       "number": 12,
+       "hash": "0x007d11ea38e984e5f7666ab16069220555f324e2cd7c089eed14a1580322f576"
+      }
+     },
+     "proven": {
+      "block": {
+       "number": 12,
+       "hash": "0x126798871dea3c54b5ec34d43e155bb397908d40b223c79c18bfe87460d9ccd1"
+      },
+      "checkpoint": {
+       "number": 12,
+       "hash": "0x007d11ea38e984e5f7666ab16069220555f324e2cd7c089eed14a1580322f576"
+      }
+     },
+     "finalized": {
+      "block": {
+       "number": 0,
+       "hash": "0x1b1641e95fbb732f15c4225c187703144d75b01fc4658a5640c2d00f28226026"
+      },
+      "checkpoint": {
+       "number": 0,
+       "hash": "0x002e384af86a480f952aa16443fd29646a9063865e62d7c403fc7ed697bb7712"
+      }
+     }
+    }
+   }
+  },
+  {
+   "method": "node_getPublicLogsByTags",
+   "params": [
+    {
+     "contractAddress": "0x154aa0a3989664b1b4df5010bfa7162626b0be0c7afd6c0a4773fdbb53b0e888",
+     "tags": [
+      "0x2aae12a9cc96e06653839f91899218db232d137a974eaff2e79c140aa1ad6f8f"
+     ],
+     "referenceBlock": "0x126798871dea3c54b5ec34d43e155bb397908d40b223c79c18bfe87460d9ccd1"
+    }
+   ],
+   "response": {
+    "result": [
+     [
+      {
+       "logData": [
+        "0x2aae12a9cc96e06653839f91899218db232d137a974eaff2e79c140aa1ad6f8f",
+        "0x00000000000000000000000000000000000000000000000000000000000003e8",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000000000000000000000000077"
+       ],
+       "blockNumber": 6,
+       "blockHash": "0x0dea5ae8acdaf06143651d9895c3f9b060491d6129288d63b2094052111b198b",
+       "blockTimestamp": "1793947538",
+       "txHash": "0x0434112e481faca1f5468e2f497169167490d6ff430ed9a1531b2fd589c77628",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 0
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "method": "node_getPublicLogsByTags",
+   "params": [
+    {
+     "contractAddress": "0x03c7fdeb99927f8149e38d2dfa0d27d4512772c33864a49243592dd678072316",
+     "tags": [
+      "0x2aae12a9cc96e06653839f91899218db232d137a974eaff2e79c140aa1ad6f8f"
+     ],
+     "referenceBlock": "0x126798871dea3c54b5ec34d43e155bb397908d40b223c79c18bfe87460d9ccd1"
+    }
+   ],
+   "response": {
+    "result": [
+     [
+      {
+       "logData": [
+        "0x2aae12a9cc96e06653839f91899218db232d137a974eaff2e79c140aa1ad6f8f",
+        "0x00000000000000000000000000000000000000000000000000000000000f423f",
+        "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "0x0000000000000000000000000000000000000000000000000000000000000bad"
+       ],
+       "blockNumber": 10,
+       "blockHash": "0x27b89c589514001ab852f5a65c2a536f0c8dcfc9d1195003dab8977324979efd",
+       "blockTimestamp": "1793947826",
+       "txHash": "0x24921ffb6a20f2d6313243ce33e9c6e4b9e0fd0bfb5cde4d9bbc873475192dca",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 0
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "method": "node_getPublicLogsByTags",
+   "params": [
+    {
+     "contractAddress": "0x2aa5b503e756edafe87d34a0bd2a75c0439b4f578506bea17b3a40600b3ffe60",
+     "tags": [
+      "0x06e049b3ec57ebb608ef50112dab67d693471e9bd9b70596dc50a9a1b27d5823"
+     ],
+     "referenceBlock": "0x126798871dea3c54b5ec34d43e155bb397908d40b223c79c18bfe87460d9ccd1"
+    }
+   ],
+   "response": {
+    "result": [
+     [
+      {
+       "logData": [
+        "0x06e049b3ec57ebb608ef50112dab67d693471e9bd9b70596dc50a9a1b27d5823",
+        "0x000000000000000000000000000000000000000000000000000000000000000b",
+        "0x000000000000000000000000000000000000000000000000000000000000000c",
+        "0x000000000000000000000000000000000000000000000000000000000000000d",
+        "0x000000000000000000000000000000000000000000000000000000000000000e",
+        "0x000000000000000000000000000000000000000000000000000000000000000f",
+        "0x0000000000000000000000000000000000000000000000000000000000000010"
+       ],
+       "blockNumber": 12,
+       "blockHash": "0x126798871dea3c54b5ec34d43e155bb397908d40b223c79c18bfe87460d9ccd1",
+       "blockTimestamp": "1793947970",
+       "txHash": "0x21c846f1537c59c549c7cd77f95c4cc744119428fe389214b1fcb475e389ee06",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 0
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "method": "node_getPublicLogsByTags",
+   "params": [
+    {
+     "contractAddress": "0x03c7fdeb99927f8149e38d2dfa0d27d4512772c33864a49243592dd678072316",
+     "tags": [
+      "0x06e049b3ec57ebb608ef50112dab67d693471e9bd9b70596dc50a9a1b27d5823"
+     ],
+     "referenceBlock": "0x126798871dea3c54b5ec34d43e155bb397908d40b223c79c18bfe87460d9ccd1"
+    }
+   ],
+   "response": {
+    "result": [
+     [
+      {
+       "logData": [
+        "0x06e049b3ec57ebb608ef50112dab67d693471e9bd9b70596dc50a9a1b27d5823",
+        "0x0000000000000000000000000000000000000000000000000000000000000009",
+        "0x0000000000000000000000000000000000000000000000000000000000000009",
+        "0x0000000000000000000000000000000000000000000000000000000000000009",
+        "0x0000000000000000000000000000000000000000000000000000000000000009",
+        "0x0000000000000000000000000000000000000000000000000000000000000009",
+        "0x0000000000000000000000000000000000000000000000000000000000000009"
+       ],
+       "blockNumber": 11,
+       "blockHash": "0x06195f2b9af27d378f32b8d951d4dcbba46028d01ccc3b932361c7b0e00e9805",
+       "blockTimestamp": "1793947898",
+       "txHash": "0x0058187d2290f290f333e23b0bdf42b2022e3fff9d302e6d5099c00bcff013c2",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 0
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "method": "node_getPublicLogsByTags",
+   "params": [
+    {
+     "contractAddress": "0x154aa0a3989664b1b4df5010bfa7162626b0be0c7afd6c0a4773fdbb53b0e888",
+     "tags": [
+      "0x06d392d3dc7188d7db2487c8c4089f1c5c69f9c95e900a9017a850738df77e39"
+     ],
+     "referenceBlock": "0x126798871dea3c54b5ec34d43e155bb397908d40b223c79c18bfe87460d9ccd1"
+    }
+   ],
+   "response": {
+    "result": [
+     []
+    ]
+   }
+  },
+  {
+   "method": "node_getChainTips",
+   "params": [],
+   "response": {
+    "result": {
+     "proposed": {
+      "number": 14,
+      "hash": "0x17941de262dce869d8e7a85f4999f4bab063b62117745eb8686a0d6cd9a41cb1"
+     },
+     "checkpointed": {
+      "block": {
+       "number": 14,
+       "hash": "0x17941de262dce869d8e7a85f4999f4bab063b62117745eb8686a0d6cd9a41cb1"
+      },
+      "checkpoint": {
+       "number": 14,
+       "hash": "0x008554e69f606991ae59134f87991ce347cc34203d56de364546dc4f5251b0e5"
+      }
+     },
+     "proven": {
+      "block": {
+       "number": 14,
+       "hash": "0x17941de262dce869d8e7a85f4999f4bab063b62117745eb8686a0d6cd9a41cb1"
+      },
+      "checkpoint": {
+       "number": 14,
+       "hash": "0x008554e69f606991ae59134f87991ce347cc34203d56de364546dc4f5251b0e5"
+      }
+     },
+     "finalized": {
+      "block": {
+       "number": 0,
+       "hash": "0x1b1641e95fbb732f15c4225c187703144d75b01fc4658a5640c2d00f28226026"
+      },
+      "checkpoint": {
+       "number": 0,
+       "hash": "0x002e384af86a480f952aa16443fd29646a9063865e62d7c403fc7ed697bb7712"
+      }
+     }
+    }
+   }
+  },
+  {
+   "method": "node_getBlockData",
+   "params": [
+    12
+   ],
+   "response": {
+    "result": {
+     "blockHash": "0x126798871dea3c54b5ec34d43e155bb397908d40b223c79c18bfe87460d9ccd1",
+     "header": {
+      "globalVariables": {
+       "blockNumber": 12
+      }
+     }
+    }
+   }
+  },
+  {
+   "method": "node_getPublicLogsByTags",
+   "params": [
+    {
+     "contractAddress": "0x2aa5b503e756edafe87d34a0bd2a75c0439b4f578506bea17b3a40600b3ffe60",
+     "referenceBlock": "0x17941de262dce869d8e7a85f4999f4bab063b62117745eb8686a0d6cd9a41cb1",
+     "tags": [
+      "0x0000000000000000000000000000000000000000000000000000000000009a9e"
+     ]
+    }
+   ],
+   "response": {
+    "result": [
+     [
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 0
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000001"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 1
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000002"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 2
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000003"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 3
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000004"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 4
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000005"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 5
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000006"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 6
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000007"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 7
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000008"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 8
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000009"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 9
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x000000000000000000000000000000000000000000000000000000000000000a"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 10
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x000000000000000000000000000000000000000000000000000000000000000b"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 11
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x000000000000000000000000000000000000000000000000000000000000000c"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 12
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x000000000000000000000000000000000000000000000000000000000000000d"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 13
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x000000000000000000000000000000000000000000000000000000000000000e"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 14
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x000000000000000000000000000000000000000000000000000000000000000f"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 15
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000010"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 16
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000011"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 17
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000012"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 18
+      },
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000013"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 19
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "method": "node_getPublicLogsByTags",
+   "params": [
+    {
+     "contractAddress": "0x2aa5b503e756edafe87d34a0bd2a75c0439b4f578506bea17b3a40600b3ffe60",
+     "referenceBlock": "0x17941de262dce869d8e7a85f4999f4bab063b62117745eb8686a0d6cd9a41cb1",
+     "tags": [
+      {
+       "tag": "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+       "afterLog": {
+        "blockNumber": 13,
+        "txIndexWithinBlock": 0,
+        "logIndexWithinTx": 19
+       }
+      }
+     ]
+    }
+   ],
+   "response": {
+    "result": [
+     [
+      {
+       "logData": [
+        "0x0000000000000000000000000000000000000000000000000000000000009a9e",
+        "0x0000000000000000000000000000000000000000000000000000000000000014"
+       ],
+       "blockNumber": 13,
+       "blockHash": "0x235c813c401f5cd9a10996f763064b8d126747b452988a9c9b0467b138e98fd5",
+       "blockTimestamp": "1793948042",
+       "txHash": "0x1d3199d5ca5c4211aaeb9411e7768b8e7d6a6f00f1b58bdf51fe26e84c244fd7",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 20
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "method": "node_getPrivateLogsByTags",
+   "params": [
+    {
+     "referenceBlock": "0x17941de262dce869d8e7a85f4999f4bab063b62117745eb8686a0d6cd9a41cb1",
+     "tags": [
+      "0x28735d458f9920b3ed8d2d6344688f082254c11111bb16d30a15788135e235a0"
+     ]
+    }
+   ],
+   "response": {
+    "result": [
+     [
+      {
+       "logData": [
+        "0x28735d458f9920b3ed8d2d6344688f082254c11111bb16d30a15788135e235a0",
+        "0x0000000000000000000000000000000000000000000000000000000000000015",
+        "0x0000000000000000000000000000000000000000000000000000000000000016",
+        "0x0000000000000000000000000000000000000000000000000000000000000017"
+       ],
+       "blockNumber": 14,
+       "blockHash": "0x17941de262dce869d8e7a85f4999f4bab063b62117745eb8686a0d6cd9a41cb1",
+       "blockTimestamp": "1793948114",
+       "txHash": "0x1befef66b602777b8682f9d58a7163a1756eba709a6491f276bfcac15b279456",
+       "txIndexWithinBlock": 0,
+       "logIndexWithinTx": 0
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "method": "node_getPublicLogsByTags",
+   "params": [
+    {
+     "contractAddress": "0x2aa5b503e756edafe87d34a0bd2a75c0439b4f578506bea17b3a40600b3ffe60",
+     "tags": [
+      "0x0000000000000000000000000000000000000000000000000000000000009a9e"
+     ],
+     "referenceBlock": "0x0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d"
+    }
+   ],
+   "response": {
+    "error": {
+     "code": -32702,
+     "message": "Reference block 0x0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d not found in the node. This might indicate a reorg has occurred."
+    }
+   }
+  },
+  {
+   "method": "node_getBlockData",
+   "params": [
+    15
+   ],
+   "response": {
+    "result": null
+   }
+  }
+ ]
+}

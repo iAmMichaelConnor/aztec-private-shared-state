@@ -1,0 +1,24 @@
+{
+  "description": "The tags of the tip's two public logs: compute_log_tag(chain_request_id, domain) of protocol_types v6.0.0, poseidon2_hash_with_separator([chain_request_id], domain), with domain a u32. REQUEST_DOMAIN tags the on-chain request log that intake emits; PSS_STATE tags the sealed-thirds log that apply emits in state mode chain. Tags computed by aztec.js 6.0.0 (computeLogTag of @aztec-labs/stdlib/hash). Read by sidecar-core tests/vectors.rs, sidecar-tip src/chain/layout.rs and src/state/chain.rs (the constants) and pss-client test/vectors.test.ts; noir/pss_public_contract defines the same two domains in Noir (REQUEST_DOMAIN in domains.nr, PSS_STATE in chain_state.nr).",
+  "request_domain": 1886614129,
+  "request_domain_ascii": "psrq",
+  "pss_state": 1347638018,
+  "pss_state_ascii": "PSS\u0002",
+  "vectors": [
+    {
+      "chain_request_id": "0x0000000000000000000000000000000000000000000000000000000000000001",
+      "request_tag": "0x2df3eff13b675139e4a2145a70508daeaa26cab3a1ba526bfdb82c93919b0d84",
+      "sealed_tag": "0x24e7251485f78c9cd49a0df8bf8805e6b58e8d9a759c92239bf0837ae1977cff"
+    },
+    {
+      "chain_request_id": "0x00000000000000000000000000000000000000000000000000000000000000a1",
+      "request_tag": "0x07384a321e3008a4537889580343a86a74a8e8cd74f5ac9d9ee887389c9101d8",
+      "sealed_tag": "0x259ea36028d558d9c5b79fd56007a1684164f271f1d087f2779911190666ac61"
+    },
+    {
+      "chain_request_id": "0x00000000000000000000000000000000000000000000000000000badc0de1234",
+      "request_tag": "0x0131ad01465c4cd36c373423acc4ca7389f01eacc2e2d685fc58c404d51fdc51",
+      "sealed_tag": "0x0e4b9863cb7df55f12b6122d2bfeb082eb3566e18c83ddbf2b4eafb3fb98c9b3"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "manifest": 1,
+  "circuit": "move",
+  "namespace_param": "namespace",
+  "state_keys": {"reads": 1, "writes": 1},
+  "intake": "shared_receipt",
+  "outcome": "partial",
+  "binding": "turn",
+  "witness": [
+    {"param": "namespace", "from": {"PUBLIC": "$namespace"}},
+    {"param": "vk_hash", "from": {"PUBLIC": "$vk_hash"}},
+    {"param": "in_slots", "from": {"PUBLIC": ["$state_keys.reads[0]"]}},
+    {"param": "out_slots", "from": {"PUBLIC": ["$state_keys.writes[0]"]}},
+    {"param": "inputs_hash", "from": {"PUBLIC": "$inputs_hash"}},
+    {"param": "from", "from": {"INPUT_SHARED": "from"}},
+    {"param": "to", "from": {"INPUT_SHARED": "to"}},
+    {"param": "amount", "from": {"INPUT_SHARED": "amount"}},
+    {"param": "partial_note", "from": {"INPUT_SHARED": "$partial_note"}},
+    {"param": "outcome_key", "from": {"INPUT_SHARED": "$outcome_key"}},
+    {"param": "outcome_tag", "from": {"INPUT_SHARED": "$outcome_tag"}},
+    {"param": "blinding", "from": {"INPUT_SHARED": "$blinding"}},
+    {"param": "leaves", "from": {"LOAD": "$state_keys.reads[0]", "slice": [0, 6], "len": 136}},
+    {"param": "old_hashes", "from": {"LOAD": "$state_keys.reads[0]", "slice": [6, 8], "len": 136}},
+    {"param": "siblings", "from": {"LOAD": "$state_keys.reads[0]", "slice": [8, 136], "len": 136}},
+    {"param": "r_new", "from": {"SAMPLE": 2}},
+    {"param": "nsk_app", "from": {"LOAD": "nsk_app", "slice": [0, 1], "len": 1}}
+  ],
+  "outputs": [
+    {"TACEO_store": "out0", "STORE": "$state_keys.writes[0]", "len": 136, "note_hash": "new_commitments[0]"}
+  ],
+  "state": {"$state_keys.reads[0]": "node", "$state_keys.writes[0]": "node"},
+  "commitment_slot": {"$state_keys.reads[0]": {"old": "old_commitments[0]"}},
+  "tree": {
+    "$state_keys.reads[0]": {"depth": 64, "leaf_len": 3, "probe": 2, "access": "oblivious", "keyed": true, "index": ["from", "to"], "params": {"leaves": "leaves", "old_hashes": "old_hashes", "siblings": "siblings"}, "store": "$state_keys.writes[0]"}
+  },
+  "public_reads": []
+}

@@ -1,0 +1,13 @@
+{
+  "example": "counter-tip",
+  "descriptor": "counter-tip",
+  "config": {},
+  "init": {
+    "method": "init_counter"
+  },
+  "methods": {
+    "counter_add": {
+      "name": "process_result"
+    }
+  }
+}

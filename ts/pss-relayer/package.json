@@ -1,0 +1,38 @@
+{
+  "name": "@aztec-pss/pss-relayer",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "description": "Operator-run relayer of the PSS sidecar at the tip of the chain: watches the queue's head, FETCHes its result through pss-client, and submits the process_result transaction, or skip() for a stale head.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
+    "test": "node --conditions=source --test --test-reporter=spec \"test/*.test.ts\"",
+    "start": "node --conditions=source --import ../hooks/register.mjs src/main.ts",
+    "rotate-enc-key": "node --conditions=source --import ../hooks/register.mjs src/rotate-enc-key.ts"
+  },
+  "dependencies": {
+    "@aztec-labs/aztec.js": "6.0.0",
+    "@aztec-labs/foundation": "6.0.0",
+    "@aztec-labs/pxe": "6.0.0",
+    "@aztec-labs/stdlib": "6.0.0",
+    "@aztec-labs/wallets": "6.0.0",
+    "@aztec-pss/pss-client": "0.1.0"
+  },
+  "devDependencies": {
+    "@aztec-pss/test-support": "0.1.0",
+    "@types/node": "26.6.6",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

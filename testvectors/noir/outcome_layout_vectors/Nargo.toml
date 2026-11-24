@@ -1,0 +1,15 @@
+[package]
+name = "outcome_layout_vectors"
+type = "bin"
+# exact: nargo 1.0.0 (toolchain.json); nargo reads no prerelease, so the contract
+# compiler 1.0.0-rc.3 this program builds with passes too
+compiler_version = "=1.0.0"
+
+[dependencies]
+# The tip contract library whose outcome layout process_result verifies
+# against, and aztec-nr beneath it; both build with the contract compiler
+# (CONTRACT_NARGO_BIN, nargo 1.0.0-rc.3).
+pss_public_contract = { path = "../../../noir/pss_public_contract" }
+# No source line names aztec: scripts/check-vectors.sh reads this line to
+# build the program with the contract compiler. Keep it.
+aztec = { path = "../../../deps/aztec-world/noir-projects/aztec-nr/aztec" }

@@ -1,0 +1,11 @@
+[package]
+name = "montyhall"
+type = "contract"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0; deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+pss_contract = { path = "../../../../noir/pss_contract" }
+# the door commitment, the one the open_door circuit outputs
+monty_hall_circuit = { path = "../../circuits/monty_hall" }

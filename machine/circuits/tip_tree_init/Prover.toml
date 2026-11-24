@@ -1,0 +1,10 @@
+# Development values for scripts/check-noir.sh machine: the tree starts with
+# the header leaf 0 = [total 5, append index 1, blinding 9] at slot 0x7c02
+# in namespace 0xc0ffee, every other leaf empty.
+# The nodes fill these from the manifest (PUBLIC $namespace, PUBLIC $vk_hash,
+# PUBLIC ["$state_keys.writes[0]"], PUBLIC "total", SAMPLE 1).
+namespace = "0xc0ffee"
+vk_hash = "0x5a5a"
+out_slots = ["0x7c02"]
+total = "5"
+r_new = "9"

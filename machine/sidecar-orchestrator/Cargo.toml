@@ -1,0 +1,49 @@
+[package]
+name = "sidecar-orchestrator"
+version = "0.1.0"
+description = "The orchestrator of the co-SNARK sidecar: the public HTTPS API, stateless checks, global serialisation, fan-out to the three nodes, and the checks of their answers"
+
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "sidecar-orchestrator"
+path = "src/main.rs"
+
+[dependencies]
+sidecar-core = { path = "../sidecar-core" }
+# The API's TLS set-up, listener and answers, and the node leg's client.
+sidecar-http = { path = "../sidecar-http" }
+# The tip's receipt checks, wire types and verifier (the receipt route).
+sidecar-tip = { path = "../sidecar-tip" }
+axum.workspace = true
+tokio.workspace = true
+tokio-rustls.workspace = true
+rustls.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+clap.workspace = true
+eyre.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+rand.workspace = true
+# Paused time for the node-call bounds (`nodes.rs`).
+tokio = { workspace = true, features = ["test-util"] }
+# The ABI type of a compiled circuit in tests/end_to_end.rs.
+noirc_abi.workspace = true
+# The freshness check of the prepared circuits (`sidecar_core::testing::artifacts`).
+sidecar-core = { path = "../sidecar-core", features = ["testing"] }
+# The three real nodes the integration tests run in process (the node's
+# server, setup and admin socket), and the loopback ports reserved for their
+# meshes (`sidecar_node::testing`). The library does not link the node.
+sidecar-node = { path = "../sidecar-node", features = ["test-util"] }
+# The in-memory Aztec node the scheduler's tests write the chain into.
+sidecar-tip = { path = "../sidecar-tip", features = ["test-util"] }
+sidecar-test-fixtures = { path = "../sidecar-test-fixtures", features = ["nodes"] }

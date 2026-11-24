@@ -1,0 +1,9 @@
+# The fixture scenario: namespace 0xc0ffee, counter slot 0xa003, nsk_app 777.
+# The counter starts at 0 under the blinding 333, which counter_add's cases
+# load as r_old, so this round's new_c is their old_c.
+namespace = "0xc0ffee"
+# a stand-in for the circuit's vk hash, which init_counter checks
+vk_hash = "0x5a5a"
+out_slots = ["0xa003"]
+r_new = "333"
+nsk_app = "777"

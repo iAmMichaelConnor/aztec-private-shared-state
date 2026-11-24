@@ -1,0 +1,406 @@
+{
+ "recorded": "Recorded by hand (no script rewrites it) from a local Aztec 6.0.0 network (aztec start --local-network), from the same deployment as queue.json. simulatePublicCalls of PssPublicTest view functions get_tail() and request_at(1), and of skip(), which writes and so reverts in a static call; the bodies use the reader's simulation transaction (src/chain/simulate.rs). Each transaction's `data` (base64 of the serialised PrivateKernelTailCircuitPublicInputs) is stored as its length and its runs of non-zero bytes; the test expands it before comparing.",
+ "contract": "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+ "slots": {
+  "queue": "0xf",
+  "pool": "0x15"
+ },
+ "vk_hash": "0x5eed",
+ "onchain": [
+  {
+   "inputs": [
+    "0x3e8",
+    "0x0"
+   ],
+   "user_nonce": "0x77"
+  },
+  {
+   "inputs": [
+    "0x9c4",
+    "0x1"
+   ],
+   "user_nonce": "0x78"
+  },
+  {
+   "inputs": [
+    "0x2a",
+    "0x0"
+   ],
+   "user_nonce": "0x79"
+  }
+ ],
+ "request_ids": [
+  "0x45119abc27f302f7576b1f68cef6a1dada05c878f3d9d311eb543e852e2febc",
+  "0x111a449ccadf82aa23f37c25363dc6d73efb5bd2a06d14d17f6e579e11ff8d8d",
+  "0x17d237fff43157d310bdaac4ed3e1472b899ae9e0ebdee1538d578e70033b023",
+  "0xd4",
+  "0xe5",
+  "0xf6",
+  "0x107"
+ ],
+ "calls": [
+  {
+   "method": "node_simulatePublicCalls",
+   "params": [
+    {
+     "chonkProof": "AAAAAA==",
+     "contractClassLogFields": [],
+     "data": {
+      "zeros_except": {
+       "len": 82774,
+       "runs": [
+        [
+         0,
+         "01"
+        ],
+        [
+         558,
+         "0c"
+        ],
+        [
+         562,
+         "63cae0"
+        ],
+        [
+         580,
+         "056bc75e2d6310"
+        ],
+        [
+         596,
+         "056bc75e2d6310"
+        ],
+        [
+         2797,
+         "130f2b7d9a2b874ba05a5ae0dd8b14faa00243238ca7049688e45a4b1ae30146"
+        ],
+        [
+         79573,
+         "2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a01159fc0efdebd4742b371b68ac70f4e617634dd9cf11859c92e8b82879c2d7ffe"
+        ]
+       ]
+      }
+     },
+     "publicFunctionCalldata": [
+      {
+       "hash": "0x159fc0efdebd4742b371b68ac70f4e617634dd9cf11859c92e8b82879c2d7ffe",
+       "values": [
+        "0x0000000000000000000000000000000000000000000000000000000045230436"
+       ]
+      }
+     ]
+    },
+    true
+   ],
+   "response": {
+    "result": {
+     "debugLogs": [],
+     "gasUsed": {
+      "billedGas": {
+       "daGas": 0,
+       "l2Gas": 7326
+      },
+      "publicGas": {
+       "daGas": 0,
+       "l2Gas": 7326
+      },
+      "teardownGas": {
+       "daGas": 0,
+       "l2Gas": 0
+      },
+      "totalGas": {
+       "daGas": 0,
+       "l2Gas": 7326
+      }
+     },
+     "globalVariables": {
+      "blockNumber": 13,
+      "chainId": "0x0000000000000000000000000000000000000000000000000000000000007a69",
+      "coinbase": "0x0000000000000000000000000000000000000000",
+      "feeRecipient": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "gasFees": {
+       "feePerDaGas": "0",
+       "feePerL2Gas": "121712400000"
+      },
+      "slotNumber": "0x000000000000000000000000000000000000000000000000000000000000000d",
+      "timestamp": "1793929441",
+      "version": "0x000000000000000000000000000000000000000000000000000000006474d653"
+     },
+     "publicReturnValues": [
+      {
+       "nested": [],
+       "values": [
+        "0x0000000000000000000000000000000000000000000000000000000000000007"
+       ]
+      }
+     ],
+     "txEffect": {
+      "contractClassLogs": [],
+      "l2ToL1Msgs": [],
+      "noteHashes": [],
+      "nullifiers": [
+       "0x130f2b7d9a2b874ba05a5ae0dd8b14faa00243238ca7049688e45a4b1ae30146"
+      ],
+      "privateLogs": [],
+      "publicDataWrites": [],
+      "publicLogs": [],
+      "revertCode": 0,
+      "transactionFee": "0x00000000000000000000000000000000000000000000000000032af6f21c6300",
+      "txHash": "0x0f350519d5784d0296c6122eee173111e820353c509ec97fd984227e44f944ca"
+     }
+    }
+   }
+  },
+  {
+   "method": "node_simulatePublicCalls",
+   "params": [
+    {
+     "chonkProof": "AAAAAA==",
+     "contractClassLogFields": [],
+     "data": {
+      "zeros_except": {
+       "len": 82774,
+       "runs": [
+        [
+         0,
+         "01"
+        ],
+        [
+         558,
+         "0c"
+        ],
+        [
+         562,
+         "63cae0"
+        ],
+        [
+         580,
+         "056bc75e2d6310"
+        ],
+        [
+         596,
+         "056bc75e2d6310"
+        ],
+        [
+         2797,
+         "0916677ac7e37ec94b1a2a5f69e1bfba10c68dfd6a9dad0dfc0292cd62342ae0"
+        ],
+        [
+         79573,
+         "2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a011c9b29fcabd53e19c2c4863981945452655f91cda4e7e87295618ed52df91c29"
+        ]
+       ]
+      }
+     },
+     "publicFunctionCalldata": [
+      {
+       "hash": "0x1c9b29fcabd53e19c2c4863981945452655f91cda4e7e87295618ed52df91c29",
+       "values": [
+        "0x0000000000000000000000000000000000000000000000000000000098ccd2dd",
+        "0x0000000000000000000000000000000000000000000000000000000000000001"
+       ]
+      }
+     ]
+    },
+    true
+   ],
+   "response": {
+    "result": {
+     "debugLogs": [],
+     "gasUsed": {
+      "billedGas": {
+       "daGas": 0,
+       "l2Gas": 8535
+      },
+      "publicGas": {
+       "daGas": 0,
+       "l2Gas": 8535
+      },
+      "teardownGas": {
+       "daGas": 0,
+       "l2Gas": 0
+      },
+      "totalGas": {
+       "daGas": 0,
+       "l2Gas": 8535
+      }
+     },
+     "globalVariables": {
+      "blockNumber": 13,
+      "chainId": "0x0000000000000000000000000000000000000000000000000000000000007a69",
+      "coinbase": "0x0000000000000000000000000000000000000000",
+      "feeRecipient": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "gasFees": {
+       "feePerDaGas": "0",
+       "feePerL2Gas": "121712400000"
+      },
+      "slotNumber": "0x000000000000000000000000000000000000000000000000000000000000000d",
+      "timestamp": "1793929441",
+      "version": "0x000000000000000000000000000000000000000000000000000000006474d653"
+     },
+     "publicReturnValues": [
+      {
+       "nested": [],
+       "values": [
+        "0x111a449ccadf82aa23f37c25363dc6d73efb5bd2a06d14d17f6e579e11ff8d8d"
+       ]
+      }
+     ],
+     "txEffect": {
+      "contractClassLogs": [],
+      "l2ToL1Msgs": [],
+      "noteHashes": [],
+      "nullifiers": [
+       "0x0916677ac7e37ec94b1a2a5f69e1bfba10c68dfd6a9dad0dfc0292cd62342ae0"
+      ],
+      "privateLogs": [],
+      "publicDataWrites": [],
+      "publicLogs": [],
+      "revertCode": 0,
+      "transactionFee": "0x0000000000000000000000000000000000000000000000000003b0cc0af86580",
+      "txHash": "0x1c935c75b72cb476d1659b86547eaa0787062ed0f785d129adf44cb470fec89f"
+     }
+    }
+   }
+  },
+  {
+   "method": "node_simulatePublicCalls",
+   "params": [
+    {
+     "chonkProof": "AAAAAA==",
+     "contractClassLogFields": [],
+     "data": {
+      "zeros_except": {
+       "len": 82774,
+       "runs": [
+        [
+         0,
+         "01"
+        ],
+        [
+         558,
+         "0c"
+        ],
+        [
+         562,
+         "63cae0"
+        ],
+        [
+         580,
+         "056bc75e2d6310"
+        ],
+        [
+         596,
+         "056bc75e2d6310"
+        ],
+        [
+         2797,
+         "0a"
+        ],
+        [
+         2799,
+         "b5d2e08e3f2256803522d65901f8735cbcee88951ccc86be1bc256783a08"
+        ],
+        [
+         79573,
+         "2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a012f4fb5c1a191ec8bdf272239054d25f74f2850ec634b68acccc74269f48e4353"
+        ]
+       ]
+      }
+     },
+     "publicFunctionCalldata": [
+      {
+       "hash": "0x2f4fb5c1a191ec8bdf272239054d25f74f2850ec634b68acccc74269f48e4353",
+       "values": [
+        "0x00000000000000000000000000000000000000000000000000000000dad602d3"
+       ]
+      }
+     ]
+    },
+    true
+   ],
+   "response": {
+    "result": {
+     "debugLogs": [],
+     "gasUsed": {
+      "billedGas": {
+       "daGas": 786432,
+       "l2Gas": 6540000
+      },
+      "publicGas": {
+       "daGas": 786432,
+       "l2Gas": 6540000
+      },
+      "teardownGas": {
+       "daGas": 0,
+       "l2Gas": 0
+      },
+      "totalGas": {
+       "daGas": 786432,
+       "l2Gas": 6540000
+      }
+     },
+     "globalVariables": {
+      "blockNumber": 13,
+      "chainId": "0x0000000000000000000000000000000000000000000000000000000000007a69",
+      "coinbase": "0x0000000000000000000000000000000000000000",
+      "feeRecipient": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "gasFees": {
+       "feePerDaGas": "0",
+       "feePerL2Gas": "121712400000"
+      },
+      "slotNumber": "0x000000000000000000000000000000000000000000000000000000000000000d",
+      "timestamp": "1793929441",
+      "version": "0x000000000000000000000000000000000000000000000000000000006474d653"
+     },
+     "publicReturnValues": [
+      {
+       "nested": [],
+       "values": []
+      }
+     ],
+     "revertReason": {
+      "functionErrorStack": [
+       {
+        "contractAddress": "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+        "functionSelector": "0xdad602d3"
+       }
+      ],
+      "noirErrorStack": [
+       "0.44",
+       "0.4558"
+      ],
+      "originalMessage": "SSTORE: Static call cannot update the state. Cannot write to storage in static context",
+      "revertData": []
+     },
+     "txEffect": {
+      "contractClassLogs": [],
+      "l2ToL1Msgs": [],
+      "noteHashes": [],
+      "nullifiers": [
+       "0x0a00b5d2e08e3f2256803522d65901f8735cbcee88951ccc86be1bc256783a08"
+      ],
+      "privateLogs": [],
+      "publicDataWrites": [],
+      "publicLogs": [],
+      "revertCode": 1,
+      "transactionFee": "0x0000000000000000000000000000000000000000000000000b0bf4f5de9cb000",
+      "txHash": "0x1c0ffc80005cd162a798a11df7946e3f43b56b053a566da0c178c88f0ddccf07"
+     }
+    }
+   }
+  },
+  {
+   "method": "node_getPublicStorageAt",
+   "params": [
+    {
+     "number": 12
+    },
+    "0x2b0fd6de1ec03bbbc7f4be60d60651f0ee8256f7b71712ed651e6736281ad85a",
+    "0x0000000000000000000000000000000000000000000000000000000000000010"
+   ],
+   "response": {
+    "result": "0x0000000000000000000000000000000000000000000000000000000000000007"
+   }
+  }
+ ]
+}

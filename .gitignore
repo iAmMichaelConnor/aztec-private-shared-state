@@ -1,0 +1,34 @@
+# build outputs
+target/
+node_modules
+dist/
+__pycache__/
+*.pyc
+
+# the pinned toolchain (scripts/install-toolchain.sh) and the deps/ links (scripts/bootstrap.sh)
+.tools/
+deps/
+
+# generated data: compiled circuits, CRS copies, dev TLS material
+# (scripts/prepare-data.sh, scripts/gen-dev-certs.sh)
+machine/data/
+*.dat
+*.der
+*.pem
+*.part
+
+# runs, scratch and logs (scripts/txe.sh, the scratch root .runs/tmp, e2e/run.sh)
+.runs/
+*.log
+*.gz
+
+# local task tracking, notes and editor state
+.planny/
+.notes/
+.vimdirs/
+.claude/
+*.swp
+*~
+.DS_Store
+.env
+.env.*

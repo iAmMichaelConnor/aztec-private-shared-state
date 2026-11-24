@@ -1,0 +1,45 @@
+{
+  "name": "@aztec-pss/pss-client",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "description": "User-side client of PSS on Aztec: requests, FETCH on failure, owner-signed REGISTER and DISABLE, the effects split, nonce mining and the proof capsule.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "pss-manifest": "./dist/bin/pss-manifest.js"
+  },
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./internal": {
+      "source": "./src/internal.ts",
+      "types": "./dist/internal.d.ts",
+      "default": "./dist/internal.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.test.json",
+    "test": "node --conditions=source --test --test-reporter=spec \"test/*.test.ts\""
+  },
+  "dependencies": {
+    "@alejoamiras/private-fee-juice": "6.0.0",
+    "@aztec-labs/aztec.js": "6.0.0",
+    "@aztec-labs/constants": "6.0.0",
+    "@aztec-labs/foundation": "6.0.0",
+    "@aztec-labs/noir-contracts.js": "6.0.0",
+    "@aztec-labs/stdlib": "6.0.0"
+  },
+  "devDependencies": {
+    "@aztec-pss/test-support": "0.1.0",
+    "@types/node": "26.6.6",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

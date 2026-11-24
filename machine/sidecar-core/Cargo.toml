@@ -1,0 +1,60 @@
+[package]
+name = "sidecar-core"
+version = "0.1.0"
+description = "The chain-agnostic core of the co-SNARK sidecar shared by node and orchestrator: the wire types, field encoding, manifest and error classes, the proving core, the state holders and stores, the request lifecycle, node recovery and the audit"
+
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+# No database dependencies and no network transport: the executor is generic over
+# mpc_net's Network trait, and the node picks the transport. The local store
+# (src/local.rs) is a file of its own.
+[dependencies]
+zeroize.workspace = true
+ark-bn254.workspace = true
+ark-ff.workspace = true
+ark-ec.workspace = true
+ark-grumpkin.workspace = true
+ark-std.workspace = true
+ark-serialize.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde_path_to_error.workspace = true
+co_noir.workspace = true
+co_noir_common.workspace = true
+mpc_core.workspace = true
+noirc_abi.workspace = true
+co_builder.workspace = true
+co_noir_types.workspace = true
+mpc_net.workspace = true
+eyre.workspace = true
+# The local store's record checksum.
+sha2.workspace = true
+# The refresh's mask streams over holder blobs (replace.rs): ChaCha20 keyed by
+# a Poseidon2 output, the same stream at the two remaining nodes.
+rand_chacha = "0.3"
+# Spans and events per lifecycle step under the request id; the node installs
+# the subscriber.
+tracing.workspace = true
+
+[build-dependencies]
+# build.rs compares the embedded artifacts' bytecode with embedded.sha256.
+serde_json.workspace = true
+sha2.workspace = true
+
+[dev-dependencies]
+# In-process three-party networks for the proving tests.
+mpc_net = { workspace = true, features = ["local"] }
+# The crate's own `testing` harness and store fixtures in its integration
+# tests.
+sidecar-core = { path = ".", features = ["testing"] }
+sidecar-test-fixtures = { path = "../sidecar-test-fixtures" }
+
+[features]
+# `store::testing`: the store test suite, for the backends sidecar-node builds.
+test-util = []
+# `testing`: the three-node lifecycle harness (in-process nodes on mpc_net's
+# local network, over `store::testing::Flaky` stores), for this crate's and
+# sidecar-tip's integration tests.
+testing = ["mpc_net/local", "test-util"]

@@ -1,0 +1,15 @@
+# Development values for scripts/check-noir.sh machine: amm_swap_tip's
+# Prover.toml with min_out a pinned value: sells 25000 x for y with min_out
+# 33000 on the pool amm_init_tip/Prover.toml creates.
+namespace = "0xc0ffee"
+vk_hash = "0x5a5a"
+in_slots = ["0xa002"]
+out_slots = ["0xa002"]
+min_out = "33000"
+amount_in = "25000"
+direction = "0"
+user_nonce = "3"
+pool = ["1359373", "1852331"]
+r_old = "333"
+r_new = "444"
+nsk_app = "777"

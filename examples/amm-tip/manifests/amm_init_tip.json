@@ -1,0 +1,20 @@
+{
+  "manifest": 1,
+  "circuit": "amm_init_tip",
+  "namespace_param": "namespace",
+  "state_keys": { "reads": 0, "writes": 1 },
+  "intake": "onchain",
+  "outcome": "none",
+  "binding": "turn",
+  "witness": [
+    { "param": "namespace", "from": { "PUBLIC": "$namespace" } },
+    { "param": "vk_hash",   "from": { "PUBLIC": "$vk_hash" } },
+    { "param": "out_slots", "from": { "PUBLIC": ["$state_keys.writes[0]"] } },
+    { "param": "rand_seed", "from": { "SAMPLE": 1 } },
+    { "param": "r_new",     "from": { "SAMPLE": 1 } },
+    { "param": "nsk_app",   "from": { "LOAD": "nsk_app", "slice": [0, 1], "len": 1 } }
+  ],
+  "outputs": [ { "TACEO_store": "out0", "STORE": "$state_keys.writes[0]", "len": 3, "note_hash": "new_c" } ],
+  "state": { "$state_keys.writes[0]": "node" },
+  "public_reads": []
+}

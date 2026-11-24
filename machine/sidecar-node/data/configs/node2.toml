@@ -1,0 +1,27 @@
+# Node config of node 2 in the development deployment. Relative paths resolve
+# against this file's directory. The API is the harness's (node j on 8200 + j,
+# loopback only); the mesh is party2.toml (10200 + j). Keys, TLS material and
+# the run directory live under machine/data, which is gitignored:
+# scripts/gen-dev-certs.sh writes the TLS material, and
+# `sidecar-node setup` (or `setup --dealer` for development) the key files.
+party = 2
+api_listen = "127.0.0.1:8202"
+mesh_config = "party2.toml"
+key_dir = "../../../data/keys/node2"
+run_dir = "../../../data/run/node2"
+requests_retention_days = 30
+prune_interval_secs = 3600
+enc_grace_days = 30
+
+[tls]
+ca = "../../../data/keys/https-ca.pem"
+cert = "../../../data/keys/https-node2.pem"
+key = "../../../data/keys/https-node2-key.pem"
+
+[store]
+backend = "memory"
+
+[crs]
+g1 = "../../../data/bn254_g1.dat"
+g2 = "../../../data/bn254_g2.dat"
+circuits_dir = "../../../data/circuits"

@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "customConditions": ["source"]
+  },
+  "include": ["harness/*.ts", "engine/*.ts", "steps/*.ts", "driver.ts", "scenario.ts", "scenarios/*.ts"]
+}

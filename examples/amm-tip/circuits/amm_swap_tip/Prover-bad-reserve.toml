@@ -1,0 +1,18 @@
+# reserve_x = 2^64 in the loaded vector: ok = 0, code 7 (defensive;
+# no proven round stores one). old_c names this vector
+namespace = "0xc0ffee"
+# a stand-in for the circuit's vk hash, which process_result checks
+vk_hash = "0x5a5a"
+in_slots = ["0xa002"]
+out_slots = ["0xa002"]
+# private: the inputs the request log carries or the nodes stored with their receipts
+amount_in = "25000"
+direction = "0"
+min_out = "0"
+# the trader's partial note, partial_commitment(owner 0xa11ce, rho 0x5eed)
+partial_note = "0x82534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a"
+user_nonce = "3"
+pool = ["18446744073709551616", "1852331"]
+r_old = "333"
+r_new = "444"
+nsk_app = "777"

@@ -1,0 +1,17 @@
+[package]
+name = "pss_core"
+type = "lib"
+# a range: a library, built by the packages that depend on it under either
+# compiler (the round circuits' 1.0.0, the contracts' 1.0.0-rc.3)
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# Aztec v6.0.0 protocol hashes and domain separators; deps/ is made by
+# scripts/bootstrap.sh.
+protocol_types = { path = "../../deps/foundation-world/noir-projects/fnd/noir-protocol-circuits/crates/types" }
+# total-noir's `total` library (a Nargo git dependency at the ref
+# toolchain.json pins): the tip helpers' fixed-length Poseidon2 and Outcome,
+# the same package the tip examples' libraries use.
+total = { git = "https://github.com/iAmMichaelConnor/total-noir", tag = "v0.1.0", directory = "noir/total" }
+# The Poseidon2 duplex AEAD (pss_utils ae.nr) private outcomes encrypt with.
+pss_utils = { path = "../pss_utils" }

@@ -1,0 +1,25 @@
+# a swap that fails on the pool: pays 33450, asked for 33451 (code 8),
+# nothing paid, the pool kept under r_new
+namespace = "0xc0ffee"
+# a stand-in for the circuit's vk hash, which process_result_shared checks
+vk_hash = "0x5a5a"
+in_slots = ["0xa002"]
+out_slots = ["0xa002"]
+# C, the commitment the queued request carries (PUBLIC $inputs_hash):
+# poseidon2([amount_in, direction, min_out, partial_note, outcome_key,
+# outcome_tag, blinding]) of the request
+inputs_hash = "0x1552c8911656db9b0c828b39e036999acfab56e6066effcfd531d8365c8bb8bb"
+# shared: the request inputs and the reserved values; partial_note is
+# partial_commitment(owner 0xa11ce, rho 0x5eed), the trader's partial note
+amount_in = "25000"
+direction = "0"
+min_out = "33451"
+partial_note = "0x82534ea2aa931e670277dee28ec03224be87d2c9cc82e474d7db2c8bf44ee3a"
+outcome_key = "0x6b6b"
+outcome_tag = "0x7a7a"
+blinding = "0xb1b1"
+# the pool amm_init_tip/Prover.toml creates: Pool::from_seed(111), blinding 333
+pool = ["1359373", "1852331"]
+r_old = "333"
+r_new = "444"
+nsk_app = "777"

@@ -1,0 +1,12 @@
+[package]
+name = "pss_utils"
+type = "lib"
+authors = ["TACEO"]
+# a range: a library, built by the packages that depend on it under either
+# compiler (the round circuits' 1.0.0, the contracts' 1.0.0-rc.3)
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# Aztec v6.0.0 protocol hashes and domain separators; deps/ is made by
+# scripts/bootstrap.sh.
+protocol_types = { path = "../../deps/foundation-world/noir-projects/fnd/noir-protocol-circuits/crates/types" }

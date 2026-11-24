@@ -1,0 +1,131 @@
+{
+  "example": "lending-tip",
+  "descriptor": "lending-tip-shared-onchain",
+  "fee": "lending-tip",
+  "credit": {
+    "fund": "fund",
+    "balance": "credit_balance",
+    "assets": {
+      "collateral": 1,
+      "borrowed": 0
+    }
+  },
+  "contracts": {
+    "collateral": {
+      "example": "token",
+      "package": "token",
+      "args": [
+        "$operator",
+        "Lending collateral test token 1",
+        "LENDCOLLATERALTESTTOKENSYMBOL01",
+        18
+      ]
+    },
+    "borrowed": {
+      "example": "token",
+      "package": "token",
+      "args": [
+        "$operator",
+        "Lending borrowed asset token 01",
+        "LENDBORROWEDASSETTOKENSYMBOL001",
+        18
+      ]
+    },
+    "oracle": {
+      "package": "lending_oracle",
+      "args": [
+        "$operator",
+        250,
+        0,
+        50
+      ]
+    }
+  },
+  "fund": {
+    "collateral": {
+      "accounts": 100000
+    },
+    "borrowed": {
+      "accounts": 100000,
+      "app": 1000000
+    }
+  },
+  "config": {
+    "init_liquidity": 1000000,
+    "oracle": "$oracle",
+    "collateral": "$collateral",
+    "borrowed": "$borrowed",
+    "deposit": {
+      "token": "$borrowed",
+      "amount": 5,
+      "kept": true
+    },
+    "treasury": "0x0000000000000000000000000000000000000000000000000000000000007ea5",
+    "t_live": 60
+  },
+  "init": {
+    "method": "init_market"
+  },
+  "methods": {
+    "deposit_shared": {
+      "name": "process_shared",
+      "args": [
+        1
+      ]
+    },
+    "borrow_shared": {
+      "name": "process_shared",
+      "args": [
+        2
+      ]
+    },
+    "repay_shared": {
+      "name": "process_shared",
+      "args": [
+        3
+      ]
+    },
+    "view_shared": {
+      "name": "process_shared",
+      "args": [
+        4
+      ]
+    },
+    "liquidate_shared": {
+      "name": "process_shared",
+      "args": [
+        5
+      ]
+    },
+    "scan_shared": {
+      "name": "process_header_shared",
+      "args": [
+        6
+      ]
+    },
+    "withdraw_shared": {
+      "name": "process_shared",
+      "args": [
+        7
+      ]
+    },
+    "supply_shared": {
+      "name": "process_shared",
+      "args": [
+        8
+      ]
+    },
+    "withdraw_supply_shared": {
+      "name": "process_shared",
+      "args": [
+        9
+      ]
+    },
+    "quote_shared": {
+      "name": "process_header_shared",
+      "args": [
+        10
+      ]
+    }
+  }
+}

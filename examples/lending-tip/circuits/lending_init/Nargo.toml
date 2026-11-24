@@ -1,0 +1,13 @@
+[package]
+name = "lending_init"
+type = "bin"
+# exact: the round circuits' Noir 1.0.0 (toolchain.json noir.version)
+compiler_version = "=1.0.0"
+
+[dependencies]
+# the round's logic and the market layout
+lending_tip = { path = "../lending_tip" }
+# npk_app_hash, the TACEO_store hand-off and the slot commitment
+pss_core = { path = "../../../../noir/pss_core" }
+# the range flag on the seeded liquidity
+total = { git = "https://github.com/iAmMichaelConnor/total-noir", tag = "v0.1.0", directory = "noir/total" }

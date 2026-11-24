@@ -1,0 +1,2 @@
+[workspace]
+members = ["lending_market", "lending_tip", "lending_tip_oblivious", "lending_oracle", "lending_tip_test"]

@@ -1,0 +1,17 @@
+{
+  "manifest": 1,
+  "circuit": "pss_seed",
+  "namespace_param": "namespace",
+  "state_keys": { "reads": 0, "writes": 1 },
+  "witness": [
+    { "param": "namespace", "from": { "PUBLIC": "$namespace" } },
+    { "param": "owner",            "from": { "PUBLIC": { "const": "0xafafaf" } } },
+    { "param": "out_slots",        "from": { "PUBLIC": ["$state_keys.writes[0]"] } },
+    { "param": "out0_randomness",  "from": { "SAMPLE": 1 } },
+    { "param": "rand_seed",        "from": { "SAMPLE": 1 } }
+  ],
+  "outputs": [ { "TACEO_store": "out0", "STORE": "$state_keys.writes[0]", "len": 2,
+                 "note_hash": "new_note_hashes[0]" } ],
+  "state": { "$state_keys.writes[0]": "node" },
+  "consume": []
+}

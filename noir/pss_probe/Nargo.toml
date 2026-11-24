@@ -1,0 +1,10 @@
+[package]
+name = "pss_probe"
+type = "contract"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0; deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+# the requester audit and the transaction summary the probe returns
+pss_tip_test = { path = "../pss_tip_test" }

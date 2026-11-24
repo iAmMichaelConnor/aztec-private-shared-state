@@ -1,0 +1,30 @@
+{
+  "manifest": 1,
+  "circuit": "tip_counter_priced",
+  "namespace_param": "namespace",
+  "state_keys": { "reads": 1, "writes": 1 },
+  "intake": "onchain",
+  "outcome": "none",
+  "witness": [
+    { "param": "namespace",  "from": { "PUBLIC": "$namespace" } },
+    { "param": "vk_hash",    "from": { "PUBLIC": "$vk_hash" } },
+    { "param": "in_slots",   "from": { "PUBLIC": ["$state_keys.reads[0]"] } },
+    { "param": "out_slots",  "from": { "PUBLIC": ["$state_keys.writes[0]"] } },
+    { "param": "amount",     "from": { "PUBLIC": "amount" } },
+    { "param": "user_nonce", "from": { "PUBLIC": "$user_nonce" } },
+    { "param": "value",      "from": { "LOAD": "$state_keys.reads[0]", "slice": [0, 1], "len": 2 } },
+    { "param": "r_old",      "from": { "LOAD": "$state_keys.reads[0]", "slice": [1, 2], "len": 2 } },
+    { "param": "r_new",      "from": { "SAMPLE": 1 } }
+  ],
+  "outputs": [ { "TACEO_store": "out0", "STORE": "$state_keys.writes[0]", "len": 2, "note_hash": "new_c" } ],
+  "state": { "$state_keys.reads[0]": "chain", "$state_keys.writes[0]": "chain" },
+  "commitment_slot": { "$state_keys.reads[0]": { "old": "old_c" } },
+  "public_reads": [
+    {
+      "contract": "0x0000000000000000000000000000000000000000000000000000000000000a11",
+      "function": "get_amount",
+      "args": [],
+      "param": "amount"
+    }
+  ]
+}

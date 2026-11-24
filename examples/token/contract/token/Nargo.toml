@@ -1,0 +1,11 @@
+[package]
+name = "token"
+type = "contract"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0; deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+uint_note = { path = "../../../../deps/aztec-world/noir-projects/aztec-nr/uint-note" }
+compressed_string = { path = "../../../../deps/aztec-world/noir-projects/aztec-nr/compressed-string" }
+balance_set = { path = "../../../../deps/aztec-world/noir-projects/aztec-nr/balance-set" }

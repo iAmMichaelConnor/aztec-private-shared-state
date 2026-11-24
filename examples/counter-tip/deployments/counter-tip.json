@@ -1,0 +1,11 @@
+{
+  "descriptor": 1,
+  "name": "counter-tip",
+  "contract": "counter_tip",
+  "stale_blocks": 50,
+  "packages": [
+    {"name": "counter_init", "circuit": "counter_init", "state_keys": {"reads": [], "writes": ["counter"]}},
+    {"name": "counter_add", "circuit": "counter_add", "state_keys": {"reads": ["counter"], "writes": ["counter"]}}
+  ],
+  "init": {"package": "counter_init", "inputs": []}
+}

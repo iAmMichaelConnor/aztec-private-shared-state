@@ -1,0 +1,11 @@
+{
+  "example": "amm-tip",
+  "descriptor": "amm-tip",
+  "fee": "amm-tip",
+  "upgrade": "amm-tip-next",
+  "staleBlocks": 4,
+  "config": {},
+  "init": {
+    "method": "init_pool"
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "encoding": "signatures[i] = {s: [lo, hi], e: [lo, hi]}, sidecar-core's Signature and pss_public_contract's Receipt; signature_bytes[i] = the 64-byte s || e of aztec.js/barretenberg SchnorrSignature, each 32 bytes big-endian",
+  "message_rule": "message = poseidon2([RECEIPT_DOMAIN, request_id, inputs_hash, expiry_block]); request_id = poseidon2([namespace, vk_hash, inputs_hash, user_nonce]) (chain_request_id.json), inputs_hash = poseidon2(inputs), the app inputs in ABI order; expiry_block a u32 block number as one field element",
+  "nodes": [
+    {
+      "node": 0,
+      "sig_pk": {
+        "x": "0x2b681809013b22f0d2db3b443103b7fffdd7fa834a008595320ac526ab30de44",
+        "y": "0x28de1717d62f6f9ebd274bd7e1dd72ad225657277893e174d4f437a53aeab182"
+      }
+    },
+    {
+      "node": 1,
+      "sig_pk": {
+        "x": "0x0b53299786c80b86efd037531a7f8c8b21cac11146c56854f315d608030c730b",
+        "y": "0x28c8b5e2974e1676c8a8e182b2f4ed5ae003e2cd3fdbbb333e4cab004d1d2bb4"
+      }
+    },
+    {
+      "node": 2,
+      "sig_pk": {
+        "x": "0x0510626ed26672208a7c0a9354eb21632b15278602f6e99673bd247bac8e3726",
+        "y": "0x0a6177e34014e1610da411dec54a91340cfadfcb5eb054f9944e655f195935eb"
+      }
+    }
+  ],
+  "nonce_rule": "derived: the nonce generator (rand StdRng, ChaCha12) is seeded with the 32 big-endian bytes of poseidon2([ASCII \"sidecar.receipt_nonce\", sig.lo, sig.hi, message]); a verifier needs only the signature",
+  "receipt_domain": "0x0000000000000000000000000000000000736964656361722e72656365697074",
+  "receipt_domain_ascii": "sidecar.receipt",
+  "scheme": "Schnorr over Grumpkin as noir-lang/schnorr v0.4.0 verify_signature checks it (schnorr.json); signatures[i] is node i's, by the sig scalar of keys.json node i, and verifies under nodes[i].sig_pk",
+  "vectors": [
+    {
+      "expiry_block": 1300,
+      "inputs": [
+        "0x0000000000000000000000000000000000000000000000000000000000001388",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "inputs_hash": "0x156e1dcb02c2b96a3a3bda67963dc6ec1137c1cf1fc07c680a18f8fe02b0142a",
+      "message": "0x1dfe8724252f7bee3899833a951339b353450299979ce737f4c3324d8c5c75b8",
+      "message_preimage": [
+        "0x0000000000000000000000000000000000736964656361722e72656365697074",
+        "0x1ffb5b2870b461151211c05f2db5ca5e3e915c71331451261ce610013b701374",
+        "0x156e1dcb02c2b96a3a3bda67963dc6ec1137c1cf1fc07c680a18f8fe02b0142a",
+        "0x0000000000000000000000000000000000000000000000000000000000000514"
+      ],
+      "name": "amm_swap_tip: two inputs, expiry 300 blocks after block 1000",
+      "namespace": "0x1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f809",
+      "request_id": "0x1ffb5b2870b461151211c05f2db5ca5e3e915c71331451261ce610013b701374",
+      "signature_bytes": [
+        "0x2ba8e46bcd8f11a06dca5a19e2f548fd1837ecdd031377cbb4e9aed991c1e0122d7dba97d6c295eb69194970e0b74a47b61d5d3df09656ccd83cb7c438e72e65",
+        "0x14fe84e925d3d3d69e197025b06d7c1d3cf6a05c66a8d0983f3979ce0c007b732e003df33e4361b315bf43d1ec3800512f6a3db009262c460069a830cf9c3099",
+        "0x1f1dfc131b043c9f2644d05ddeaa1cfab8c17bcd0c2e970993783fe0d690c2c423d8bd24d709ef795bec4572d21980fab99dadf5065c9792c5287b3ea0a78415"
+      ],
+      "signatures": [
+        {
+          "e": [
+            "0x00000000000000000000000000000000b61d5d3df09656ccd83cb7c438e72e65",
+            "0x000000000000000000000000000000002d7dba97d6c295eb69194970e0b74a47"
+          ],
+          "s": [
+            "0x000000000000000000000000000000001837ecdd031377cbb4e9aed991c1e012",
+            "0x000000000000000000000000000000002ba8e46bcd8f11a06dca5a19e2f548fd"
+          ]
+        },
+        {
+          "e": [
+            "0x000000000000000000000000000000002f6a3db009262c460069a830cf9c3099",
+            "0x000000000000000000000000000000002e003df33e4361b315bf43d1ec380051"
+          ],
+          "s": [
+            "0x000000000000000000000000000000003cf6a05c66a8d0983f3979ce0c007b73",
+            "0x0000000000000000000000000000000014fe84e925d3d3d69e197025b06d7c1d"
+          ]
+        },
+        {
+          "e": [
+            "0x00000000000000000000000000000000b99dadf5065c9792c5287b3ea0a78415",
+            "0x0000000000000000000000000000000023d8bd24d709ef795bec4572d21980fa"
+          ],
+          "s": [
+            "0x00000000000000000000000000000000b8c17bcd0c2e970993783fe0d690c2c4",
+            "0x000000000000000000000000000000001f1dfc131b043c9f2644d05ddeaa1cfa"
+          ]
+        }
+      ],
+      "user_nonce": "0x0000000000000000000000000000000000000000000000000000000000000001",
+      "vk_hash": "0x2a8f1c0e9b7d6a5f4e3c2b1a09f8e7d6c5b4a39281706f5e4d3c2b1a09f8e7d6"
+    },
+    {
+      "expiry_block": 4294967295,
+      "inputs": [
+        "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+        "0x0000000000000000000000000000000000000000000000000000000000000007",
+        "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000"
+      ],
+      "inputs_hash": "0x1cc4d246af298e6bddac22a10699a33050785bafbf6d20e702cb94d673552e2e",
+      "message": "0x1a5be7fc194b3d1b223f79558959fa0b554740ce10a03b9f85009e52f1d7e0d1",
+      "message_preimage": [
+        "0x0000000000000000000000000000000000736964656361722e72656365697074",
+        "0x0f540a150949460914e2e47ecdccc9fd089a943233d42a6c7f0e10f25b5c0117",
+        "0x1cc4d246af298e6bddac22a10699a33050785bafbf6d20e702cb94d673552e2e",
+        "0x00000000000000000000000000000000000000000000000000000000ffffffff"
+      ],
+      "name": "field-sized values (p - 1), the largest u32 expiry",
+      "namespace": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+      "request_id": "0x0f540a150949460914e2e47ecdccc9fd089a943233d42a6c7f0e10f25b5c0117",
+      "signature_bytes": [
+        "0x084dcf4ac8ad9b49e4330f14603a20f7cbcf98e0dfc53ff4b8e5c5e1f54ea3a61e416d58256c03ed721294abcff58d2118ff22eecebbf8d880c53d86d8af8b6e",
+        "0x06bb7a052af3bc34e38f12a9f9d8f746c19d80f2f457e6e578df0f3afc6e817816ed52eedf2b30d16de468df4d1f846bb5ed0e3ec51d62319a879afa5279d0c7",
+        "0x14808800640f7bf84530635e8dc3ef717073a8fcb40504b835d2cf9647323e7a241a295e02e9397f5a940d666ab3528fabc3e16916693b60c6b4c4e2cc64bd85"
+      ],
+      "signatures": [
+        {
+          "e": [
+            "0x0000000000000000000000000000000018ff22eecebbf8d880c53d86d8af8b6e",
+            "0x000000000000000000000000000000001e416d58256c03ed721294abcff58d21"
+          ],
+          "s": [
+            "0x00000000000000000000000000000000cbcf98e0dfc53ff4b8e5c5e1f54ea3a6",
+            "0x00000000000000000000000000000000084dcf4ac8ad9b49e4330f14603a20f7"
+          ]
+        },
+        {
+          "e": [
+            "0x00000000000000000000000000000000b5ed0e3ec51d62319a879afa5279d0c7",
+            "0x0000000000000000000000000000000016ed52eedf2b30d16de468df4d1f846b"
+          ],
+          "s": [
+            "0x00000000000000000000000000000000c19d80f2f457e6e578df0f3afc6e8178",
+            "0x0000000000000000000000000000000006bb7a052af3bc34e38f12a9f9d8f746"
+          ]
+        },
+        {
+          "e": [
+            "0x00000000000000000000000000000000abc3e16916693b60c6b4c4e2cc64bd85",
+            "0x00000000000000000000000000000000241a295e02e9397f5a940d666ab3528f"
+          ],
+          "s": [
+            "0x000000000000000000000000000000007073a8fcb40504b835d2cf9647323e7a",
+            "0x0000000000000000000000000000000014808800640f7bf84530635e8dc3ef71"
+          ]
+        }
+      ],
+      "user_nonce": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000",
+      "vk_hash": "0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000000"
+    }
+  ]
+}

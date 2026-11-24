@@ -1,0 +1,15 @@
+[package]
+name = "pss_tip_test"
+type = "lib"
+compiler_version = ">=1.0.0"
+
+[dependencies]
+# aztec-nr v6.0.0 (TestEnvironment, capsules); deps/ is made by scripts/bootstrap.sh.
+aztec = { path = "../../deps/aztec-world/noir-projects/aztec-nr/aztec" }
+pss_public_contract = { path = "../pss_public_contract" }
+# the capsule type and slot the result and init functions load (ProofData, CAPSULE_SLOT_PROOF)
+pss_contract = { path = "../pss_contract" }
+# the secret-shared on-chain encoding (`tip::derived`, `tip::intake`) and the
+# key exchange the shared on-chain fixtures recompute
+pss_core = { path = "../pss_core" }
+pss_utils = { path = "../pss_utils" }

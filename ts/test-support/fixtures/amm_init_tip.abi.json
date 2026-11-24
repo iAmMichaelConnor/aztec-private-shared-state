@@ -1,0 +1,107 @@
+{
+ "noir_version": "1.0.0+275d3ab1a5c916c6ea73e8d6b943f685f574500c",
+ "abi": {
+  "abi_version": 1,
+  "parameters": [
+   {
+    "name": "namespace",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "public"
+   },
+   {
+    "name": "vk_hash",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "public"
+   },
+   {
+    "name": "out_slots",
+    "type": {
+     "kind": "array",
+     "length": 1,
+     "type": {
+      "kind": "field"
+     }
+    },
+    "visibility": "public"
+   },
+   {
+    "name": "rand_seed",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "r_new",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   },
+   {
+    "name": "nsk_app",
+    "type": {
+     "kind": "field"
+    },
+    "visibility": "private"
+   }
+  ],
+  "return_type": {
+   "abi_type": {
+    "kind": "struct",
+    "path": "pss_core::tip::outputs::Init",
+    "fields": [
+     {
+      "name": "request_id",
+      "type": {
+       "kind": "field"
+      }
+     },
+     {
+      "name": "old_c",
+      "type": {
+       "kind": "field"
+      }
+     },
+     {
+      "name": "new_c",
+      "type": {
+       "kind": "field"
+      }
+     },
+     {
+      "name": "npk_app_hash",
+      "type": {
+       "kind": "field"
+      }
+     },
+     {
+      "name": "new_hashes",
+      "type": {
+       "kind": "array",
+       "length": 0,
+       "type": {
+        "kind": "field"
+       }
+      }
+     }
+    ]
+   },
+   "visibility": "public"
+  },
+  "error_types": {
+   "12469291177396340830": {
+    "error_kind": "string",
+    "string": "call to assert_max_bit_size"
+   },
+   "14990209321349310352": {
+    "error_kind": "string",
+    "string": "attempt to add with overflow"
+   }
+  }
+ }
+}

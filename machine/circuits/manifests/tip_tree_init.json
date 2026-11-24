@@ -1,0 +1,21 @@
+{
+  "manifest": 1,
+  "circuit": "tip_tree_init",
+  "namespace_param": "namespace",
+  "state_keys": { "reads": 0, "writes": 1 },
+  "intake": "onchain",
+  "outcome": "none",
+  "binding": "turn",
+  "witness": [
+    { "param": "namespace", "from": { "PUBLIC": "$namespace" } },
+    { "param": "vk_hash",   "from": { "PUBLIC": "$vk_hash" } },
+    { "param": "out_slots", "from": { "PUBLIC": ["$state_keys.writes[0]"] } },
+    { "param": "total",     "from": { "PUBLIC": "total" } },
+    { "param": "r_new",     "from": { "SAMPLE": 1 } }
+  ],
+  "outputs": [ { "TACEO_store": "out0", "STORE": "$state_keys.writes[0]", "len": 3, "note_hash": "new_c" } ],
+  "state": { "$state_keys.writes[0]": "node" },
+  "tree": {
+    "$state_keys.writes[0]": { "depth": 16, "leaf_len": 3, "probe": 1, "header": true, "new_hashes": "new_hashes" }
+  }
+}

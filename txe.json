@@ -1,0 +1,50 @@
+{
+  "txe_profile": "hosted-v6",
+  "packages": [
+    "noir/pss_contract",
+    "noir/pss_public_contract",
+    "noir/pss_public_contract_test",
+    "noir/pss_tip_test",
+    "examples/amm/contract/amm_test",
+    "examples/monty-hall/contract/montyhall_test",
+    "examples/amm-tip/contract/amm_tip_test",
+    "examples/lending-tip/contract/lending_tip_test",
+    "examples/credits-tip/contract/credits_tip_test",
+    "examples/counter-tip/contract/counter_tip_test"
+  ],
+  "deploys": {
+    "noir/pss_public_contract_test": [
+      "noir/pss_public_contract_test"
+    ],
+    "examples/amm/contract/amm_test": [
+      "examples/amm/contract/amm"
+    ],
+    "examples/monty-hall/contract/montyhall_test": [
+      "examples/monty-hall/contract/montyhall"
+    ],
+    "examples/amm-tip/contract/amm_tip_test": [
+      "examples/amm-tip/contract/amm_tip",
+      "noir/pss_probe"
+    ],
+    "examples/lending-tip/contract/lending_tip_test": [
+      {
+        "path": "examples/lending-tip/contract/lending_tip",
+        "timeout_seconds": 1200
+      },
+      {
+        "path": "examples/lending-tip/contract/lending_tip_oblivious",
+        "timeout_seconds": 1200
+      },
+      "examples/lending-tip/contract/lending_oracle",
+      "examples/token/contract/token",
+      "noir/pss_probe"
+    ],
+    "examples/credits-tip/contract/credits_tip_test": [
+      "examples/credits-tip/contract/credits_tip"
+    ],
+    "examples/counter-tip/contract/counter_tip_test": [
+      "examples/counter-tip/contract/counter_tip"
+    ]
+  },
+  "test_timeout_seconds": 2700
+}
