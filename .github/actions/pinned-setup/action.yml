@@ -1,12 +1,12 @@
 # The setup every job that builds with the pinned toolchain runs after its
 # checkout: .tools restored from the toolchain job's cache (install-toolchain),
 # Rust, the job's Rust cache when it names one, the nargo git-dependency
-# cache, the CRS cache when asked, and scripts/bootstrap.sh.
+# cache, the CRS cache when asked, Node and scripts/bootstrap.sh.
 #
 # Every action is pinned to a commit; the comment names its release.
 
 name: pinned setup
-description: Restores the pinned tools, installs Rust, restores the caches and runs scripts/bootstrap.sh.
+description: Restores the pinned tools, installs Rust, restores the caches, installs Node and runs scripts/bootstrap.sh.
 
 inputs:
   tools-key:
@@ -57,6 +57,10 @@ runs:
           machine/data/bn254_g1.dat
           machine/data/bn254_g2.dat
         key: bn254-crs-32768
+    - if: inputs.bootstrap == 'true'
+      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0 (bootstrap.sh checks the major)
+      with:
+        node-version: "24"
     - if: inputs.bootstrap == 'true'
       shell: bash
       run: scripts/bootstrap.sh

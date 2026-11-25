@@ -316,7 +316,7 @@ Other notes:
   `.github/actions/install-toolchain` (`scripts/install-toolchain.sh` into `.tools`, cached
   per `toolchain.json`), and every job that builds with the pinned tools runs
   `.github/actions/pinned-setup` after its checkout (`.tools` from that cache, Rust, the
-  job's Rust cache, the nargo and CRS caches, `scripts/bootstrap.sh`).
+  job's Rust cache, the nargo and CRS caches, Node 24, `scripts/bootstrap.sh`).
 - The `toolchain` job also installs total-lint (`cargo install --git` at total-noir's
   pinned commit) into the cached `.tools`; nargo fetches total-noir's `total` library as a
   git dependency, kept between runs in the `~/nargo` cache.
