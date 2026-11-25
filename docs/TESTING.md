@@ -279,7 +279,7 @@ restore and the toolchain's setup add a minute or two.
 | ci | `noir-vectors`: `scripts/check-vectors.sh` | 1 | 0.9 | 15 |
 | ci | `contracts`: `scripts/check-contracts.sh <group>` | one per example with a contract package, plus `noir` and `machine` | lending-tip's the longest: `lending_tip`'s compile 4.5 and `lending_tip_oblivious`'s beside it, about as long (estimated: on the reference host it takes 0.8 of `lending_tip`'s); all of lending-tip in one job about 6 (estimated) | 20 |
 | ci | `rust-clippy`: `prepare-data.sh machine`, `cargo clippy --release --workspace --all-targets -D warnings` | 1 | clippy 2.3 | 20 |
-| ci | `rust-test`: `prepare-data.sh`, `gen-dev-certs.sh`, `cargo nextest run --release --profile quick` with Postgres | two package groups: `sidecar-orchestrator`, the rest | build 14.6 and 12.5, prepare-data 2.3, the tests under 1 | 30 |
+| ci | `rust-test`: the circuits `noir-circuits` compiled, `prepare-data.sh`, `gen-dev-certs.sh`, `cargo nextest run --release --profile quick` with Postgres | two package groups: `sidecar-orchestrator`, the rest | build 14.6 and 12.5, prepare-data 2.3, the tests under 1 | 30 |
 | ci | `typescript`: `npm run build`, `npm test` | 1 | a few (estimated) | 15 |
 | ci | `ci-passed`: fails unless every job above succeeded; the one check `main`'s branch protection requires | 1 | seconds | 5 |
 | nightly | `toolchain` and `shards` | 1 each | as in ci | 20, 5 |
@@ -290,8 +290,8 @@ restore and the toolchain's setup add a minute or two.
 
 How the shards are made:
 
-- `noir-circuits` uploads each directory's compiled circuits; `abi-fixtures` unpacks them
-  all (with the time of unpacking, so they are newer than its checkout) before
+- `noir-circuits` uploads each directory's compiled circuits; `abi-fixtures` and
+  `rust-test` unpack them all (with the time of unpacking, so they are newer than its checkout) before
   `fixtures.test.ts`.
 - `scripts/check-contracts.sh --list` prints its jobs; `shards` groups them by
   `examples/<name>` or by top directory. A group without `noir/pss_public_contract` or
