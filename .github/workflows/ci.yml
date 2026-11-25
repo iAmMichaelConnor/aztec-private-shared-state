@@ -339,3 +339,22 @@ jobs:
           set -euo pipefail
           source scripts/toolchain.sh
           npm test
+
+  ci-passed:
+    name: ci passed
+    # The one check main's branch protection requires: it fails when any job
+    # above failed or was cancelled, so the protection need not name each
+    # matrix shard.
+    if: always()
+    needs: [checks, toolchain, shards, noir-circuits, abi-fixtures, noir-vectors, contracts, rust-clippy, rust-test, typescript]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: every job succeeded
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "results: $RESULTS"
+          for r in $RESULTS; do
+            if [ "$r" != success ]; then exit 1; fi
+          done

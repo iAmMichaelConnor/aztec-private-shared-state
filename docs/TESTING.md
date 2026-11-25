@@ -281,6 +281,7 @@ restore and the toolchain's setup add a minute or two.
 | ci | `rust-clippy`: `prepare-data.sh machine`, `cargo clippy --release --workspace --all-targets -D warnings` | 1 | clippy 2.3 | 20 |
 | ci | `rust-test`: `prepare-data.sh`, `gen-dev-certs.sh`, `cargo nextest run --release --profile quick` with Postgres | two package groups: `sidecar-orchestrator`, the rest | build 14.6 and 12.5, prepare-data 2.3, the tests under 1 | 30 |
 | ci | `typescript`: `npm run build`, `npm test` | 1 | a few (estimated) | 15 |
+| ci | `ci-passed`: fails unless every job above succeeded; the one check `main`'s branch protection requires | 1 | seconds | 5 |
 | nightly | `toolchain` and `shards` | 1 each | as in ci | 20, 5 |
 | nightly | `txe`: `scripts/txe.sh --contracts --only <package> [--shard k/n]`, four test threads | one per test package of `txe.json`; `lending_tip_test` two | 0.3-4.4 per package; `lending_tip_test` whole about 19 (its two contracts side by side, about 4.5 each, estimated from `lending_tip`'s; its tests 14.2), so about 12 per shard | 25 |
 | nightly | `witness-extend`: `scripts/witness-extend.sh --shard k/n <example>` | amm-tip 1, lending-tip 2 | the checker's build 3.5, then about 8 s per fixture: amm-tip 17 fixtures, lending-tip 127 (17 whole, about 8.5 per shard) | 25 |
